@@ -1,0 +1,55 @@
+[gd_scene load_steps=3 format=3 uid="uid://bf72qg18hvqmp"]
+
+[ext_resource type="PackedScene" uid="uid://bi2rau283g2l6" path="res://dummy_agent.tscn" id="1_1hxmu"]
+
+[sub_resource type="GDScript" id="GDScript_r02d8"]
+resource_name = "main"
+script/source = "extends Node
+
+var dummy_agent_scene : PackedScene = preload(\"res://dummy_agent.tscn\")
+
+func _on_add_btn_pressed() -> void:
+	var d = dummy_agent_scene.instantiate()
+	add_child(d)
+
+
+func _on_remove_btn_pressed() -> void:
+	var removed = AgentManager.remove_agent()
+	
+	print(removed.agent_id)
+	
+	remove_child(removed)
+	removed.queue_free()
+"
+
+[node name="Main" type="Node"]
+script = SubResource("GDScript_r02d8")
+
+[node name="DummyAgent" parent="." instance=ExtResource("1_1hxmu")]
+position = Vector2(307, 147)
+
+[node name="Control" type="VBoxContainer" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -563.5
+offset_top = -119.0
+offset_right = 563.5
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="AddBtn" type="Button" parent="Control"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Add agent"
+
+[node name="RemoveBtn" type="Button" parent="Control"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Remove agent"
+
+[connection signal="pressed" from="Control/AddBtn" to="." method="_on_add_btn_pressed"]
+[connection signal="pressed" from="Control/RemoveBtn" to="." method="_on_remove_btn_pressed"]

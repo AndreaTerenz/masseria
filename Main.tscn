@@ -16,10 +16,9 @@ func _on_add_btn_pressed() -> void:
 func _on_remove_btn_pressed() -> void:
 	var removed = AgentManager.remove_agent()
 	
-	print(removed.agent_id)
-	
-	remove_child(removed)
-	removed.queue_free()
+	if removed:
+		remove_child(removed)
+		removed.queue_free()
 "
 
 [node name="Main" type="Node"]

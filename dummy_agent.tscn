@@ -10,11 +10,11 @@ texture_filter = 1
 texture = ExtResource("1_6xupl")
 script = ExtResource("2_u83cq")
 
-[node name="GreenHandPoint" type="Sprite2D" parent="."]
+[node name="LeftHand" type="Sprite2D" parent="."]
 position = Vector2(60, 2)
 texture = ExtResource("3_wi01w")
 
-[node name="GreenHandPoint2" type="Sprite2D" parent="."]
+[node name="RightHand" type="Sprite2D" parent="."]
 position = Vector2(-57, 2)
 texture = ExtResource("3_wi01w")
 

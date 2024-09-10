@@ -2,14 +2,18 @@ class_name Agent
 extends Node2D
 
 var agent_id : StringName = &"default"
+var possible_actions = [1, 1, 0, 0]
+
 var left_tween: Tween
 var right_tween: Tween
+
 
 func _ready() -> void:
 	add_to_group(&"Agents")
 	
 	position.x = randf_range(100., 500.)
 	position.y = randf_range(100., 500.)
+	possible_actions.shuffle()
 	
 	AgentManager.add_agent(self)
 	
@@ -20,3 +24,7 @@ func _ready() -> void:
 	right_tween = create_tween().set_loops()
 	right_tween.tween_property($RightHand, "rotation_degrees", -90, 0.5).from(0)
 	right_tween.tween_property($RightHand, "rotation_degrees", 0, 0.5).from(-90)
+	
+	
+func get_possible_actions():
+	return [possible_actions.find(1), possible_actions.rfind(1)]

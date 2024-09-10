@@ -4,6 +4,7 @@ signal new_agent(a: Agent)
 signal agent_removed(a: Agent)
 
 var agents_created = 0
+enum {ACTION_DOUGH, ACTION_TOPPING, ACTION_COOK, ACTION_SERVE}
 
 var agents : Array[Agent] = []
 
@@ -15,6 +16,8 @@ func add_agent(a: Agent):
 	agents_created += 1
 	
 	print("Added agent " + a.agent_id)
+	print("Agent " + a.agent_id + " can do actions " + str(a.get_possible_actions()[0]) + 
+			" and " + str(a.get_possible_actions()[1]))
 	
 func remove_agent(id := str(-1)):
 	if len(agents) == 0:

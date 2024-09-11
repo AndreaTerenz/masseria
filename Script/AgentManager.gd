@@ -2,6 +2,7 @@ extends Node
 
 signal new_agent(a: Agent)
 signal agent_removed(a: Agent)
+signal broadcast(id: StringName, data: Variant)
 
 var agents_created = 0
 enum {ACTION_DOUGH, ACTION_TOPPING, ACTION_COOK, ACTION_SERVE}
@@ -45,6 +46,9 @@ func remove_agent(id := str(-1)):
 	print("Removed agent " + str(id))
 	
 	return removed
+
+func send_broadcast(signal_id: StringName, signal_data = null):
+	broadcast.emit(signal_id, signal_data)
 
 # Deprecated
 func generate_agent_id():

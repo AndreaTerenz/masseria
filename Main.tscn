@@ -1,54 +1,143 @@
-[gd_scene load_steps=3 format=3 uid="uid://bf72qg18hvqmp"]
+[gd_scene load_steps=7 format=3 uid="uid://y03djfecm8p4"]
 
 [ext_resource type="PackedScene" uid="uid://bi2rau283g2l6" path="res://dummy_agent.tscn" id="1_1hxmu"]
+[ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="2_5qmts"]
+[ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="3_piqc7"]
 
-[sub_resource type="GDScript" id="GDScript_r02d8"]
-resource_name = "main"
-script/source = "extends Node
+[sub_resource type="GDScript" id="GDScript_i6dm0"]
+resource_name = "kitchen"
+script/source = "extends Node2D
 
-var dummy_agent_scene : PackedScene = preload(\"res://dummy_agent.tscn\")
-
-func _on_add_btn_pressed() -> void:
-	var d = dummy_agent_scene.instantiate()
-	add_child(d)
-
-
-func _on_remove_btn_pressed() -> void:
-	var removed = AgentManager.remove_agent()
+func _ready() -> void:
+	await get_tree().create_timer(5.0).timeout
 	
-	if removed:
-		remove_child(removed)
-		removed.queue_free()
+	AgentManager.send_broadcast(&\"PISELLARE\", 69)
 "
 
-[node name="Main" type="Node"]
-script = SubResource("GDScript_r02d8")
+[sub_resource type="Curve2D" id="Curve2D_obaid"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 384, 192, 0, 0, 0, 0, 768, 192, 0, 0, 0, 0, 832, 320, 0, 0, 0, 0, 768, 448, 0, 0, 0, 0, 384, 448, 0, 0, 0, 0, 320, 320, 0, 0, 0, 0, 384, 192)
+}
+point_count = 7
 
-[node name="DummyAgent" parent="." instance=ExtResource("1_1hxmu")]
-position = Vector2(307, 147)
+[sub_resource type="GDScript" id="GDScript_rn7af"]
+resource_name = "dummy"
+script/source = "extends Agent
 
-[node name="Control" type="VBoxContainer" parent="."]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -563.5
-offset_top = -119.0
-offset_right = 563.5
-grow_horizontal = 2
-grow_vertical = 0
-alignment = 1
+@export var idle_speed := 500.0
+@export var path : Path2D
 
-[node name="AddBtn" type="Button" parent="Control"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Add agent"
+var offset := 0.0
+var idle := true :
+	set(i):
+		idle = i
+		
+		if idle:
+			var curve_p := path.to_local(global_position)
+		
+			global_position = path.curve.get_closest_point(curve_p)
+			offset = path.curve.get_closest_offset(curve_p)
+		else:
+			var fridges := get_tree().get_nodes_in_group(\"Fridges\")
+			
+			var min_dist := INF
+			var closest = null
+			for fridge in fridges:
+				var d : float = fridge.global_position.distance_to(global_position)
+				
+				if d < min_dist:
+					min_dist = d
+					closest = fridge
+					
+			global_position = closest.global_position
+					
 
-[node name="RemoveBtn" type="Button" parent="Control"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Remove agent"
+func _ready() -> void:
+	super()
+	
+	idle = true
+	
+func _on_broadcast(id, val):
+	if id == &\"PISELLARE\":
+		idle = false
 
-[connection signal="pressed" from="Control/AddBtn" to="." method="_on_add_btn_pressed"]
-[connection signal="pressed" from="Control/RemoveBtn" to="." method="_on_remove_btn_pressed"]
+func _process(delta: float) -> void:
+	if not idle:
+		return
+	
+	offset += delta * idle_speed
+
+	global_position = path.to_global(path.curve.sample_baked(offset))
+	
+	if offset >= path.curve.get_baked_length():
+		offset = 0.
+"
+
+[node name="Kitchen" type="Node2D"]
+script = SubResource("GDScript_i6dm0")
+
+[node name="IdlePath" type="Path2D" parent="."]
+curve = SubResource("Curve2D_obaid")
+
+[node name="DummyAgent" parent="." node_paths=PackedStringArray("path") instance=ExtResource("1_1hxmu")]
+z_index = 10
+position = Vector2(896, 424)
+scale = Vector2(1, 1)
+script = SubResource("GDScript_rn7af")
+idle_speed = 500.0
+path = NodePath("../IdlePath")
+
+[node name="Oven" type="Sprite2D" parent="." groups=["Ovens"]]
+position = Vector2(64, 584)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("2_5qmts")
+
+[node name="Oven2" type="Sprite2D" parent="." groups=["Ovens"]]
+position = Vector2(192, 584)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("2_5qmts")
+
+[node name="Oven3" type="Sprite2D" parent="." groups=["Ovens"]]
+position = Vector2(960, 584)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("2_5qmts")
+
+[node name="Oven4" type="Sprite2D" parent="." groups=["Ovens"]]
+position = Vector2(1088, 584)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("2_5qmts")
+
+[node name="Table" type="Sprite2D" parent="." groups=["Table"]]
+position = Vector2(512, 320)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("2_5qmts")
+
+[node name="Table2" type="Sprite2D" parent="." groups=["Table"]]
+position = Vector2(640, 320)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("2_5qmts")
+
+[node name="Table3" type="Sprite2D" parent="." groups=["Table"]]
+position = Vector2(512, 584)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("2_5qmts")
+
+[node name="Table4" type="Sprite2D" parent="." groups=["Table"]]
+position = Vector2(640, 584)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("2_5qmts")
+
+[node name="Fridge" type="Sprite2D" parent="." groups=["Fridges"]]
+position = Vector2(1088, 128)
+scale = Vector2(1.6, 3.2)
+texture = ExtResource("2_5qmts")
+
+[node name="DoughFridge" type="Sprite2D" parent="." groups=["Fridges"]]
+position = Vector2(64, 128)
+scale = Vector2(1.6, 3.2)
+texture = ExtResource("2_5qmts")
+
+[node name="Exit" type="Sprite2D" parent="."]
+position = Vector2(576, 16)
+scale = Vector2(3.2, 0.4)
+texture = ExtResource("3_piqc7")

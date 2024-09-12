@@ -22,3 +22,11 @@ texture = ExtResource("3_wi01w")
 [node name="FaceH" type="Sprite2D" parent="."]
 position = Vector2(1, 2)
 texture = ExtResource("4_oaehy")
+
+[node name="Progress" type="ProgressBar" parent="."]
+visible = false
+modulate = Color(0, 0.784314, 0, 1)
+offset_left = -70.0
+offset_top = -82.0
+offset_right = 70.0
+offset_bottom = -55.0

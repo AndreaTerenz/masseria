@@ -1,0 +1,39 @@
+[gd_resource type="BehaviorTree" load_steps=8 format=3 uid="uid://bv6csbkmtc48m"]
+
+[sub_resource type="BlackboardPlan" id="BlackboardPlan_b644n"]
+var/idle/name = &"idle"
+var/idle/type = 1
+var/idle/value = false
+var/idle/hint = 0
+var/idle/hint_string = ""
+
+[sub_resource type="BBVariant" id="BBVariant_lx0yt"]
+type = 1
+saved_value = false
+resource_name = "false"
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_0uv5u"]
+variable = &"idle"
+value = SubResource("BBVariant_lx0yt")
+
+[sub_resource type="BBVariant" id="BBVariant_ouhoi"]
+type = 21
+saved_value = &"Fridges"
+resource_name = "Fridges"
+
+[sub_resource type="BBNode" id="BBNode_6djbo"]
+saved_value = NodePath("DummyAgent")
+resource_name = "DummyAgent"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_o33dm"]
+node = SubResource("BBNode_6djbo")
+method = &"go_to_closest_of"
+args = Array[BBVariant]([SubResource("BBVariant_ouhoi")])
+
+[sub_resource type="BTSequence" id="BTSequence_s6ml5"]
+custom_name = "Root"
+children = [SubResource("BTCheckVar_0uv5u"), SubResource("BTCallMethod_o33dm")]
+
+[resource]
+blackboard_plan = SubResource("BlackboardPlan_b644n")
+root_task = SubResource("BTSequence_s6ml5")

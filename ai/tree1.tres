@@ -1,39 +1,167 @@
-[gd_resource type="BehaviorTree" load_steps=8 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=38 format=3 uid="uid://bv6csbkmtc48m"]
+
+[ext_resource type="Script" path="res://ai/tasks/IdleStep.gd" id="1_3itpa"]
+[ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_rg1dp"]
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_b644n"]
 var/idle/name = &"idle"
 var/idle/type = 1
-var/idle/value = false
+var/idle/value = true
 var/idle/hint = 0
 var/idle/hint_string = ""
+var/state/name = &"state"
+var/state/type = 2
+var/state/value = 0
+var/state/hint = 2
+var/state/hint_string = "IDLE,FRIDGE,OVEN,TABLE"
+
+[sub_resource type="BBVariant" id="BBVariant_ty8ke"]
+type = 2
+saved_value = 0
+resource_name = "0"
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_tprwf"]
+variable = &"state"
+value = SubResource("BBVariant_ty8ke")
+custom_name = "check_idle"
+
+[sub_resource type="BTAction" id="BTAction_pqujm"]
+script = ExtResource("1_3itpa")
+
+[sub_resource type="BTSequence" id="BTSequence_07s6a"]
+custom_name = "Idle"
+children = [SubResource("BTCheckVar_tprwf"), SubResource("BTAction_pqujm")]
 
 [sub_resource type="BBVariant" id="BBVariant_lx0yt"]
-type = 1
-saved_value = false
-resource_name = "false"
+type = 2
+saved_value = 1
+resource_name = "1"
 
 [sub_resource type="BTCheckVar" id="BTCheckVar_0uv5u"]
-variable = &"idle"
+variable = &"state"
 value = SubResource("BBVariant_lx0yt")
+custom_name = "check_fridge"
 
-[sub_resource type="BBVariant" id="BBVariant_ouhoi"]
-type = 21
-saved_value = &"Fridges"
-resource_name = "Fridges"
+[sub_resource type="BTAction" id="BTAction_u26pg"]
+script = ExtResource("1_rg1dp")
+target_group = &"Fridges"
 
-[sub_resource type="BBNode" id="BBNode_6djbo"]
-saved_value = NodePath("DummyAgent")
-resource_name = "DummyAgent"
+[sub_resource type="BTWait" id="BTWait_3qkw8"]
+duration = 2.0
 
-[sub_resource type="BTCallMethod" id="BTCallMethod_o33dm"]
-node = SubResource("BBNode_6djbo")
-method = &"go_to_closest_of"
-args = Array[BBVariant]([SubResource("BBVariant_ouhoi")])
+[sub_resource type="BBVariant" id="BBVariant_vcbmj"]
+type = 2
+saved_value = 1
+resource_name = "1"
+
+[sub_resource type="BTSetVar" id="BTSetVar_i5e1p"]
+variable = &"state"
+value = SubResource("BBVariant_vcbmj")
+operation = 1
 
 [sub_resource type="BTSequence" id="BTSequence_s6ml5"]
-custom_name = "Root"
-children = [SubResource("BTCheckVar_0uv5u"), SubResource("BTCallMethod_o33dm")]
+custom_name = "Fridge"
+children = [SubResource("BTCheckVar_0uv5u"), SubResource("BTAction_u26pg"), SubResource("BTWait_3qkw8"), SubResource("BTSetVar_i5e1p")]
+
+[sub_resource type="BBVariant" id="BBVariant_8nf1a"]
+type = 2
+saved_value = 2
+resource_name = "2"
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_gnb4p"]
+variable = &"state"
+value = SubResource("BBVariant_8nf1a")
+custom_name = "check_table"
+
+[sub_resource type="BTAction" id="BTAction_mjyu7"]
+script = ExtResource("1_rg1dp")
+target_group = &"Tables"
+
+[sub_resource type="BTWait" id="BTWait_iq4t6"]
+duration = 2.0
+
+[sub_resource type="BBVariant" id="BBVariant_mnm42"]
+type = 2
+saved_value = 1
+resource_name = "1"
+
+[sub_resource type="BTSetVar" id="BTSetVar_mkboo"]
+variable = &"state"
+value = SubResource("BBVariant_mnm42")
+operation = 1
+
+[sub_resource type="BTSequence" id="BTSequence_oivck"]
+custom_name = "Table"
+children = [SubResource("BTCheckVar_gnb4p"), SubResource("BTAction_mjyu7"), SubResource("BTWait_iq4t6"), SubResource("BTSetVar_mkboo")]
+
+[sub_resource type="BBVariant" id="BBVariant_8rhvh"]
+type = 2
+saved_value = 3
+resource_name = "3"
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_ph7rp"]
+variable = &"state"
+value = SubResource("BBVariant_8rhvh")
+custom_name = "check_oven"
+
+[sub_resource type="BTAction" id="BTAction_gwq51"]
+script = ExtResource("1_rg1dp")
+target_group = &"Ovens"
+
+[sub_resource type="BTWait" id="BTWait_d2o36"]
+duration = 2.0
+
+[sub_resource type="BBVariant" id="BBVariant_po2mw"]
+type = 2
+saved_value = 1
+resource_name = "1"
+
+[sub_resource type="BTSetVar" id="BTSetVar_glmvc"]
+variable = &"state"
+value = SubResource("BBVariant_po2mw")
+operation = 1
+
+[sub_resource type="BTSequence" id="BTSequence_kkgit"]
+custom_name = "Oven"
+children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_gwq51"), SubResource("BTWait_d2o36"), SubResource("BTSetVar_glmvc")]
+
+[sub_resource type="BBVariant" id="BBVariant_nv65k"]
+type = 2
+saved_value = 4
+resource_name = "4"
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_81jxt"]
+variable = &"state"
+value = SubResource("BBVariant_nv65k")
+custom_name = "check_exit"
+
+[sub_resource type="BTAction" id="BTAction_h6van"]
+script = ExtResource("1_rg1dp")
+target_group = &"Exit"
+
+[sub_resource type="BTWait" id="BTWait_fvqci"]
+duration = 2.0
+
+[sub_resource type="BBVariant" id="BBVariant_thb2b"]
+type = 2
+saved_value = 0
+resource_name = "0"
+
+[sub_resource type="BTSetVar" id="BTSetVar_cdyo3"]
+variable = &"state"
+value = SubResource("BBVariant_thb2b")
+
+[sub_resource type="BTAction" id="BTAction_chsio"]
+script = ExtResource("1_rg1dp")
+target_group = &""
+
+[sub_resource type="BTSequence" id="BTSequence_pld4j"]
+custom_name = "Exit"
+children = [SubResource("BTCheckVar_81jxt"), SubResource("BTAction_h6van"), SubResource("BTWait_fvqci"), SubResource("BTSetVar_cdyo3"), SubResource("BTAction_chsio")]
+
+[sub_resource type="BTSelector" id="BTSelector_0xbrx"]
+children = [SubResource("BTSequence_07s6a"), SubResource("BTSequence_s6ml5"), SubResource("BTSequence_oivck"), SubResource("BTSequence_kkgit"), SubResource("BTSequence_pld4j")]
 
 [resource]
 blackboard_plan = SubResource("BlackboardPlan_b644n")
-root_task = SubResource("BTSequence_s6ml5")
+root_task = SubResource("BTSelector_0xbrx")

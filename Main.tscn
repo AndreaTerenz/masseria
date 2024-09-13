@@ -9,9 +9,7 @@
 resource_name = "kitchen"
 script/source = "extends Node2D
 
-func _ready() -> void:
-	await get_tree().create_timer(1.0).timeout
-	
+func _on_button_pressed() -> void:
 	AgentManager.send_broadcast(&\"PISELLARE\", 69)
 "
 
@@ -39,66 +37,29 @@ enum STATE {
 }
 
 var offset := 0.0
-var idle : bool :
+var state : int : 
 	get:
-		return bt_player.blackboard.get_var(\"idle\", true)
-	set(i):
-		bt_player.blackboard.set_var(\"idle\", i)
+		return bt_player.blackboard.get_var(\"state\", 0)
+	set(s):
+		if state == s:
+			return
+			
+		bt_player.blackboard.set_var(\"state\", s)
 		
-		if i:
-			go_idle()
+			
 var target_position := Vector2.ZERO
 
 func _ready() -> void:
 	super()
 	
-	idle = true
+	state = STATE.IDLE
 	
 func _on_broadcast(id, val):
 	if id == &\"PISELLARE\":
-		idle = false
-		
-		bt_player.update(0.0)
-		
-func _process(delta: float) -> void:
-	if idle:
-		offset += delta * mov_speed
-
-		global_position = path.to_global(path.curve.sample_baked(offset))
-		
-		if offset >= path.curve.get_baked_length():
-			offset = 0.
-		return
-		
-	global_position = global_position.move_toward(target_position, delta * mov_speed)
-		
-func go_idle():
-	var curve_p := path.to_local(global_position)
-		
-	global_position = path.curve.get_closest_point(curve_p)
-	offset = path.curve.get_closest_offset(curve_p)
-
-func go_to_closest_of(group: StringName):
-	var fridges := get_tree().get_nodes_in_group(group)
-			
-	var min_dist := INF
-	var closest = null
-	for fridge in fridges:
-		var d : float = fridge.global_position.distance_to(global_position)
-		
-		if d < min_dist:
-			min_dist = d
-			closest = fridge
-			
-	target_position = closest.global_position
+		state = STATE.FRIDGE
 "
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_j72xp"]
-var/idle/name = &"idle"
-var/idle/type = 1
-var/idle/value = true
-var/idle/hint = 0
-var/idle/hint_string = ""
 
 [node name="Kitchen" type="Node2D"]
 script = SubResource("GDScript_i6dm0")
@@ -111,12 +72,11 @@ z_index = 10
 position = Vector2(896, 424)
 scale = Vector2(1, 1)
 script = SubResource("GDScript_rn7af")
-mov_speed = 500.0
+mov_speed = 200.0
 path = NodePath("../IdlePath")
 
 [node name="BTPlayer" type="BTPlayer" parent="DummyAgent"]
 behavior_tree = ExtResource("3_2iei4")
-update_mode = 2
 blackboard_plan = SubResource("BlackboardPlan_j72xp")
 
 [node name="Oven" type="Sprite2D" parent="." groups=["Ovens"]]
@@ -169,7 +129,18 @@ position = Vector2(64, 128)
 scale = Vector2(1.6, 3.2)
 texture = ExtResource("2_5qmts")
 
-[node name="Exit" type="Sprite2D" parent="."]
+[node name="Exit" type="Sprite2D" parent="." groups=["Exit"]]
 position = Vector2(576, 16)
 scale = Vector2(3.2, 0.4)
 texture = ExtResource("3_piqc7")
+
+[node name="Button" type="Button" parent="."]
+offset_left = 8.0
+offset_top = 296.0
+offset_right = 153.0
+offset_bottom = 343.0
+pivot_offset = Vector2(0, 16)
+theme_override_font_sizes/font_size = 28
+text = "New pizza"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

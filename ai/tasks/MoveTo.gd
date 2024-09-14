@@ -19,6 +19,7 @@ var group_valid: bool :
 		return agent.get_tree().has_group(target_group) if agent else false
 
 var target : Vector2
+var to_oven := false
 var path : Path2D
 
 # Called to generate a display name for the task (requires @tool).
@@ -33,14 +34,15 @@ func _setup() -> void:
 # Called when the task is entered.
 func _enter() -> void:
 	if group_valid:
-		target = get_closest_of(target_group)
+		var tmp : Node2D = get_closest_of(target_group)
+		target = tmp.global_position
+		
+		# UGLYY :3:3:3:3:3 OWO
+		if target_group == &"Ovens":
+			blackboard.set_var(&"current_oven", tmp)
+			print(blackboard.get_var(&"current_oven"))
 	else:
 		target = get_closest_path_point()
-
-
-# Called when the task is exited.
-func _exit() -> void:
-	pass
 
 
 # Called each time this task is ticked (aka executed).
@@ -67,7 +69,7 @@ func get_closest_of(group: StringName):
 			min_dist = d
 			closest = fridge
 			
-	return closest.global_position
+	return closest
 
 func get_closest_path_point():
 	var curve_p := path.to_local(here)

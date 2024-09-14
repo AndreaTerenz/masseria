@@ -1,7 +1,8 @@
-[gd_resource type="BehaviorTree" load_steps=38 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=41 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/IdleStep.gd" id="1_3itpa"]
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_rg1dp"]
+[ext_resource type="Script" path="res://ai/tasks/AwaitSignal.gd" id="2_jmokk"]
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_b644n"]
 var/idle/name = &"idle"
@@ -14,23 +15,10 @@ var/state/type = 2
 var/state/value = 0
 var/state/hint = 2
 var/state/hint_string = "IDLE,FRIDGE,OVEN,TABLE"
-
-[sub_resource type="BBVariant" id="BBVariant_ty8ke"]
-type = 2
-saved_value = 0
-resource_name = "0"
-
-[sub_resource type="BTCheckVar" id="BTCheckVar_tprwf"]
-variable = &"state"
-value = SubResource("BBVariant_ty8ke")
-custom_name = "check_idle"
-
-[sub_resource type="BTAction" id="BTAction_pqujm"]
-script = ExtResource("1_3itpa")
-
-[sub_resource type="BTSequence" id="BTSequence_07s6a"]
-custom_name = "Idle"
-children = [SubResource("BTCheckVar_tprwf"), SubResource("BTAction_pqujm")]
+var/current_oven/name = &"current_oven"
+var/current_oven/type = 24
+var/current_oven/hint = 34
+var/current_oven/hint_string = ""
 
 [sub_resource type="BBVariant" id="BBVariant_lx0yt"]
 type = 2
@@ -108,8 +96,29 @@ custom_name = "check_oven"
 script = ExtResource("1_rg1dp")
 target_group = &"Ovens"
 
-[sub_resource type="BTWait" id="BTWait_d2o36"]
-duration = 2.0
+[sub_resource type="BBNode" id="BBNode_icqe1"]
+value_source = 1
+variable = &"current_oven"
+resource_name = "$current_oven"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_vxfxm"]
+node = SubResource("BBNode_icqe1")
+method = &"start"
+
+[sub_resource type="BBStringName" id="BBStringName_8rr5f"]
+saved_value = &"done"
+resource_name = "done"
+
+[sub_resource type="BBNode" id="BBNode_pn1df"]
+value_source = 1
+variable = &"current_oven"
+resource_name = "$current_oven"
+
+[sub_resource type="BTAction" id="BTAction_xjdal"]
+custom_name = "Await oven done"
+script = ExtResource("2_jmokk")
+signal_source = SubResource("BBNode_pn1df")
+signal_name = SubResource("BBStringName_8rr5f")
 
 [sub_resource type="BBVariant" id="BBVariant_po2mw"]
 type = 2
@@ -123,7 +132,7 @@ operation = 1
 
 [sub_resource type="BTSequence" id="BTSequence_kkgit"]
 custom_name = "Oven"
-children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_gwq51"), SubResource("BTWait_d2o36"), SubResource("BTSetVar_glmvc")]
+children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTAction_xjdal"), SubResource("BTSetVar_glmvc")]
 
 [sub_resource type="BBVariant" id="BBVariant_nv65k"]
 type = 2
@@ -159,8 +168,14 @@ target_group = &""
 custom_name = "Exit"
 children = [SubResource("BTCheckVar_81jxt"), SubResource("BTAction_h6van"), SubResource("BTWait_fvqci"), SubResource("BTSetVar_cdyo3"), SubResource("BTAction_chsio")]
 
+[sub_resource type="BTComment" id="BTComment_uc4cq"]
+custom_name = "If all above fail, step along idle path"
+
+[sub_resource type="BTAction" id="BTAction_pqujm"]
+script = ExtResource("1_3itpa")
+
 [sub_resource type="BTSelector" id="BTSelector_0xbrx"]
-children = [SubResource("BTSequence_07s6a"), SubResource("BTSequence_s6ml5"), SubResource("BTSequence_oivck"), SubResource("BTSequence_kkgit"), SubResource("BTSequence_pld4j")]
+children = [SubResource("BTSequence_s6ml5"), SubResource("BTSequence_oivck"), SubResource("BTSequence_kkgit"), SubResource("BTSequence_pld4j"), SubResource("BTComment_uc4cq"), SubResource("BTAction_pqujm")]
 
 [resource]
 blackboard_plan = SubResource("BlackboardPlan_b644n")

@@ -1,13 +1,16 @@
-[gd_scene load_steps=9 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=10 format=3 uid="uid://y03djfecm8p4"]
 
 [ext_resource type="PackedScene" uid="uid://bi2rau283g2l6" path="res://dummy_agent.tscn" id="1_1hxmu"]
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="2_5qmts"]
 [ext_resource type="BehaviorTree" uid="uid://bv6csbkmtc48m" path="res://ai/tree1.tres" id="3_2iei4"]
+[ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://KitchenThings/oven.tscn" id="3_6da2g"]
 [ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="3_piqc7"]
 
 [sub_resource type="GDScript" id="GDScript_i6dm0"]
 resource_name = "kitchen"
 script/source = "extends Node2D
+
+var jobs := []
 
 func _on_button_pressed() -> void:
 	AgentManager.send_broadcast(&\"PISELLARE\", 69)
@@ -36,21 +39,15 @@ enum STATE {
 	BREAK
 }
 
-var offset := 0.0
-var state : int : 
-	get:
-		return bt_player.blackboard.get_var(\"state\", 0)
+var state := STATE.IDLE :
 	set(s):
-		if state == s:
-			return
-			
-		bt_player.blackboard.set_var(\"state\", s)
-		
-			
-var target_position := Vector2.ZERO
+		print(s)
+		state = s
 
 func _ready() -> void:
 	super()
+	
+	bt_player.blackboard.bind_var_to_property(&\"state\", self, &\"state\")
 	
 	state = STATE.IDLE
 	
@@ -79,25 +76,17 @@ path = NodePath("../IdlePath")
 behavior_tree = ExtResource("3_2iei4")
 blackboard_plan = SubResource("BlackboardPlan_j72xp")
 
-[node name="Oven" type="Sprite2D" parent="." groups=["Ovens"]]
+[node name="Oven" parent="." instance=ExtResource("3_6da2g")]
 position = Vector2(64, 584)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
 
-[node name="Oven2" type="Sprite2D" parent="." groups=["Ovens"]]
+[node name="Oven2" parent="." instance=ExtResource("3_6da2g")]
 position = Vector2(192, 584)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
 
-[node name="Oven3" type="Sprite2D" parent="." groups=["Ovens"]]
+[node name="Oven3" parent="." instance=ExtResource("3_6da2g")]
 position = Vector2(960, 584)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
 
-[node name="Oven4" type="Sprite2D" parent="." groups=["Ovens"]]
+[node name="Oven4" parent="." instance=ExtResource("3_6da2g")]
 position = Vector2(1088, 584)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
 
 [node name="Table" type="Sprite2D" parent="." groups=["Tables"]]
 position = Vector2(512, 320)

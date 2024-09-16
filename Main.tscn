@@ -34,8 +34,10 @@ script/source = "extends Agent
 enum STATE {
 	IDLE,
 	FRIDGE,
-	OVEN,
 	TABLE,
+	OVEN,
+	SERVING,
+	WAITING,
 	BREAK
 }
 
@@ -47,13 +49,31 @@ var state := STATE.IDLE :
 func _ready() -> void:
 	super()
 	
+	print(\"Setting all possible actions to TRUE for debug\")
+	possible_actions = [true, true, true, true]
+	
+	bt_player.blackboard.set_var(&\"PASTAMAN\", possible_actions[0])
+	bt_player.blackboard.set_var(&\"DECORATOR\", possible_actions[1])
+	bt_player.blackboard.set_var(&\"COOK\", possible_actions[2])
+	bt_player.blackboard.set_var(&\"WAITER\", possible_actions[3])
+	
 	bt_player.blackboard.bind_var_to_property(&\"state\", self, &\"state\")
 	
 	state = STATE.IDLE
 	
 func _on_broadcast(id, val):
-	if id == &\"PISELLARE\":
+	if id == &\"PISELLARE\" and possible_actions[0] and state == STATE.IDLE:
 		state = STATE.FRIDGE
+		bt_player.blackboard.set_var(&\"current_action\", 0)
+		
+func _on_direct_signal(id, val):
+	if state == STATE.WAITING:
+		state = STATE.IDLE
+		bt_player.blackboard.set_var(&\"current_action\", -1)
+	
+func _process(delta):
+	if state == STATE.WAITING:
+		rotation_degrees += 1
 "
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_j72xp"]

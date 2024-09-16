@@ -2,7 +2,7 @@ class_name Agent
 extends Node2D
 
 var agent_id : StringName = &"default"
-var possible_actions = [1, 1, 0, 0]
+var possible_actions = [true, true, false, false]
 
 
 func _ready() -> void:
@@ -28,7 +28,7 @@ func _ready() -> void:
 	
 	
 func get_possible_actions():
-	return [possible_actions.find(1), possible_actions.rfind(1)]
+	return [possible_actions.find(true), possible_actions.rfind(true)]
 
 func _on_broadcast(id: StringName, data: Variant):
 	pass

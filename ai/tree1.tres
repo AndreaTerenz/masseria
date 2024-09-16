@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=41 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=76 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/IdleStep.gd" id="1_3itpa"]
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_rg1dp"]
@@ -19,6 +19,31 @@ var/current_oven/name = &"current_oven"
 var/current_oven/type = 24
 var/current_oven/hint = 34
 var/current_oven/hint_string = ""
+var/PASTAMAN/name = &"PASTAMAN"
+var/PASTAMAN/type = 1
+var/PASTAMAN/value = false
+var/PASTAMAN/hint = 0
+var/PASTAMAN/hint_string = "Can do action 1"
+var/DECORATOR/name = &"DECORATOR"
+var/DECORATOR/type = 1
+var/DECORATOR/value = false
+var/DECORATOR/hint = 0
+var/DECORATOR/hint_string = "Can do action 2"
+var/COOK/name = &"COOK"
+var/COOK/type = 1
+var/COOK/value = false
+var/COOK/hint = 0
+var/COOK/hint_string = "Can do action 3"
+var/WAITER/name = &"WAITER"
+var/WAITER/type = 1
+var/WAITER/value = false
+var/WAITER/hint = 0
+var/WAITER/hint_string = "Can do action 4"
+var/current_action/name = &"current_action"
+var/current_action/type = 2
+var/current_action/value = 0
+var/current_action/hint = 2
+var/current_action/hint_string = "DOUGH, DECORATE, COOK, SERVE"
 
 [sub_resource type="BBVariant" id="BBVariant_lx0yt"]
 type = 2
@@ -68,6 +93,57 @@ target_group = &"Tables"
 [sub_resource type="BTWait" id="BTWait_iq4t6"]
 duration = 2.0
 
+[sub_resource type="BBVariant" id="BBVariant_144rj"]
+type = 2
+saved_value = 0
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_nh4ie"]
+variable = &"current_action"
+value = SubResource("BBVariant_144rj")
+custom_name = "check_action"
+
+[sub_resource type="BBVariant" id="BBVariant_m2iry"]
+type = 1
+saved_value = true
+resource_name = "true"
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_t4lcr"]
+variable = &"DECORATOR"
+value = SubResource("BBVariant_m2iry")
+
+[sub_resource type="BBVariant" id="BBVariant_6thvt"]
+type = 2
+saved_value = 1
+resource_name = "1"
+
+[sub_resource type="BTSetVar" id="BTSetVar_rti7h"]
+variable = &"state"
+value = SubResource("BBVariant_6thvt")
+operation = 2
+
+[sub_resource type="BBVariant" id="BBVariant_88cyc"]
+type = 2
+saved_value = 1
+resource_name = "1"
+
+[sub_resource type="BTSetVar" id="BTSetVar_a7c04"]
+variable = &"current_action"
+value = SubResource("BBVariant_88cyc")
+operation = 1
+
+[sub_resource type="BTSequence" id="BTSequence_r6qdd"]
+custom_name = "Next Action (Loop)"
+children = [SubResource("BTCheckVar_nh4ie"), SubResource("BTCheckVar_t4lcr"), SubResource("BTSetVar_rti7h"), SubResource("BTSetVar_a7c04")]
+
+[sub_resource type="BBVariant" id="BBVariant_3b7j7"]
+type = 1
+saved_value = true
+resource_name = "true"
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_ee4nm"]
+variable = &"COOK"
+value = SubResource("BBVariant_3b7j7")
+
 [sub_resource type="BBVariant" id="BBVariant_mnm42"]
 type = 2
 saved_value = 1
@@ -78,9 +154,36 @@ variable = &"state"
 value = SubResource("BBVariant_mnm42")
 operation = 1
 
+[sub_resource type="BBVariant" id="BBVariant_g22ug"]
+type = 2
+saved_value = 1
+resource_name = "1"
+
+[sub_resource type="BTSetVar" id="BTSetVar_ccj2f"]
+variable = &"current_action"
+value = SubResource("BBVariant_g22ug")
+operation = 1
+
+[sub_resource type="BTSequence" id="BTSequence_yq4e6"]
+custom_name = "Next Action"
+children = [SubResource("BTCheckVar_ee4nm"), SubResource("BTSetVar_mkboo"), SubResource("BTSetVar_ccj2f")]
+
+[sub_resource type="BBVariant" id="BBVariant_cm4oh"]
+type = 2
+saved_value = 5
+resource_name = "5"
+
+[sub_resource type="BTSetVar" id="BTSetVar_wtd0o"]
+variable = &"state"
+value = SubResource("BBVariant_cm4oh")
+custom_name = "Set state to WAITING (5)"
+
+[sub_resource type="BTSelector" id="BTSelector_7dx6t"]
+children = [SubResource("BTSequence_r6qdd"), SubResource("BTSequence_yq4e6"), SubResource("BTSetVar_wtd0o")]
+
 [sub_resource type="BTSequence" id="BTSequence_oivck"]
 custom_name = "Table"
-children = [SubResource("BTCheckVar_gnb4p"), SubResource("BTAction_mjyu7"), SubResource("BTWait_iq4t6"), SubResource("BTSetVar_mkboo")]
+children = [SubResource("BTCheckVar_gnb4p"), SubResource("BTAction_mjyu7"), SubResource("BTWait_iq4t6"), SubResource("BTSelector_7dx6t")]
 
 [sub_resource type="BBVariant" id="BBVariant_8rhvh"]
 type = 2
@@ -120,19 +223,55 @@ script = ExtResource("2_jmokk")
 signal_source = SubResource("BBNode_pn1df")
 signal_name = SubResource("BBStringName_8rr5f")
 
-[sub_resource type="BBVariant" id="BBVariant_po2mw"]
+[sub_resource type="BBVariant" id="BBVariant_wtxsn"]
+type = 1
+saved_value = true
+resource_name = "true"
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_av6bp"]
+variable = &"WAITER"
+value = SubResource("BBVariant_wtxsn")
+
+[sub_resource type="BBVariant" id="BBVariant_3tu3l"]
 type = 2
 saved_value = 1
 resource_name = "1"
 
-[sub_resource type="BTSetVar" id="BTSetVar_glmvc"]
+[sub_resource type="BTSetVar" id="BTSetVar_b0lhy"]
 variable = &"state"
-value = SubResource("BBVariant_po2mw")
+value = SubResource("BBVariant_3tu3l")
 operation = 1
+
+[sub_resource type="BBVariant" id="BBVariant_ygdtu"]
+type = 2
+saved_value = 1
+resource_name = "1"
+
+[sub_resource type="BTSetVar" id="BTSetVar_to0ag"]
+variable = &"current_action"
+value = SubResource("BBVariant_ygdtu")
+operation = 1
+
+[sub_resource type="BTSequence" id="BTSequence_82x4c"]
+custom_name = "Next Action"
+children = [SubResource("BTCheckVar_av6bp"), SubResource("BTSetVar_b0lhy"), SubResource("BTSetVar_to0ag")]
+
+[sub_resource type="BBVariant" id="BBVariant_soagi"]
+type = 2
+saved_value = 5
+resource_name = "5"
+
+[sub_resource type="BTSetVar" id="BTSetVar_e2cph"]
+variable = &"state"
+value = SubResource("BBVariant_soagi")
+custom_name = "Set state to WAITING (5)"
+
+[sub_resource type="BTSelector" id="BTSelector_skyrv"]
+children = [SubResource("BTSequence_82x4c"), SubResource("BTSetVar_e2cph")]
 
 [sub_resource type="BTSequence" id="BTSequence_kkgit"]
 custom_name = "Oven"
-children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTAction_xjdal"), SubResource("BTSetVar_glmvc")]
+children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTAction_xjdal"), SubResource("BTSelector_skyrv")]
 
 [sub_resource type="BBVariant" id="BBVariant_nv65k"]
 type = 2
@@ -148,8 +287,28 @@ custom_name = "check_exit"
 script = ExtResource("1_rg1dp")
 target_group = &"Exit"
 
+[sub_resource type="BBVariant" id="BBVariant_hwmta"]
+type = 1
+saved_value = false
+resource_name = "false"
+
+[sub_resource type="BTSetAgentProperty" id="BTSetAgentProperty_5bhwn"]
+property = &"visible"
+value = SubResource("BBVariant_hwmta")
+custom_name = "Hide Agent"
+
 [sub_resource type="BTWait" id="BTWait_fvqci"]
 duration = 2.0
+
+[sub_resource type="BBVariant" id="BBVariant_2yhbo"]
+type = 1
+saved_value = true
+resource_name = "true"
+
+[sub_resource type="BTSetAgentProperty" id="BTSetAgentProperty_wo7k8"]
+property = &"visible"
+value = SubResource("BBVariant_2yhbo")
+custom_name = "Show Agent"
 
 [sub_resource type="BBVariant" id="BBVariant_thb2b"]
 type = 2
@@ -160,13 +319,39 @@ resource_name = "0"
 variable = &"state"
 value = SubResource("BBVariant_thb2b")
 
+[sub_resource type="BBVariant" id="BBVariant_od4f6"]
+type = 2
+saved_value = -1
+resource_name = "-1"
+
+[sub_resource type="BTSetVar" id="BTSetVar_x0402"]
+variable = &"current_action"
+value = SubResource("BBVariant_od4f6")
+operation = 1
+
 [sub_resource type="BTAction" id="BTAction_chsio"]
 script = ExtResource("1_rg1dp")
 target_group = &""
 
 [sub_resource type="BTSequence" id="BTSequence_pld4j"]
 custom_name = "Exit"
-children = [SubResource("BTCheckVar_81jxt"), SubResource("BTAction_h6van"), SubResource("BTWait_fvqci"), SubResource("BTSetVar_cdyo3"), SubResource("BTAction_chsio")]
+children = [SubResource("BTCheckVar_81jxt"), SubResource("BTAction_h6van"), SubResource("BTSetAgentProperty_5bhwn"), SubResource("BTWait_fvqci"), SubResource("BTSetAgentProperty_wo7k8"), SubResource("BTSetVar_cdyo3"), SubResource("BTSetVar_x0402"), SubResource("BTAction_chsio")]
+
+[sub_resource type="BBVariant" id="BBVariant_iydsi"]
+type = 2
+saved_value = 5
+resource_name = "5"
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_vu2js"]
+variable = &"state"
+value = SubResource("BBVariant_iydsi")
+custom_name = "check_wait"
+
+[sub_resource type="BTWait" id="BTWait_bh2yi"]
+
+[sub_resource type="BTSequence" id="BTSequence_pad4m"]
+custom_name = "Wait"
+children = [SubResource("BTCheckVar_vu2js"), SubResource("BTWait_bh2yi")]
 
 [sub_resource type="BTComment" id="BTComment_uc4cq"]
 custom_name = "If all above fail, step along idle path"
@@ -175,7 +360,7 @@ custom_name = "If all above fail, step along idle path"
 script = ExtResource("1_3itpa")
 
 [sub_resource type="BTSelector" id="BTSelector_0xbrx"]
-children = [SubResource("BTSequence_s6ml5"), SubResource("BTSequence_oivck"), SubResource("BTSequence_kkgit"), SubResource("BTSequence_pld4j"), SubResource("BTComment_uc4cq"), SubResource("BTAction_pqujm")]
+children = [SubResource("BTSequence_s6ml5"), SubResource("BTSequence_oivck"), SubResource("BTSequence_kkgit"), SubResource("BTSequence_pld4j"), SubResource("BTSequence_pad4m"), SubResource("BTComment_uc4cq"), SubResource("BTAction_pqujm")]
 
 [resource]
 blackboard_plan = SubResource("BlackboardPlan_b644n")

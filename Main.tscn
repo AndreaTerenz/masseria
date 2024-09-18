@@ -22,7 +22,7 @@ func request_job(curriculum):
 	var job_id = -1
 	var job_location = null
 	for job in jobs:
-		if curriculum[job]:
+		if curriculum[job[0]]:
 			job_id = job[0]
 			job_location = job[1]
 			jobs.erase(job)
@@ -46,7 +46,7 @@ script/source = "extends Agent
 
 @onready var bt_player: BTPlayer = $BTPlayer
 
-var kitchen = get_parent()
+@onready var kitchen = get_parent()
 var current_action = -1
 
 enum STATE {

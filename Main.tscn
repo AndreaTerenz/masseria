@@ -13,7 +13,8 @@ script/source = "extends Node2D
 var jobs := []
 
 func _on_button_pressed() -> void:
-	AgentManager.send_broadcast(&\"PISELLARE\", 69)
+	# AgentManager.send_broadcast(&\"PISELLARE\", 69)
+	add_job(0, null)
 
 func add_job(id: int, location=null):
 	jobs.append([id, location])
@@ -61,7 +62,7 @@ enum STATE {
 var state := STATE.IDLE :
 	set(s):
 		print(s)
-		if s in [STATE.IDLE, STATE.BREAK] and current_action != 3:
+		if s in [STATE.IDLE, STATE.BREAK] and current_action not in [-1, 3]:
 			kitchen.add_job(current_action+1)
 		state = s
 

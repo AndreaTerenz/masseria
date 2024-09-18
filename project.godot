@@ -20,6 +20,10 @@ config/icon="res://icon.svg"
 Globals="*res://Script/Globals.gd"
 AgentManager="*res://Script/AgentManager.gd"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/kanban_tasks/plugin.cfg")
+
 [input]
 
 db_quit={

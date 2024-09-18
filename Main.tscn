@@ -14,6 +14,21 @@ var jobs := []
 
 func _on_button_pressed() -> void:
 	AgentManager.send_broadcast(&\"PISELLARE\", 69)
+
+func add_job(id: int, location=null):
+	jobs.append([id, location])
+	
+func request_job(curriculum):
+	var job_id = -1
+	var job_location = null
+	for job in jobs:
+		if curriculum[job]:
+			job_id = job[0]
+			job_location = job[1]
+			jobs.erase(job)
+			break
+	return [job_id, job_location]
+	
 "
 
 [sub_resource type="Curve2D" id="Curve2D_obaid"]
@@ -31,19 +46,23 @@ script/source = "extends Agent
 
 @onready var bt_player: BTPlayer = $BTPlayer
 
+var kitchen = get_parent()
+var current_action = -1
+
 enum STATE {
 	IDLE,
 	FRIDGE,
 	TABLE,
 	OVEN,
 	SERVING,
-	WAITING,
 	BREAK
 }
 
 var state := STATE.IDLE :
 	set(s):
 		print(s)
+		if s in [STATE.IDLE, STATE.BREAK] and current_action != 3:
+			kitchen.add_job(current_action+1)
 		state = s
 
 func _ready() -> void:
@@ -58,22 +77,33 @@ func _ready() -> void:
 	bt_player.blackboard.set_var(&\"WAITER\", possible_actions[3])
 	
 	bt_player.blackboard.bind_var_to_property(&\"state\", self, &\"state\")
+	bt_player.blackboard.bind_var_to_property(&\"current_action\", self, &\"current_action\")
 	
 	state = STATE.IDLE
 	
 func _on_broadcast(id, val):
 	if id == &\"PISELLARE\" and possible_actions[0] and state == STATE.IDLE:
 		state = STATE.FRIDGE
-		bt_player.blackboard.set_var(&\"current_action\", 0)
+		current_action = 0
 		
+# Probably useless
 func _on_direct_signal(id, val):
-	if state == STATE.WAITING:
+	if state == STATE.BREAK:
 		state = STATE.IDLE
-		bt_player.blackboard.set_var(&\"current_action\", -1)
+		current_action = -1
 	
 func _process(delta):
-	if state == STATE.WAITING:
-		rotation_degrees += 1
+	match state:
+		STATE.BREAK:
+			rotation_degrees += 1
+		STATE.IDLE:
+			var new_job = kitchen.request_job(possible_actions)
+			if new_job[0] != -1:
+				current_action = new_job[0]
+				state = current_action + 1
+				if state == 2:
+					state -= 1
+	
 "
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_j72xp"]

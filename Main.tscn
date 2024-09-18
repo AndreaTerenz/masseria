@@ -1,14 +1,14 @@
-[gd_scene load_steps=10 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=6 format=3 uid="uid://y03djfecm8p4"]
 
-[ext_resource type="PackedScene" uid="uid://bi2rau283g2l6" path="res://dummy_agent.tscn" id="1_1hxmu"]
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="2_5qmts"]
-[ext_resource type="BehaviorTree" uid="uid://bv6csbkmtc48m" path="res://ai/tree1.tres" id="3_2iei4"]
 [ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://KitchenThings/oven.tscn" id="3_6da2g"]
 [ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="3_piqc7"]
 
 [sub_resource type="GDScript" id="GDScript_i6dm0"]
 resource_name = "kitchen"
 script/source = "extends Node2D
+
+var agent_scene = preload(\"res://dummy_agent.tscn\")
 
 var jobs := []
 
@@ -24,12 +24,19 @@ func request_job(curriculum):
 	var job_location = null
 	for job in jobs:
 		if curriculum[job[0]]:
+			print(\"Questo caro agente sa svolgere l'azione \" + str(job[0]))
 			job_id = job[0]
 			job_location = job[1]
 			jobs.erase(job)
 			break
 	return [job_id, job_location]
-	
+
+func _on_agent_button_pressed():
+	var agg = agent_scene.instantiate()
+	agg.path = $IdlePath
+	agg.kitchen = self
+	add_child(agg)
+	# AgentManager.register_agent(agg)
 "
 
 [sub_resource type="Curve2D" id="Curve2D_obaid"]
@@ -38,94 +45,11 @@ _data = {
 }
 point_count = 7
 
-[sub_resource type="GDScript" id="GDScript_rn7af"]
-resource_name = "dummy"
-script/source = "extends Agent
-
-@export var mov_speed := 500.0
-@export var path : Path2D
-
-@onready var bt_player: BTPlayer = $BTPlayer
-
-@onready var kitchen = get_parent()
-var current_action = -1
-
-enum STATE {
-	IDLE,
-	FRIDGE,
-	TABLE,
-	OVEN,
-	SERVING,
-	BREAK
-}
-
-var state := STATE.IDLE :
-	set(s):
-		print(s)
-		if s in [STATE.IDLE, STATE.BREAK] and current_action not in [-1, 3]:
-			kitchen.add_job(current_action+1)
-		state = s
-
-func _ready() -> void:
-	super()
-	
-	print(\"Setting all possible actions to TRUE for debug\")
-	possible_actions = [true, true, true, true]
-	
-	bt_player.blackboard.set_var(&\"PASTAMAN\", possible_actions[0])
-	bt_player.blackboard.set_var(&\"DECORATOR\", possible_actions[1])
-	bt_player.blackboard.set_var(&\"COOK\", possible_actions[2])
-	bt_player.blackboard.set_var(&\"WAITER\", possible_actions[3])
-	
-	bt_player.blackboard.bind_var_to_property(&\"state\", self, &\"state\")
-	bt_player.blackboard.bind_var_to_property(&\"current_action\", self, &\"current_action\")
-	
-	state = STATE.IDLE
-	
-func _on_broadcast(id, val):
-	if id == &\"PISELLARE\" and possible_actions[0] and state == STATE.IDLE:
-		state = STATE.FRIDGE
-		current_action = 0
-		
-# Probably useless
-func _on_direct_signal(id, val):
-	if state == STATE.BREAK:
-		state = STATE.IDLE
-		current_action = -1
-	
-func _process(delta):
-	match state:
-		STATE.BREAK:
-			rotation_degrees += 1
-		STATE.IDLE:
-			var new_job = kitchen.request_job(possible_actions)
-			if new_job[0] != -1:
-				current_action = new_job[0]
-				state = current_action + 1
-				if state == 2:
-					state -= 1
-	
-"
-
-[sub_resource type="BlackboardPlan" id="BlackboardPlan_j72xp"]
-
 [node name="Kitchen" type="Node2D"]
 script = SubResource("GDScript_i6dm0")
 
 [node name="IdlePath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_obaid")
-
-[node name="DummyAgent" parent="." node_paths=PackedStringArray("path") instance=ExtResource("1_1hxmu")]
-z_index = 10
-position = Vector2(896, 424)
-scale = Vector2(1, 1)
-script = SubResource("GDScript_rn7af")
-mov_speed = 200.0
-path = NodePath("../IdlePath")
-
-[node name="BTPlayer" type="BTPlayer" parent="DummyAgent"]
-behavior_tree = ExtResource("3_2iei4")
-blackboard_plan = SubResource("BlackboardPlan_j72xp")
 
 [node name="Oven" parent="." instance=ExtResource("3_6da2g")]
 position = Vector2(64, 584)
@@ -183,4 +107,14 @@ pivot_offset = Vector2(0, 16)
 theme_override_font_sizes/font_size = 28
 text = "New pizza"
 
+[node name="AgentButton" type="Button" parent="."]
+offset_left = 8.0
+offset_top = 363.0
+offset_right = 153.0
+offset_bottom = 410.0
+pivot_offset = Vector2(0, 16)
+theme_override_font_sizes/font_size = 28
+text = "Add agent"
+
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="AgentButton" to="." method="_on_agent_button_pressed"]

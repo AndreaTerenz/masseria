@@ -10,7 +10,8 @@ var agents_created = 0
 var agents : Array[Agent] = []
 var data : Dictionary[StringName, Variant] = {}
 
-func add_agent(a: Agent):
+
+func register_agent(a: Agent):
 	agents.append(a)
 	new_agent.emit(a)
 	

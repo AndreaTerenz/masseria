@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=99 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=101 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/IdleStep.gd" id="1_3itpa"]
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_rg1dp"]
@@ -136,6 +136,16 @@ operation = 1
 custom_name = "Next Action (Loop)"
 children = [SubResource("BTCheckVar_nh4ie"), SubResource("BTCheckVar_t4lcr"), SubResource("BTSetVar_rti7h"), SubResource("BTSetVar_a7c04")]
 
+[sub_resource type="BBVariant" id="BBVariant_ygc5y"]
+type = 2
+saved_value = 1
+resource_name = "1"
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_v8hik"]
+variable = &"current_action"
+value = SubResource("BBVariant_ygc5y")
+custom_name = "check_action"
+
 [sub_resource type="BBVariant" id="BBVariant_3b7j7"]
 type = 1
 saved_value = true
@@ -167,7 +177,7 @@ operation = 1
 
 [sub_resource type="BTSequence" id="BTSequence_yq4e6"]
 custom_name = "Next Action"
-children = [SubResource("BTCheckVar_ee4nm"), SubResource("BTSetVar_mkboo"), SubResource("BTSetVar_ccj2f")]
+children = [SubResource("BTCheckVar_v8hik"), SubResource("BTCheckVar_ee4nm"), SubResource("BTSetVar_mkboo"), SubResource("BTSetVar_ccj2f")]
 
 [sub_resource type="BBVariant" id="BBVariant_2wrxo"]
 type = 2

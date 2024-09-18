@@ -1,13 +1,15 @@
-[gd_scene load_steps=5 format=3 uid="uid://bi2rau283g2l6"]
+[gd_scene load_steps=7 format=3 uid="uid://bi2rau283g2l6"]
 
 [ext_resource type="Texture2D" uid="uid://q5jfpgygsg1s" path="res://Assets/kenney_shape-characters/PNG/Default/blue_body_circle.png" id="1_6xupl"]
 [ext_resource type="Script" path="res://Script/Agent.gd" id="2_u83cq"]
 [ext_resource type="Texture2D" uid="uid://4hhhopdfwqnw" path="res://Assets/kenney_shape-characters/PNG/Default/green_hand_point.png" id="3_wi01w"]
 [ext_resource type="Texture2D" uid="uid://dwolodcr7db16" path="res://Assets/kenney_shape-characters/PNG/Default/face_h.png" id="4_oaehy"]
+[ext_resource type="BehaviorTree" uid="uid://bv6csbkmtc48m" path="res://ai/tree1.tres" id="5_qtdmf"]
+
+[sub_resource type="BlackboardPlan" id="BlackboardPlan_jj6lk"]
 
 [node name="DummyAgent" type="Sprite2D"]
 texture_filter = 1
-scale = Vector2(0.5, 0.5)
 texture = ExtResource("1_6xupl")
 script = ExtResource("2_u83cq")
 
@@ -23,10 +25,6 @@ texture = ExtResource("3_wi01w")
 position = Vector2(1, 2)
 texture = ExtResource("4_oaehy")
 
-[node name="Progress" type="ProgressBar" parent="."]
-visible = false
-modulate = Color(0, 0.784314, 0, 1)
-offset_left = -70.0
-offset_top = -82.0
-offset_right = 70.0
-offset_bottom = -55.0
+[node name="BTPlayer" type="BTPlayer" parent="."]
+behavior_tree = ExtResource("5_qtdmf")
+blackboard_plan = SubResource("BlackboardPlan_jj6lk")

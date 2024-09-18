@@ -1,17 +1,42 @@
 [gd_scene load_steps=6 format=3 uid="uid://y03djfecm8p4"]
 
-[ext_resource type="PackedScene" uid="uid://bi2rau283g2l6" path="res://dummy_agent.tscn" id="1_1hxmu"]
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="2_5qmts"]
+[ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://KitchenThings/oven.tscn" id="3_6da2g"]
 [ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="3_piqc7"]
 
 [sub_resource type="GDScript" id="GDScript_i6dm0"]
 resource_name = "kitchen"
 script/source = "extends Node2D
 
-func _ready() -> void:
-	await get_tree().create_timer(2.0).timeout
+var agent_scene = preload(\"res://dummy_agent.tscn\")
+
+var jobs := []
+
+func _on_button_pressed() -> void:
+	# AgentManager.send_broadcast(&\"PISELLARE\", 69)
+	add_job(0, null)
+
+func add_job(id: int, location=null):
+	jobs.append([id, location])
 	
-	AgentManager.send_broadcast(&\"PISELLARE\", 69)
+func request_job(curriculum):
+	var job_id = -1
+	var job_location = null
+	for job in jobs:
+		if curriculum[job[0]]:
+			print(\"Questo caro agente sa svolgere l'azione \" + str(job[0]))
+			job_id = job[0]
+			job_location = job[1]
+			jobs.erase(job)
+			break
+	return [job_id, job_location]
+
+func _on_agent_button_pressed():
+	var agg = agent_scene.instantiate()
+	agg.path = $IdlePath
+	agg.kitchen = self
+	add_child(agg)
+	# AgentManager.register_agent(agg)
 "
 
 [sub_resource type="Curve2D" id="Curve2D_obaid"]
@@ -26,31 +51,17 @@ script = SubResource("GDScript_i6dm0")
 [node name="IdlePath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_obaid")
 
-[node name="DummyAgent" parent="." node_paths=PackedStringArray("path") instance=ExtResource("1_1hxmu")]
-z_index = 3
-position = Vector2(915, 436)
-scale = Vector2(1, 1)
-path = NodePath("../IdlePath")
-
-[node name="Oven" type="Sprite2D" parent="." groups=["Ovens"]]
+[node name="Oven" parent="." instance=ExtResource("3_6da2g")]
 position = Vector2(64, 584)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
 
-[node name="Oven2" type="Sprite2D" parent="." groups=["Ovens"]]
+[node name="Oven2" parent="." instance=ExtResource("3_6da2g")]
 position = Vector2(192, 584)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
 
-[node name="Oven3" type="Sprite2D" parent="." groups=["Ovens"]]
+[node name="Oven3" parent="." instance=ExtResource("3_6da2g")]
 position = Vector2(960, 584)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
 
-[node name="Oven4" type="Sprite2D" parent="." groups=["Ovens"]]
+[node name="Oven4" parent="." instance=ExtResource("3_6da2g")]
 position = Vector2(1088, 584)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
 
 [node name="Table" type="Sprite2D" parent="." groups=["Tables"]]
 position = Vector2(512, 320)
@@ -86,3 +97,24 @@ texture = ExtResource("2_5qmts")
 position = Vector2(576, 16)
 scale = Vector2(3.2, 0.4)
 texture = ExtResource("3_piqc7")
+
+[node name="Button" type="Button" parent="."]
+offset_left = 8.0
+offset_top = 296.0
+offset_right = 153.0
+offset_bottom = 343.0
+pivot_offset = Vector2(0, 16)
+theme_override_font_sizes/font_size = 28
+text = "New pizza"
+
+[node name="AgentButton" type="Button" parent="."]
+offset_left = 8.0
+offset_top = 363.0
+offset_right = 153.0
+offset_bottom = 410.0
+pivot_offset = Vector2(0, 16)
+theme_override_font_sizes/font_size = 28
+text = "Add agent"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="AgentButton" to="." method="_on_agent_button_pressed"]

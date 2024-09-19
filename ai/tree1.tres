@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=101 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=111 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/IdleStep.gd" id="1_3itpa"]
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_rg1dp"]
@@ -237,6 +237,27 @@ variable = &"state"
 value = SubResource("BBVariant_8rhvh")
 custom_name = "check_oven"
 
+[sub_resource type="BTAction" id="BTAction_g4rw8"]
+script = ExtResource("1_rg1dp")
+target_group = &"Tables"
+
+[sub_resource type="BBVariant" id="BBVariant_4vw8r"]
+type = 1
+saved_value = false
+resource_name = "false"
+
+[sub_resource type="BTSetAgentProperty" id="BTSetAgentProperty_jp6ug"]
+property = &"action_target.occupied"
+value = SubResource("BBVariant_4vw8r")
+custom_name = "Free the Table"
+
+[sub_resource type="BBVariant" id="BBVariant_5vh4x"]
+saved_value = null
+
+[sub_resource type="BTSetAgentProperty" id="BTSetAgentProperty_xnrjs"]
+property = &"action_target"
+value = SubResource("BBVariant_5vh4x")
+
 [sub_resource type="BTAction" id="BTAction_gwq51"]
 script = ExtResource("1_rg1dp")
 target_group = &"Ovens"
@@ -345,7 +366,7 @@ children = [SubResource("BTSequence_82x4c"), SubResource("BTProbabilitySelector_
 
 [sub_resource type="BTSequence" id="BTSequence_kkgit"]
 custom_name = "Oven"
-children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTAction_xjdal"), SubResource("BTSelector_skyrv")]
+children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_g4rw8"), SubResource("BTSetAgentProperty_jp6ug"), SubResource("BTSetAgentProperty_xnrjs"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTAction_xjdal"), SubResource("BTSelector_skyrv")]
 
 [sub_resource type="BBVariant" id="BBVariant_nv65k"]
 type = 2
@@ -356,6 +377,27 @@ resource_name = "4"
 variable = &"state"
 value = SubResource("BBVariant_nv65k")
 custom_name = "check_exit"
+
+[sub_resource type="BTAction" id="BTAction_bb1sd"]
+script = ExtResource("1_rg1dp")
+target_group = &"Ovens"
+
+[sub_resource type="BBVariant" id="BBVariant_kk0oa"]
+type = 1
+saved_value = false
+resource_name = "false"
+
+[sub_resource type="BTSetAgentProperty" id="BTSetAgentProperty_0qudw"]
+property = &"action_target.occupied"
+value = SubResource("BBVariant_kk0oa")
+custom_name = "Free the Oven"
+
+[sub_resource type="BBVariant" id="BBVariant_hwytb"]
+saved_value = null
+
+[sub_resource type="BTSetAgentProperty" id="BTSetAgentProperty_23pug"]
+property = &"action_target"
+value = SubResource("BBVariant_hwytb")
 
 [sub_resource type="BTAction" id="BTAction_h6van"]
 script = ExtResource("1_rg1dp")
@@ -427,7 +469,7 @@ children = [SubResource("BTSequence_8hcn4"), SubResource("BTSetVar_dt2cj")]
 
 [sub_resource type="BTSequence" id="BTSequence_pld4j"]
 custom_name = "Exit"
-children = [SubResource("BTCheckVar_81jxt"), SubResource("BTAction_h6van"), SubResource("BTSetAgentProperty_5bhwn"), SubResource("BTWait_fvqci"), SubResource("BTSetAgentProperty_wo7k8"), SubResource("BTProbabilitySelector_vj5lb")]
+children = [SubResource("BTCheckVar_81jxt"), SubResource("BTAction_bb1sd"), SubResource("BTSetAgentProperty_0qudw"), SubResource("BTSetAgentProperty_23pug"), SubResource("BTAction_h6van"), SubResource("BTSetAgentProperty_5bhwn"), SubResource("BTWait_fvqci"), SubResource("BTSetAgentProperty_wo7k8"), SubResource("BTProbabilitySelector_vj5lb")]
 
 [sub_resource type="BBVariant" id="BBVariant_iydsi"]
 type = 2

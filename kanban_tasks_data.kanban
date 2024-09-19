@@ -12,7 +12,6 @@
 			"title": "Todo",
 			"tasks": [
 				"598d5904-e912-4d82-826c-adf2969823e7",
-				"c22fc1e3-d4b6-47b7-9f70-6835bf14db9b",
 				"f8837433-d8ae-4428-9058-92e030d1415e",
 				"fbed7cff-0b67-453c-89a5-d8fa69625ade"
 			]
@@ -32,14 +31,26 @@
 			"steps": [
 				{
 					"details": "specificare location nella tupla del job\n\nCioè riferimento a (e.g.) in quale forno infornare - si applica solo a azioni non 0 (andare al tavolo)",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "far sì che l'agente usi la location del job\n\nnel caso di INFORNARE, la location sarebbe il tavolo dove c'è la pizza da infornare (poi il forno è whatever)",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "rendere location exclusive\n\ncioè ogni forno/tavolo è usato da una pizza alla volta",
+					"done": true
+				},
+				{
+					"details": "ri-aggiungere il job se tutte le location sono occupate",
+					"done": true
+				},
+				{
+					"details": "Fixare i tavoli dell'azione 0\n\nOvvero, quel che ti ho scritto su Telegram",
+					"done": false
+				},
+				{
+					"details": "\"Liberare\" forni e tavoli a momento opportuno\n\nOvvero, l'agente quando va a ritirare la pizza dal forno per servirla ai tavoli (o la prende dal tavolo per infornarla) libera l'oggetto corrispondende per altre azioni, ma lo fa PRIMA di arrivarci, a movimento iniziato; dovrebbe farlo solo una volta arrivato.",
 					"done": false
 				}
 			]

@@ -11,6 +11,7 @@ var possible_actions = [true, true, false, false]
 
 var kitchen = null
 var current_action = -1
+var action_target = null
 
 enum STATE {
 	IDLE, #0
@@ -23,9 +24,13 @@ enum STATE {
 
 var state := STATE.IDLE :
 	set(s):
-		print(s)
 		if s in [STATE.IDLE, STATE.BREAK] and current_action not in [-1, 3]:
-			kitchen.add_job(current_action+1)
+			kitchen.add_job(current_action+1, action_target)
+			action_target = null
+		elif s in [STATE.OVEN, STATE.SERVING] and action_target:
+			action_target.occupied = false
+		if s == STATE.BREAK:
+			current_action = -1
 		state = s
 
 func _ready() -> void:
@@ -80,6 +85,7 @@ func _process(delta):
 			var new_job = kitchen.request_job(possible_actions)
 			if new_job[0] != -1:
 				current_action = new_job[0]
+				action_target = new_job[1]
 				state = current_action + 1
 				if state == STATE.TABLE:
 					state = STATE.FRIDGE

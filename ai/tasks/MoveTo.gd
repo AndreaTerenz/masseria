@@ -37,10 +37,8 @@ func _enter() -> void:
 		var tmp : Node2D = get_closest_of(target_group)
 		target = tmp.global_position
 		
-		# UGLYY :3:3:3:3:3 OWO
 		if target_group == &"Ovens":
 			blackboard.set_var(&"current_oven", tmp)
-			print(blackboard.get_var(&"current_oven"))
 	else:
 		target = get_closest_path_point()
 
@@ -57,18 +55,29 @@ func _tick(delta: float) -> Status:
 	return RUNNING
 
 func get_closest_of(group: StringName):
+	if agent.action_target and group != "Fridges":
+		return agent.action_target
+	
 	var here : Vector2 = agent.global_position
-	var fridges := agent.get_tree().get_nodes_in_group(group)
+	var group_nodes := agent.get_tree().get_nodes_in_group(group)
 			
 	var min_dist := INF
 	var closest = null
-	for fridge in fridges:
-		var d : float = fridge.global_position.distance_to(here)
+	for target in group_nodes:
+		var d : float = target.global_position.distance_to(here)
+		
+		if group in ["Tables", "Ovens"] and target.occupied:
+			continue
 		
 		if d < min_dist:
 			min_dist = d
-			closest = fridge
+			closest = target
 			
+	if group != "Fridges":
+		agent.action_target = closest
+		if group != "Exit":
+			agent.action_target.occupied = true
+	
 	return closest
 
 func get_closest_path_point():

@@ -24,11 +24,24 @@ func request_job(curriculum):
 	var job_location = null
 	for job in jobs:
 		if curriculum[job[0]]:
-			print(\"Questo caro agente sa svolgere l'azione \" + str(job[0]))
-			job_id = job[0]
-			job_location = job[1]
-			jobs.erase(job)
-			break
+			
+			var valid_job = false
+			if job[0] in [0,1]:
+				for child in self.find_children(\"*\"):
+					if child.is_in_group(\"Tables\") and not child.occupied:
+						valid_job = true
+			elif job[0] == 2:
+				for child in self.find_children(\"*\"):
+					if child.is_in_group(\"Ovens\") and not child.occupied:
+						valid_job = true
+			else:
+				valid_job = true
+						
+			if valid_job:
+				job_id = job[0]
+				job_location = job[1]
+				jobs.erase(job)
+				break
 	return [job_id, job_location]
 
 func _on_agent_button_pressed():
@@ -37,6 +50,11 @@ func _on_agent_button_pressed():
 	agg.kitchen = self
 	add_child(agg)
 	# AgentManager.register_agent(agg)
+
+func _ready():
+	for child in self.find_children(\"*\"):
+		if child.is_in_group(\"Tables\"):
+			child.set_script(load(\"res://Script/kitchen_sprite.gd\"))
 "
 
 [sub_resource type="Curve2D" id="Curve2D_obaid"]

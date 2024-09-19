@@ -4,7 +4,7 @@
 
 [sub_resource type="GDScript" id="GDScript_xsk0r"]
 resource_name = "oven"
-script/source = "extends Sprite2D
+script/source = "extends KitchenSprite
 
 signal done
 

@@ -3,6 +3,7 @@ extends Node2D
 
 var agent_id : StringName = &"default"
 var possible_actions = [true, true, false, false]
+signal delivered
 
 @export var mov_speed := 500.0
 @export var path : Path2D
@@ -24,20 +25,20 @@ enum STATE {
 
 var state := STATE.IDLE :
 	set(s):
-		if s in [STATE.IDLE, STATE.BREAK] and current_action not in [-1, 3]:
-			kitchen.add_job(current_action+1, action_target)
-			action_target = null
-		elif s in [STATE.OVEN, STATE.SERVING] and action_target:
+		if s in [STATE.OVEN, STATE.SERVING] and action_target:
 			action_target.occupied = false
+		elif s in [STATE.IDLE, STATE.BREAK]:
+			if current_action not in [-1, 3]:
+				kitchen.add_job(current_action+1, action_target)
+				action_target = null
+			elif current_action == 3:
+				emit_signal("delivered")
 		if s == STATE.BREAK:
 			current_action = -1
 		state = s
 
 func _ready() -> void:
 	add_to_group(&"Agents")
-	
-	# position.x = randf_range(100., 500.)
-	# position.y = randf_range(100., 500.)
 	possible_actions.shuffle()
 	
 	AgentManager.register_agent(self)

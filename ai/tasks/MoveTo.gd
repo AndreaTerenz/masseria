@@ -73,7 +73,7 @@ func get_closest_of(group: StringName):
 			min_dist = d
 			closest = target
 			
-	if group != "Fridges":
+	if group != "Fridges" and closest:
 		agent.action_target = closest
 		if group != "Exit":
 			agent.action_target.occupied = true

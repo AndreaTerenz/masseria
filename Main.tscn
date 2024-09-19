@@ -11,10 +11,18 @@ script/source = "extends Node2D
 var agent_scene = preload(\"res://dummy_agent.tscn\")
 
 var jobs := []
+var orders := 0:
+	set(v):
+		orders = v
+		$PizzaLabel.text = \"Total orders: \" + str(orders)
+var on_cooldown = false
+@onready var timer = Timer.new()
 
 func _on_button_pressed() -> void:
 	# AgentManager.send_broadcast(&\"PISELLARE\", 69)
 	add_job(0, null)
+	orders += 1
+	
 
 func add_job(id: int, location=null):
 	jobs.append([id, location])
@@ -22,11 +30,15 @@ func add_job(id: int, location=null):
 func request_job(curriculum):
 	var job_id = -1
 	var job_location = null
+	
+	if on_cooldown:
+		return [job_id, job_location]
+	
 	for job in jobs:
 		if curriculum[job[0]]:
 			
 			var valid_job = false
-			if job[0] in [0,1]:
+			if job[0] == 0:
 				for child in self.find_children(\"*\"):
 					if child.is_in_group(\"Tables\") and not child.occupied:
 						valid_job = true
@@ -41,20 +53,29 @@ func request_job(curriculum):
 				job_id = job[0]
 				job_location = job[1]
 				jobs.erase(job)
+				on_cooldown = true
+				timer.start()
 				break
 	return [job_id, job_location]
+	
+func _on_timer_timeout() -> void:
+	on_cooldown = false
 
 func _on_agent_button_pressed():
 	var agg = agent_scene.instantiate()
 	agg.path = $IdlePath
 	agg.kitchen = self
 	add_child(agg)
+	agg.connect(\"delivered\", func reduce(): orders-=1)
 	# AgentManager.register_agent(agg)
 
 func _ready():
 	for child in self.find_children(\"*\"):
 		if child.is_in_group(\"Tables\"):
 			child.set_script(load(\"res://Script/kitchen_sprite.gd\"))
+	add_child(timer)
+	timer.connect(\"timeout\", Callable(self, \"_on_timer_timeout\"))
+	timer.wait_time = 0.1
 "
 
 [sub_resource type="Curve2D" id="Curve2D_obaid"]
@@ -133,6 +154,16 @@ offset_bottom = 410.0
 pivot_offset = Vector2(0, 16)
 theme_override_font_sizes/font_size = 28
 text = "Add agent"
+
+[node name="PizzaLabel" type="Label" parent="."]
+offset_left = 141.0
+offset_top = 8.0
+offset_right = 323.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.792157, 0.176471, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "Total orders: 0"
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="AgentButton" to="." method="_on_agent_button_pressed"]

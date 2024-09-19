@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=111 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=112 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/IdleStep.gd" id="1_3itpa"]
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_rg1dp"]
@@ -55,6 +55,10 @@ variable = &"state"
 value = SubResource("BBVariant_lx0yt")
 custom_name = "check_fridge"
 
+[sub_resource type="BTAction" id="BTAction_lswe5"]
+script = ExtResource("1_rg1dp")
+target_group = &"Tables"
+
 [sub_resource type="BTAction" id="BTAction_u26pg"]
 script = ExtResource("1_rg1dp")
 target_group = &"Fridges"
@@ -74,7 +78,7 @@ operation = 1
 
 [sub_resource type="BTSequence" id="BTSequence_s6ml5"]
 custom_name = "Fridge"
-children = [SubResource("BTCheckVar_0uv5u"), SubResource("BTAction_u26pg"), SubResource("BTWait_3qkw8"), SubResource("BTSetVar_i5e1p")]
+children = [SubResource("BTCheckVar_0uv5u"), SubResource("BTAction_lswe5"), SubResource("BTAction_u26pg"), SubResource("BTWait_3qkw8"), SubResource("BTSetVar_i5e1p")]
 
 [sub_resource type="BBVariant" id="BBVariant_8nf1a"]
 type = 2
@@ -253,6 +257,7 @@ custom_name = "Free the Table"
 
 [sub_resource type="BBVariant" id="BBVariant_5vh4x"]
 saved_value = null
+resource_name = "<null>"
 
 [sub_resource type="BTSetAgentProperty" id="BTSetAgentProperty_xnrjs"]
 property = &"action_target"
@@ -394,6 +399,7 @@ custom_name = "Free the Oven"
 
 [sub_resource type="BBVariant" id="BBVariant_hwytb"]
 saved_value = null
+resource_name = "<null>"
 
 [sub_resource type="BTSetAgentProperty" id="BTSetAgentProperty_23pug"]
 property = &"action_target"

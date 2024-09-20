@@ -1,19 +1,7 @@
 class_name Agent
 extends Node2D
 
-var agent_id : StringName = &"default"
-var possible_actions = [true, true, false, false]
 signal delivered
-
-var kitchen = null
-var break_location = null
-var current_action = -1
-var action_target = null
-
-@export var mov_speed := 500.0
-@export var path : Path2D
-
-@onready var bt_player: BTPlayer = $BTPlayer
 
 enum STATE {
 	IDLE, #0
@@ -23,6 +11,18 @@ enum STATE {
 	SERVING, #4 -> starting point of action 3
 	BREAK
 }
+
+@export var mov_speed := 500.0
+@export var path : Path2D
+
+@onready var bt_player: BTPlayer = $BTPlayer
+
+var agent_id : StringName = &"default"
+var possible_actions = [true, true, false, false]
+var kitchen = null
+var break_location = null
+var current_action = -1
+var action_target = null
 
 var state := STATE.IDLE :
 	set(s):
@@ -41,7 +41,6 @@ var state := STATE.IDLE :
 
 func _ready() -> void:
 	add_to_group(&"Agents")
-	possible_actions.shuffle()
 	
 	AgentManager.register_agent(self)
 	AgentManager.broadcast.connect(func(id: StringName, data: Variant):
@@ -57,11 +56,14 @@ func _ready() -> void:
 	right_tween.tween_property($RightHand, "rotation_degrees", -90, 0.5).from(0)
 	right_tween.tween_property($RightHand, "rotation_degrees", 0, 0.5).from(-90)
 	
+	var action_bb_vars := [&"PASTAMAN",
+		&"DECORATOR",
+		&"COOK",
+		&"WAITER"]
 	
-	bt_player.blackboard.set_var(&"PASTAMAN", possible_actions[0])
-	bt_player.blackboard.set_var(&"DECORATOR", possible_actions[1])
-	bt_player.blackboard.set_var(&"COOK", possible_actions[2])
-	bt_player.blackboard.set_var(&"WAITER", possible_actions[3])
+	possible_actions.shuffle()	
+	for i in range(len(action_bb_vars)):
+		bt_player.blackboard.set_var(action_bb_vars[i], possible_actions[i])
 	
 	bt_player.blackboard.bind_var_to_property(&"state", self, &"state")
 	bt_player.blackboard.bind_var_to_property(&"current_action", self, &"current_action")

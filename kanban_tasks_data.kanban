@@ -48,7 +48,7 @@
 				},
 				{
 					"details": "Fixare i crash in azione 0\n\nOgni tanto, ordinando più di 4 pizze, un agente accede a un oggetto null",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "\"Liberare\" forni e tavoli a momento opportuno\n\nOvvero, l'agente quando va a ritirare la pizza dal forno per servirla ai tavoli (o la prende dal tavolo per infornarla) libera l'oggetto corrispondende per altre azioni, ma lo fa PRIMA di arrivarci, a movimento iniziato; dovrebbe farlo solo una volta arrivato.",

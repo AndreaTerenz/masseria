@@ -5,14 +5,15 @@ var agent_id : StringName = &"default"
 var possible_actions = [true, true, false, false]
 signal delivered
 
+var kitchen = null
+var break_location = null
+var current_action = -1
+var action_target = null
+
 @export var mov_speed := 500.0
 @export var path : Path2D
 
 @onready var bt_player: BTPlayer = $BTPlayer
-
-var kitchen = null
-var current_action = -1
-var action_target = null
 
 enum STATE {
 	IDLE, #0
@@ -28,6 +29,7 @@ var state := STATE.IDLE :
 		if s in [STATE.OVEN, STATE.SERVING] and action_target:
 			action_target.occupied = false
 		elif s in [STATE.IDLE, STATE.BREAK]:
+			self.rotation_degrees = 0
 			if current_action not in [-1, 3]:
 				kitchen.add_job(current_action+1, action_target)
 				action_target = null
@@ -81,7 +83,8 @@ func _on_direct_signal(id, val):
 func _process(delta):
 	match state:
 		STATE.BREAK:
-			rotation_degrees += 1
+			if position == break_location:
+				rotation_degrees += 1
 		STATE.IDLE:
 			var new_job = kitchen.request_job(possible_actions)
 			if new_job[0] != -1:

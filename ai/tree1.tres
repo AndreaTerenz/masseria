@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=112 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=113 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/IdleStep.gd" id="1_3itpa"]
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_rg1dp"]
@@ -487,6 +487,10 @@ variable = &"state"
 value = SubResource("BBVariant_iydsi")
 custom_name = "check_wait"
 
+[sub_resource type="BTAction" id="BTAction_cfxkk"]
+script = ExtResource("1_rg1dp")
+target_group = &"Break"
+
 [sub_resource type="BTWait" id="BTWait_bh2yi"]
 duration = 10.0
 
@@ -516,7 +520,7 @@ target_group = &""
 
 [sub_resource type="BTSequence" id="BTSequence_pad4m"]
 custom_name = "Break"
-children = [SubResource("BTCheckVar_vu2js"), SubResource("BTWait_bh2yi"), SubResource("BTSetVar_ljn4j"), SubResource("BTSetVar_5eeav"), SubResource("BTAction_v7a3m")]
+children = [SubResource("BTCheckVar_vu2js"), SubResource("BTAction_cfxkk"), SubResource("BTWait_bh2yi"), SubResource("BTSetVar_ljn4j"), SubResource("BTSetVar_5eeav"), SubResource("BTAction_v7a3m")]
 
 [sub_resource type="BTComment" id="BTComment_uc4cq"]
 custom_name = "If all above fail, step along idle path"

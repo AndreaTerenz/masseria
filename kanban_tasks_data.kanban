@@ -13,7 +13,7 @@
 			"tasks": [
 				"598d5904-e912-4d82-826c-adf2969823e7",
 				"f8837433-d8ae-4428-9058-92e030d1415e",
-				"fbed7cff-0b67-453c-89a5-d8fa69625ade"
+				"fa44320a-6f37-46d9-b6b4-12e52ca91088"
 			]
 		},
 		{
@@ -87,6 +87,13 @@
 			"uuid": "1f1c71ce-9061-4582-af92-b5cd52c144ba",
 			"title": "Aggiungere grafica che mostra le pizze in attesa",
 			"description": "*migliorare quella esistente",
+			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
+			"steps": []
+		},
+		{
+			"uuid": "fa44320a-6f37-46d9-b6b4-12e52ca91088",
+			"title": "Bugfix: un agente che va in break dopo aver servito la pizza rimane incastrato sulla porta",
+			"description": "",
 			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
 			"steps": []
 		}

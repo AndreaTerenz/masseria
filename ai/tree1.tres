@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=113 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=125 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/IdleStep.gd" id="1_3itpa"]
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_rg1dp"]
@@ -66,6 +66,15 @@ target_group = &"Fridges"
 [sub_resource type="BTWait" id="BTWait_3qkw8"]
 duration = 2.0
 
+[sub_resource type="BBNode" id="BBNode_w0t6i"]
+saved_value = NodePath("Carrying")
+resource_name = "Carrying"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_sovlv"]
+node = SubResource("BBNode_w0t6i")
+method = &"show"
+custom_name = "Show the ingredient"
+
 [sub_resource type="BBVariant" id="BBVariant_vcbmj"]
 type = 2
 saved_value = 1
@@ -78,7 +87,7 @@ operation = 1
 
 [sub_resource type="BTSequence" id="BTSequence_s6ml5"]
 custom_name = "Fridge"
-children = [SubResource("BTCheckVar_0uv5u"), SubResource("BTAction_lswe5"), SubResource("BTAction_u26pg"), SubResource("BTWait_3qkw8"), SubResource("BTSetVar_i5e1p")]
+children = [SubResource("BTCheckVar_0uv5u"), SubResource("BTAction_lswe5"), SubResource("BTAction_u26pg"), SubResource("BTWait_3qkw8"), SubResource("BTCallMethod_sovlv"), SubResource("BTSetVar_i5e1p")]
 
 [sub_resource type="BBVariant" id="BBVariant_8nf1a"]
 type = 2
@@ -96,6 +105,15 @@ target_group = &"Tables"
 
 [sub_resource type="BTWait" id="BTWait_iq4t6"]
 duration = 2.0
+
+[sub_resource type="BBNode" id="BBNode_qem7w"]
+saved_value = NodePath("Carrying")
+resource_name = "Carrying"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_gkn7w"]
+node = SubResource("BBNode_qem7w")
+method = &"hide"
+custom_name = "Hide the ingredient"
 
 [sub_resource type="BBVariant" id="BBVariant_144rj"]
 type = 2
@@ -227,9 +245,18 @@ children = [SubResource("BTSequence_okq56"), SubResource("BTSetVar_wtd0o")]
 [sub_resource type="BTSelector" id="BTSelector_7dx6t"]
 children = [SubResource("BTSequence_r6qdd"), SubResource("BTSequence_yq4e6"), SubResource("BTProbabilitySelector_xmw4c")]
 
+[sub_resource type="BBNode" id="BBNode_0b3qg"]
+saved_value = NodePath("Carrying")
+resource_name = "Carrying"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_ls2d7"]
+node = SubResource("BBNode_0b3qg")
+method = &"hide"
+custom_name = "Hide the ingredient"
+
 [sub_resource type="BTSequence" id="BTSequence_oivck"]
 custom_name = "Table"
-children = [SubResource("BTCheckVar_gnb4p"), SubResource("BTAction_mjyu7"), SubResource("BTWait_iq4t6"), SubResource("BTSelector_7dx6t")]
+children = [SubResource("BTCheckVar_gnb4p"), SubResource("BTAction_mjyu7"), SubResource("BTWait_iq4t6"), SubResource("BTCallMethod_gkn7w"), SubResource("BTSelector_7dx6t"), SubResource("BTCallMethod_ls2d7")]
 
 [sub_resource type="BBVariant" id="BBVariant_8rhvh"]
 type = 2
@@ -244,6 +271,15 @@ custom_name = "check_oven"
 [sub_resource type="BTAction" id="BTAction_g4rw8"]
 script = ExtResource("1_rg1dp")
 target_group = &"Tables"
+
+[sub_resource type="BBNode" id="BBNode_2iseu"]
+saved_value = NodePath("Carrying")
+resource_name = "Carrying"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_jgm2i"]
+node = SubResource("BBNode_2iseu")
+method = &"show"
+custom_name = "Show the ingredient"
 
 [sub_resource type="BBVariant" id="BBVariant_4vw8r"]
 type = 1
@@ -371,7 +407,7 @@ children = [SubResource("BTSequence_82x4c"), SubResource("BTProbabilitySelector_
 
 [sub_resource type="BTSequence" id="BTSequence_kkgit"]
 custom_name = "Oven"
-children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_g4rw8"), SubResource("BTSetAgentProperty_jp6ug"), SubResource("BTSetAgentProperty_xnrjs"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTAction_xjdal"), SubResource("BTSelector_skyrv")]
+children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_g4rw8"), SubResource("BTCallMethod_jgm2i"), SubResource("BTSetAgentProperty_jp6ug"), SubResource("BTSetAgentProperty_xnrjs"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTAction_xjdal"), SubResource("BTSelector_skyrv")]
 
 [sub_resource type="BBVariant" id="BBVariant_nv65k"]
 type = 2
@@ -386,6 +422,15 @@ custom_name = "check_exit"
 [sub_resource type="BTAction" id="BTAction_bb1sd"]
 script = ExtResource("1_rg1dp")
 target_group = &"Ovens"
+
+[sub_resource type="BBNode" id="BBNode_ccf28"]
+saved_value = NodePath("Carrying")
+resource_name = "Carrying"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_8oj2t"]
+node = SubResource("BBNode_ccf28")
+method = &"show"
+custom_name = "Show the ingredient"
 
 [sub_resource type="BBVariant" id="BBVariant_kk0oa"]
 type = 1
@@ -421,6 +466,15 @@ custom_name = "Hide Agent"
 
 [sub_resource type="BTWait" id="BTWait_fvqci"]
 duration = 2.0
+
+[sub_resource type="BBNode" id="BBNode_5l4eh"]
+saved_value = NodePath("Carrying")
+resource_name = "Carrying"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_ndjxx"]
+node = SubResource("BBNode_5l4eh")
+method = &"hide"
+custom_name = "Hide the ingredient"
 
 [sub_resource type="BBVariant" id="BBVariant_2yhbo"]
 type = 1
@@ -475,7 +529,7 @@ children = [SubResource("BTSequence_8hcn4"), SubResource("BTSetVar_dt2cj")]
 
 [sub_resource type="BTSequence" id="BTSequence_pld4j"]
 custom_name = "Exit"
-children = [SubResource("BTCheckVar_81jxt"), SubResource("BTAction_bb1sd"), SubResource("BTSetAgentProperty_0qudw"), SubResource("BTSetAgentProperty_23pug"), SubResource("BTAction_h6van"), SubResource("BTSetAgentProperty_5bhwn"), SubResource("BTWait_fvqci"), SubResource("BTSetAgentProperty_wo7k8"), SubResource("BTProbabilitySelector_vj5lb")]
+children = [SubResource("BTCheckVar_81jxt"), SubResource("BTAction_bb1sd"), SubResource("BTCallMethod_8oj2t"), SubResource("BTSetAgentProperty_0qudw"), SubResource("BTSetAgentProperty_23pug"), SubResource("BTAction_h6van"), SubResource("BTSetAgentProperty_5bhwn"), SubResource("BTWait_fvqci"), SubResource("BTCallMethod_ndjxx"), SubResource("BTSetAgentProperty_wo7k8"), SubResource("BTProbabilitySelector_vj5lb")]
 
 [sub_resource type="BBVariant" id="BBVariant_iydsi"]
 type = 2

@@ -1,12 +1,51 @@
-[gd_scene load_steps=7 format=3 uid="uid://bi2rau283g2l6"]
+[gd_scene load_steps=12 format=3 uid="uid://bi2rau283g2l6"]
 
 [ext_resource type="Texture2D" uid="uid://q5jfpgygsg1s" path="res://Assets/kenney_shape-characters/PNG/Default/blue_body_circle.png" id="1_6xupl"]
 [ext_resource type="Script" path="res://Script/Agent.gd" id="2_u83cq"]
 [ext_resource type="Texture2D" uid="uid://4hhhopdfwqnw" path="res://Assets/kenney_shape-characters/PNG/Default/green_hand_point.png" id="3_wi01w"]
 [ext_resource type="Texture2D" uid="uid://dwolodcr7db16" path="res://Assets/kenney_shape-characters/PNG/Default/face_h.png" id="4_oaehy"]
 [ext_resource type="BehaviorTree" uid="uid://bv6csbkmtc48m" path="res://ai/tree1.tres" id="5_qtdmf"]
+[ext_resource type="Texture2D" uid="uid://cit32rh1fs60v" path="res://Assets/hand-made/cook_piza.png" id="6_m3ydo"]
+[ext_resource type="Texture2D" uid="uid://cjcpoqeqta7ty" path="res://Assets/hand-made/dough.png" id="7_ik1gl"]
+[ext_resource type="Texture2D" uid="uid://b2anau4ms0fv8" path="res://Assets/hand-made/piza.png" id="8_dn7v1"]
+[ext_resource type="Texture2D" uid="uid://dj3y4kssklsid" path="res://Assets/hand-made/tomato.png" id="9_jmdsv"]
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_jj6lk"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0lmpo"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_m3ydo")
+}],
+"loop": true,
+"name": &"cooked_pizza",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_ik1gl")
+}],
+"loop": true,
+"name": &"dough",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_dn7v1")
+}],
+"loop": true,
+"name": &"pizza",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_jmdsv")
+}],
+"loop": true,
+"name": &"tomato",
+"speed": 5.0
+}]
 
 [node name="DummyAgent" type="Sprite2D"]
 texture_filter = 1
@@ -28,3 +67,9 @@ texture = ExtResource("4_oaehy")
 [node name="BTPlayer" type="BTPlayer" parent="."]
 behavior_tree = ExtResource("5_qtdmf")
 blackboard_plan = SubResource("BlackboardPlan_jj6lk")
+
+[node name="Carrying" type="AnimatedSprite2D" parent="."]
+visible = false
+position = Vector2(0, -43)
+sprite_frames = SubResource("SpriteFrames_0lmpo")
+animation = &"dough"

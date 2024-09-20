@@ -26,17 +26,29 @@ var action_target = null
 
 var state := STATE.IDLE :
 	set(s):
-		if s in [STATE.OVEN, STATE.SERVING] and action_target:
-			action_target.occupied = false
-		elif s in [STATE.IDLE, STATE.BREAK]:
+		if s in [STATE.IDLE, STATE.BREAK]:
 			self.rotation_degrees = 0
 			if current_action not in [-1, 3]:
 				kitchen.add_job(current_action+1, action_target)
 				action_target = null
 			elif current_action == 3:
 				emit_signal("delivered")
-		if s == STATE.BREAK:
-			current_action = -1
+			$Carrying.hide()
+				
+		match s:
+			STATE.OVEN:
+				action_target.occupied = false
+				$Carrying.play("pizza")
+			STATE.SERVING:
+				action_target.occupied = false
+				$Carrying.play("cooked_pizza")
+			STATE.TABLE:
+				if current_action == 0:
+					$Carrying.play("dough")
+				else:
+					$Carrying.play("tomato")
+			STATE.BREAK:
+				current_action = -1
 		state = s
 
 func _ready() -> void:
@@ -48,19 +60,10 @@ func _ready() -> void:
 		_on_broadcast(id, data)
 	)
 
-	var left_tween := create_tween().set_loops()
-	left_tween.tween_property($LeftHand, "rotation_degrees", -90, 0.5).from(0)
-	left_tween.tween_property($LeftHand, "rotation_degrees", 0, 0.5).from(-90)
+	oscillate_sprite($LeftHand)
+	oscillate_sprite($RightHand)
 	
-	var right_tween := create_tween().set_loops()
-	right_tween.tween_property($RightHand, "rotation_degrees", -90, 0.5).from(0)
-	right_tween.tween_property($RightHand, "rotation_degrees", 0, 0.5).from(-90)
-	
-	var action_bb_vars := [&"PASTAMAN",
-		&"DECORATOR",
-		&"COOK",
-		&"WAITER"]
-	
+	var action_bb_vars := [&"PASTAMAN", &"DECORATOR", &"COOK", &"WAITER"]
 	possible_actions.shuffle()	
 	for i in range(len(action_bb_vars)):
 		bt_player.blackboard.set_var(action_bb_vars[i], possible_actions[i])
@@ -98,3 +101,8 @@ func _process(delta):
 	
 func get_possible_actions():
 	return [possible_actions.find(true), possible_actions.rfind(true)]
+	
+func oscillate_sprite(sprite):
+	var r_tween := create_tween().set_loops()
+	r_tween.tween_property(sprite, "rotation_degrees", -90, 0.5).from(0)
+	r_tween.tween_property(sprite, "rotation_degrees", 0, 0.5).from(-90)

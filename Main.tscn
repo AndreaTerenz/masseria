@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=10 format=3 uid="uid://y03djfecm8p4"]
 
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="2_5qmts"]
 [ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://KitchenThings/oven.tscn" id="3_6da2g"]
 [ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="3_piqc7"]
 [ext_resource type="Texture2D" uid="uid://droy782oinaw" path="res://icon.svg" id="4_bfiv8"]
+[ext_resource type="Script" path="res://score.gd" id="5_tcaa7"]
 
 [sub_resource type="GDScript" id="GDScript_i6dm0"]
 resource_name = "kitchen"
@@ -98,6 +99,7 @@ script/source = "extends Control
 
 @onready var order_count: Label = $VBoxContainer2/OrderCount
 @onready var pizza_list: HBoxContainer = $VBoxContainer2/PizzaList
+@onready var score_label: Label = $Score
 
 func _on_kitchen_orders_changed(new_val: int, diff: int) -> void:
 	order_count.text = \"Total orders: %d\" % new_val
@@ -113,15 +115,21 @@ resource_name = "orders_view"
 script/source = "extends HBoxContainer
 
 @export var pizza_scene : PackedScene = preload(\"res://Pizza.tscn\")
+@export var UI: Panel
 
 var offset := -1.0
+var times := []
 
 func add_pizza():
 	var pizza = pizza_scene.instantiate()
+	times.append(Time.get_unix_time_from_system())
 	add_child(pizza)
 
 func remove_first():
 	remove_child(get_child(0))
+	var score = 100 - (Time.get_unix_time_from_system() - times.pop_front())
+	UI.score_label.score += score
+	
 "
 
 [node name="Kitchen" type="Node2D"]
@@ -217,12 +225,13 @@ theme_override_colors/font_shadow_color = Color(0.792157, 0.176471, 0, 1)
 theme_override_font_sizes/font_size = 24
 text = "Total orders: 0"
 
-[node name="PizzaList" type="HBoxContainer" parent="UI/VBoxContainer2"]
+[node name="PizzaList" type="HBoxContainer" parent="UI/VBoxContainer2" node_paths=PackedStringArray("UI")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 3
 alignment = 1
 script = SubResource("GDScript_rxako")
+UI = NodePath("../..")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI"]
 layout_mode = 1
@@ -247,6 +256,20 @@ layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 28
 text = "Add agent"
+
+[node name="Score" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 326.0
+offset_top = 5.0
+offset_right = 826.0
+offset_bottom = 105.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0.501961, 1, 1)
+theme_override_font_sizes/font_size = 25
+text = "Score:
+0"
+horizontal_alignment = 1
+script = ExtResource("5_tcaa7")
 
 [connection signal="orders_changed" from="." to="UI" method="_on_kitchen_orders_changed"]
 [connection signal="pressed" from="UI/VBoxContainer/NewPizza" to="." method="_on_new_pizza"]

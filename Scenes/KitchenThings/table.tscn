@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://cvquwoqa7jito"]
+
+[ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="1_88ge3"]
+
+[sub_resource type="GDScript" id="GDScript_t0ba4"]
+resource_name = "table"
+script/source = "extends Sprite2D
+
+func _ready():
+	add_to_group(&\"Tables\")
+"
+
+[node name="Table" type="Sprite2D"]
+position = Vector2(512, 320)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("1_88ge3")
+script = SubResource("GDScript_t0ba4")

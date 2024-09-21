@@ -33,21 +33,22 @@ func _setup() -> void:
 
 # Called when the task is entered.
 func _enter() -> void:
-	if group_valid:
-		var tmp : Node2D = get_closest_of(target_group)
-		target = tmp.global_position
-		
-		if target_group == &"Ovens":
-			blackboard.set_var(&"current_oven", tmp)
-	else:
+	if not group_valid:
 		target = get_closest_path_point()
+		return
+		
+	var tmp : Node2D = get_closest_of(target_group)
+	target = tmp.global_position
+	
+	if target_group == &"Ovens":
+		blackboard.set_var(&"current_oven", tmp)
 
 
 # Called each time this task is ticked (aka executed).
 func _tick(delta: float) -> Status:
 	var here : Vector2 = agent.global_position
 	
-	if here == target:
+	if here.distance_to(target) < 0.001:
 		return SUCCESS
 	
 	agent.global_position = here.move_toward(target, delta * agent.mov_speed)
@@ -55,7 +56,7 @@ func _tick(delta: float) -> Status:
 	return RUNNING
 
 func get_closest_of(group: StringName):
-	if agent.action_target and group != "Fridges":
+	if agent.action_target and group != &"Fridges":
 		return agent.action_target
 	
 	var here : Vector2 = agent.global_position
@@ -66,23 +67,19 @@ func get_closest_of(group: StringName):
 	for target in group_nodes:
 		var d : float = target.global_position.distance_to(here)
 		
-		if group in ["Tables", "Ovens"] and target.occupied:
+		if group in [&"Tables", &"Ovens"] and target.occupied:
 			continue
 		
 		if d < min_dist:
 			min_dist = d
 			closest = target
 			
-	if group not in ["Fridges", "Break"] and closest:
+	if group not in [&"Fridges", &"Break"] and closest:
 		agent.action_target = closest
-		if group != "Exit":
+		if group != &"Exit":
 			agent.action_target.occupied = true
 	
 	return closest
 
 func get_closest_path_point():
-	var curve_p := path.to_local(here)
-		
-	return path.curve.get_closest_point(curve_p)
-	
-	#return path.curve.get_closest_offset(curve_p)
+	return path.curve.get_closest_point(path.to_local(here))

@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=11 format=3 uid="uid://y03djfecm8p4"]
 
-[ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="2_5qmts"]
-[ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://KitchenThings/oven.tscn" id="3_6da2g"]
-[ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="3_piqc7"]
-[ext_resource type="Texture2D" uid="uid://droy782oinaw" path="res://icon.svg" id="4_bfiv8"]
-[ext_resource type="Script" path="res://score.gd" id="5_tcaa7"]
+[ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://Scenes/KitchenThings/oven.tscn" id="1_nda1u"]
+[ext_resource type="PackedScene" uid="uid://cvquwoqa7jito" path="res://Scenes/KitchenThings/table.tscn" id="2_5wjk2"]
+[ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="3_nlnuv"]
+[ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="4_bx3c8"]
+[ext_resource type="Texture2D" uid="uid://droy782oinaw" path="res://icon.svg" id="5_kmdbf"]
+[ext_resource type="Script" path="res://score.gd" id="6_8jt66"]
 
 [sub_resource type="GDScript" id="GDScript_i6dm0"]
 resource_name = "kitchen"
@@ -12,7 +13,7 @@ script/source = "extends Node2D
 
 signal orders_changed(new_val: int, diff: int)
 
-@export var agent_scene : PackedScene = preload(\"res://dummy_agent.tscn\")
+@export var agent_scene : PackedScene = preload(\"res://Scenes/Agent.tscn\")
 
 @onready var timer = Timer.new()
 
@@ -114,7 +115,7 @@ func _on_kitchen_orders_changed(new_val: int, diff: int) -> void:
 resource_name = "orders_view"
 script/source = "extends HBoxContainer
 
-@export var pizza_scene : PackedScene = preload(\"res://Pizza.tscn\")
+@export var pizza_scene : PackedScene = preload(\"res://Scenes/Pizza.tscn\")
 @export var UI: Panel
 
 var offset := -1.0
@@ -138,57 +139,48 @@ script = SubResource("GDScript_i6dm0")
 [node name="IdlePath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_obaid")
 
-[node name="Oven" parent="." instance=ExtResource("3_6da2g")]
+[node name="Oven" parent="." instance=ExtResource("1_nda1u")]
 position = Vector2(64, 584)
 
-[node name="Oven2" parent="." instance=ExtResource("3_6da2g")]
+[node name="Oven2" parent="." instance=ExtResource("1_nda1u")]
 position = Vector2(192, 584)
 
-[node name="Oven3" parent="." instance=ExtResource("3_6da2g")]
+[node name="Oven3" parent="." instance=ExtResource("1_nda1u")]
 position = Vector2(960, 584)
 
-[node name="Oven4" parent="." instance=ExtResource("3_6da2g")]
+[node name="Oven4" parent="." instance=ExtResource("1_nda1u")]
 position = Vector2(1088, 584)
 
-[node name="Table" type="Sprite2D" parent="." groups=["Tables"]]
-position = Vector2(512, 320)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
+[node name="Table" parent="." instance=ExtResource("2_5wjk2")]
 
-[node name="Table2" type="Sprite2D" parent="." groups=["Tables"]]
+[node name="Table2" parent="." instance=ExtResource("2_5wjk2")]
 position = Vector2(640, 320)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
 
-[node name="Table3" type="Sprite2D" parent="." groups=["Tables"]]
-position = Vector2(512, 584)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
+[node name="Table3" parent="." instance=ExtResource("2_5wjk2")]
+position = Vector2(520, 584)
 
-[node name="Table4" type="Sprite2D" parent="." groups=["Tables"]]
-position = Vector2(640, 584)
-scale = Vector2(1.6, 1.6)
-texture = ExtResource("2_5qmts")
+[node name="Table4" parent="." instance=ExtResource("2_5wjk2")]
+position = Vector2(648, 584)
 
 [node name="Fridge" type="Sprite2D" parent="." groups=["Fridges"]]
 position = Vector2(1088, 128)
 scale = Vector2(1.6, 3.2)
-texture = ExtResource("2_5qmts")
+texture = ExtResource("3_nlnuv")
 
 [node name="DoughFridge" type="Sprite2D" parent="." groups=["Fridges"]]
 position = Vector2(64, 128)
 scale = Vector2(1.6, 3.2)
-texture = ExtResource("2_5qmts")
+texture = ExtResource("3_nlnuv")
 
 [node name="Exit" type="Sprite2D" parent="." groups=["Exit"]]
 position = Vector2(576, 16)
 scale = Vector2(3.2, 0.4)
-texture = ExtResource("3_piqc7")
+texture = ExtResource("4_bx3c8")
 
 [node name="BreakPoint" type="Sprite2D" parent="." groups=["Break"]]
 modulate = Color(1, 1, 1, 0.270588)
 position = Vector2(1026, 385)
-texture = ExtResource("4_bfiv8")
+texture = ExtResource("5_kmdbf")
 
 [node name="BreakLabel" type="Label" parent="BreakPoint"]
 offset_left = -70.0
@@ -269,7 +261,7 @@ theme_override_font_sizes/font_size = 25
 text = "Score:
 0"
 horizontal_alignment = 1
-script = ExtResource("5_tcaa7")
+script = ExtResource("6_8jt66")
 
 [connection signal="orders_changed" from="." to="UI" method="_on_kitchen_orders_changed"]
 [connection signal="pressed" from="UI/VBoxContainer/NewPizza" to="." method="_on_new_pizza"]

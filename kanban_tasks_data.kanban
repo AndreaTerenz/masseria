@@ -79,7 +79,7 @@
 			"steps": [
 				{
 					"details": "si dovrebbe vedere se c'è una pizza abbandonata su un tavolo",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "aggiungere UI o simile per capire chi può fare cosa",

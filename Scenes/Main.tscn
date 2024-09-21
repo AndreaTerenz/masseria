@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="3_nlnuv"]
 [ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="4_bx3c8"]
 [ext_resource type="Texture2D" uid="uid://droy782oinaw" path="res://icon.svg" id="5_kmdbf"]
-[ext_resource type="Script" path="res://score.gd" id="6_8jt66"]
+[ext_resource type="Script" path="res://Script/score.gd" id="6_8jt66"]
 
 [sub_resource type="GDScript" id="GDScript_i6dm0"]
 resource_name = "kitchen"
@@ -25,6 +25,14 @@ var orders := 0:
 		orders_changed.emit(orders, diff)
 var on_cooldown = false
 
+func _ready():
+	# TODO: This fix is extremely ass. It works.
+	add_child(timer)
+	timer.connect(\"timeout\", func():
+		on_cooldown = false
+	)
+	timer.wait_time = 0.2
+
 func _on_new_pizza() -> void:
 	add_job(0, null)
 	orders += 1
@@ -41,7 +49,7 @@ func _on_new_agent():
 
 func add_job(id: int, location=null):
 	jobs.append([id, location])
-	print(\"Added job \", id, \" \", location)
+	print(\"Added job %s at %s\" % [id, location])
 	
 func request_job(curriculum):
 	var job_id = -1
@@ -51,41 +59,35 @@ func request_job(curriculum):
 		return [job_id, job_location]
 	
 	for job in jobs:
-		if curriculum[job[0]]:
+		if not curriculum[job[0]]:
+			continue
+		
+		var valid_job = (job[0] == 1)
+		var id_to_group := {
+			0: &\"Tables\",
+			2: &\"Ovens\"
+		}
+		
+		if not valid_job:
+			var group : StringName = id_to_group[job[0]]
 			
-			var valid_job = false
-			if job[0] == 0:
-				for child in self.find_children(\"*\"):
-					if child.is_in_group(\"Tables\") and not child.occupied:
-						valid_job = true
-			elif job[0] == 2:
-				for child in self.find_children(\"*\"):
-					if child.is_in_group(\"Ovens\") and not child.occupied:
-						valid_job = true
-			else:
-				valid_job = true
-						
-			if valid_job:
-				job_id = job[0]
-				job_location = job[1]
-				jobs.erase(job)
-				on_cooldown = true
-				timer.start()
-				print(\"Returned job \", job)
-				break
+			for child in get_children():
+				if child.is_in_group(group) and not child.occupied:
+					valid_job = true
+					break
+					
+			if not valid_job:
+				continue
+			
+		job_id = job[0]
+		job_location = job[1]
+		jobs.erase(job)
+		on_cooldown = true
+		timer.start()
+		print(\"Returned job \", job)
+		break
+			
 	return [job_id, job_location]
-	
-func _on_timer_timeout() -> void:
-	on_cooldown = false
-
-func _ready():
-	for child in self.find_children(\"*\"):
-		if child.is_in_group(\"Tables\"):
-			child.set_script(load(\"res://Script/kitchen_sprite.gd\"))
-	# TODO: This fix is extremely ass. It works.
-	add_child(timer)
-	timer.connect(\"timeout\", Callable(self, \"_on_timer_timeout\"))
-	timer.wait_time = 0.2
 "
 
 [sub_resource type="Curve2D" id="Curve2D_obaid"]
@@ -152,6 +154,7 @@ position = Vector2(960, 584)
 position = Vector2(1088, 584)
 
 [node name="Table" parent="." instance=ExtResource("2_5wjk2")]
+position = Vector2(512, 320)
 
 [node name="Table2" parent="." instance=ExtResource("2_5wjk2")]
 position = Vector2(640, 320)

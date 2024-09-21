@@ -21,9 +21,9 @@ var agent_id : StringName = &"default"
 var possible_actions = [true, true, false, false]
 var kitchen = null
 var break_location = null
-var current_action = -1
-var action_target = null
 
+var action_target = null
+var current_action = -1
 var state := STATE.IDLE :
 	set(s):
 		if s in [STATE.IDLE, STATE.BREAK]:
@@ -63,16 +63,19 @@ func _ready() -> void:
 	oscillate_sprite($LeftHand)
 	oscillate_sprite($RightHand)
 	
+	possible_actions.shuffle()
+	
 	var action_bb_vars := [&"PASTAMAN", &"DECORATOR", &"COOK", &"WAITER"]
-	possible_actions.shuffle()	
+	
 	for i in range(len(action_bb_vars)):
 		bt_player.blackboard.set_var(action_bb_vars[i], possible_actions[i])
 	
-	bt_player.blackboard.bind_var_to_property(&"state", self, &"state")
-	bt_player.blackboard.bind_var_to_property(&"current_action", self, &"current_action")
 	
+	var to_bind := [&"state", &"current_action", &"action_target"]
+	for v in to_bind:
+		bt_player.blackboard.bind_var_to_property(v, self, v)
+		
 	state = STATE.IDLE
-	
 	
 func _on_broadcast(id, val):
 	if id == &"PISELLARE" and possible_actions[0] and state == STATE.IDLE:

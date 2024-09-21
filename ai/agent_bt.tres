@@ -1,8 +1,9 @@
-[gd_resource type="BehaviorTree" load_steps=125 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=131 format=3 uid="uid://bv6csbkmtc48m"]
 
-[ext_resource type="Script" path="res://ai/tasks/IdleStep.gd" id="1_3itpa"]
-[ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_rg1dp"]
-[ext_resource type="Script" path="res://ai/tasks/AwaitSignal.gd" id="2_jmokk"]
+[ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_y8ahv"]
+[ext_resource type="Script" path="res://ai/tasks/GoToIdlePath.gd" id="2_nv2oq"]
+[ext_resource type="Script" path="res://ai/tasks/AwaitSignal.gd" id="3_y3jh6"]
+[ext_resource type="Script" path="res://ai/tasks/IdleStep.gd" id="4_x3o0u"]
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_b644n"]
 var/idle/name = &"idle"
@@ -19,6 +20,10 @@ var/current_oven/name = &"current_oven"
 var/current_oven/type = 24
 var/current_oven/hint = 34
 var/current_oven/hint_string = ""
+var/action_target/name = &"action_target"
+var/action_target/type = 24
+var/action_target/hint = 34
+var/action_target/hint_string = ""
 var/PASTAMAN/name = &"PASTAMAN"
 var/PASTAMAN/type = 1
 var/PASTAMAN/value = false
@@ -56,11 +61,11 @@ value = SubResource("BBVariant_lx0yt")
 custom_name = "check_fridge"
 
 [sub_resource type="BTAction" id="BTAction_lswe5"]
-script = ExtResource("1_rg1dp")
+script = ExtResource("1_y8ahv")
 target_group = &"Tables"
 
 [sub_resource type="BTAction" id="BTAction_u26pg"]
-script = ExtResource("1_rg1dp")
+script = ExtResource("1_y8ahv")
 target_group = &"Fridges"
 
 [sub_resource type="BTWait" id="BTWait_3qkw8"]
@@ -100,11 +105,20 @@ value = SubResource("BBVariant_8nf1a")
 custom_name = "check_table"
 
 [sub_resource type="BTAction" id="BTAction_mjyu7"]
-script = ExtResource("1_rg1dp")
+script = ExtResource("1_y8ahv")
 target_group = &"Tables"
 
 [sub_resource type="BTWait" id="BTWait_iq4t6"]
 duration = 2.0
+
+[sub_resource type="BBNode" id="BBNode_oebdf"]
+value_source = 1
+variable = &"action_target"
+resource_name = "$action_target"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_77d8m"]
+node = SubResource("BBNode_oebdf")
+method = &"next_state"
 
 [sub_resource type="BBNode" id="BBNode_qem7w"]
 saved_value = NodePath("Carrying")
@@ -220,13 +234,13 @@ variable = &"current_action"
 value = SubResource("BBVariant_ph6h7")
 operation = 1
 
-[sub_resource type="BTAction" id="BTAction_o78rf"]
-script = ExtResource("1_rg1dp")
+[sub_resource type="BTAction" id="BTAction_jbqbo"]
+script = ExtResource("2_nv2oq")
 target_group = &""
 
 [sub_resource type="BTSequence" id="BTSequence_okq56"]
 custom_name = "Return IDLE"
-children = [SubResource("BTSetVar_23sdi"), SubResource("BTSetVar_2uopa"), SubResource("BTAction_o78rf")]
+children = [SubResource("BTSetVar_23sdi"), SubResource("BTSetVar_2uopa"), SubResource("BTAction_jbqbo")]
 metadata/_weight_ = 9.0
 
 [sub_resource type="BBVariant" id="BBVariant_cm4oh"]
@@ -256,7 +270,7 @@ custom_name = "Hide the ingredient"
 
 [sub_resource type="BTSequence" id="BTSequence_oivck"]
 custom_name = "Table"
-children = [SubResource("BTCheckVar_gnb4p"), SubResource("BTAction_mjyu7"), SubResource("BTWait_iq4t6"), SubResource("BTCallMethod_gkn7w"), SubResource("BTSelector_7dx6t"), SubResource("BTCallMethod_ls2d7")]
+children = [SubResource("BTCheckVar_gnb4p"), SubResource("BTAction_mjyu7"), SubResource("BTWait_iq4t6"), SubResource("BTCallMethod_77d8m"), SubResource("BTCallMethod_gkn7w"), SubResource("BTSelector_7dx6t"), SubResource("BTCallMethod_ls2d7")]
 
 [sub_resource type="BBVariant" id="BBVariant_8rhvh"]
 type = 2
@@ -269,7 +283,7 @@ value = SubResource("BBVariant_8rhvh")
 custom_name = "check_oven"
 
 [sub_resource type="BTAction" id="BTAction_g4rw8"]
-script = ExtResource("1_rg1dp")
+script = ExtResource("1_y8ahv")
 target_group = &"Tables"
 
 [sub_resource type="BBNode" id="BBNode_2iseu"]
@@ -291,6 +305,15 @@ property = &"action_target.occupied"
 value = SubResource("BBVariant_4vw8r")
 custom_name = "Free the Table"
 
+[sub_resource type="BBNode" id="BBNode_3taxg"]
+value_source = 1
+variable = &"action_target"
+resource_name = "$action_target"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_hve5q"]
+node = SubResource("BBNode_3taxg")
+method = &"next_state"
+
 [sub_resource type="BBVariant" id="BBVariant_5vh4x"]
 saved_value = null
 resource_name = "<null>"
@@ -300,7 +323,7 @@ property = &"action_target"
 value = SubResource("BBVariant_5vh4x")
 
 [sub_resource type="BTAction" id="BTAction_gwq51"]
-script = ExtResource("1_rg1dp")
+script = ExtResource("1_y8ahv")
 target_group = &"Ovens"
 
 [sub_resource type="BBNode" id="BBNode_icqe1"]
@@ -323,7 +346,7 @@ resource_name = "$current_oven"
 
 [sub_resource type="BTAction" id="BTAction_xjdal"]
 custom_name = "Await oven done"
-script = ExtResource("2_jmokk")
+script = ExtResource("3_y3jh6")
 signal_source = SubResource("BBNode_pn1df")
 signal_name = SubResource("BBStringName_8rr5f")
 
@@ -380,13 +403,13 @@ variable = &"current_action"
 value = SubResource("BBVariant_m6o2r")
 operation = 1
 
-[sub_resource type="BTAction" id="BTAction_wlja7"]
-script = ExtResource("1_rg1dp")
+[sub_resource type="BTAction" id="BTAction_33b3w"]
+script = ExtResource("2_nv2oq")
 target_group = &""
 
 [sub_resource type="BTSequence" id="BTSequence_ucmtl"]
 custom_name = "Return IDLE"
-children = [SubResource("BTSetVar_kgi8y"), SubResource("BTSetVar_u0e56"), SubResource("BTAction_wlja7")]
+children = [SubResource("BTSetVar_kgi8y"), SubResource("BTSetVar_u0e56"), SubResource("BTAction_33b3w")]
 metadata/_weight_ = 9.0
 
 [sub_resource type="BBVariant" id="BBVariant_7sxdq"]
@@ -407,7 +430,7 @@ children = [SubResource("BTSequence_82x4c"), SubResource("BTProbabilitySelector_
 
 [sub_resource type="BTSequence" id="BTSequence_kkgit"]
 custom_name = "Oven"
-children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_g4rw8"), SubResource("BTCallMethod_jgm2i"), SubResource("BTSetAgentProperty_jp6ug"), SubResource("BTSetAgentProperty_xnrjs"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTAction_xjdal"), SubResource("BTSelector_skyrv")]
+children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_g4rw8"), SubResource("BTCallMethod_jgm2i"), SubResource("BTSetAgentProperty_jp6ug"), SubResource("BTCallMethod_hve5q"), SubResource("BTSetAgentProperty_xnrjs"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTAction_xjdal"), SubResource("BTSelector_skyrv")]
 
 [sub_resource type="BBVariant" id="BBVariant_nv65k"]
 type = 2
@@ -420,7 +443,7 @@ value = SubResource("BBVariant_nv65k")
 custom_name = "check_exit"
 
 [sub_resource type="BTAction" id="BTAction_bb1sd"]
-script = ExtResource("1_rg1dp")
+script = ExtResource("1_y8ahv")
 target_group = &"Ovens"
 
 [sub_resource type="BBNode" id="BBNode_ccf28"]
@@ -451,7 +474,7 @@ property = &"action_target"
 value = SubResource("BBVariant_hwytb")
 
 [sub_resource type="BTAction" id="BTAction_h6van"]
-script = ExtResource("1_rg1dp")
+script = ExtResource("1_y8ahv")
 target_group = &"Exit"
 
 [sub_resource type="BBVariant" id="BBVariant_hwmta"]
@@ -505,13 +528,13 @@ variable = &"current_action"
 value = SubResource("BBVariant_k7peg")
 operation = 1
 
-[sub_resource type="BTAction" id="BTAction_nbdv6"]
-script = ExtResource("1_rg1dp")
+[sub_resource type="BTAction" id="BTAction_10if8"]
+script = ExtResource("2_nv2oq")
 target_group = &""
 
 [sub_resource type="BTSequence" id="BTSequence_8hcn4"]
 custom_name = "Return IDLE"
-children = [SubResource("BTSetVar_xyj2g"), SubResource("BTSetVar_s1cvx"), SubResource("BTAction_nbdv6")]
+children = [SubResource("BTSetVar_xyj2g"), SubResource("BTSetVar_s1cvx"), SubResource("BTAction_10if8")]
 metadata/_weight_ = 9.0
 
 [sub_resource type="BBVariant" id="BBVariant_6jw03"]
@@ -542,7 +565,7 @@ value = SubResource("BBVariant_iydsi")
 custom_name = "check_wait"
 
 [sub_resource type="BTAction" id="BTAction_cfxkk"]
-script = ExtResource("1_rg1dp")
+script = ExtResource("1_y8ahv")
 target_group = &"Break"
 
 [sub_resource type="BTWait" id="BTWait_bh2yi"]
@@ -568,19 +591,23 @@ variable = &"current_action"
 value = SubResource("BBVariant_01v54")
 operation = 1
 
-[sub_resource type="BTAction" id="BTAction_v7a3m"]
-script = ExtResource("1_rg1dp")
+[sub_resource type="BTAction" id="BTAction_qmun7"]
+script = ExtResource("2_nv2oq")
 target_group = &""
+
+[sub_resource type="BTSequence" id="BTSequence_4v1db"]
+custom_name = "Return IDLE"
+children = [SubResource("BTSetVar_ljn4j"), SubResource("BTSetVar_5eeav"), SubResource("BTAction_qmun7")]
 
 [sub_resource type="BTSequence" id="BTSequence_pad4m"]
 custom_name = "Break"
-children = [SubResource("BTCheckVar_vu2js"), SubResource("BTAction_cfxkk"), SubResource("BTWait_bh2yi"), SubResource("BTSetVar_ljn4j"), SubResource("BTSetVar_5eeav"), SubResource("BTAction_v7a3m")]
+children = [SubResource("BTCheckVar_vu2js"), SubResource("BTAction_cfxkk"), SubResource("BTWait_bh2yi"), SubResource("BTSequence_4v1db")]
 
 [sub_resource type="BTComment" id="BTComment_uc4cq"]
 custom_name = "If all above fail, step along idle path"
 
 [sub_resource type="BTAction" id="BTAction_pqujm"]
-script = ExtResource("1_3itpa")
+script = ExtResource("4_x3o0u")
 
 [sub_resource type="BTSelector" id="BTSelector_0xbrx"]
 children = [SubResource("BTSequence_s6ml5"), SubResource("BTSequence_oivck"), SubResource("BTSequence_kkgit"), SubResource("BTSequence_pld4j"), SubResource("BTSequence_pad4m"), SubResource("BTComment_uc4cq"), SubResource("BTAction_pqujm")]

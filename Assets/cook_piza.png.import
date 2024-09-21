@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ypnab4eeq25w"
-path="res://.godot/imported/cook_piza.png-779b8e4e05b1eda9279b81105ac790e2.ctex"
+path="res://.godot/imported/cook_piza.png-c7979a64d76139b232e461a192f788a1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ai/cook_piza.png"
-dest_files=["res://.godot/imported/cook_piza.png-779b8e4e05b1eda9279b81105ac790e2.ctex"]
+source_file="res://Assets/cook_piza.png"
+dest_files=["res://.godot/imported/cook_piza.png-c7979a64d76139b232e461a192f788a1.ctex"]
 
 [params]
 

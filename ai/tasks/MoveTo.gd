@@ -20,23 +20,14 @@ var group_valid: bool :
 
 var target : Vector2
 var to_oven := false
-var path : Path2D
 
 # Called to generate a display name for the task (requires @tool).
 func _generate_name() -> String:
 	return "Move to closest of : %s" % [target_group] if group_valid else "Move to idle path"
 
-# Called to initialize the task.
-func _setup() -> void:
-	path = agent.path
-
 
 # Called when the task is entered.
 func _enter() -> void:
-	if not group_valid:
-		target = get_closest_path_point()
-		return
-		
 	var tmp : Node2D = get_closest_of(target_group)
 	target = tmp.global_position
 	
@@ -80,6 +71,3 @@ func get_closest_of(group: StringName):
 			agent.action_target.occupied = true
 	
 	return closest
-
-func get_closest_path_point():
-	return path.curve.get_closest_point(path.to_local(here))

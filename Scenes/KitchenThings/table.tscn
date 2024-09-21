@@ -1,17 +1,48 @@
-[gd_scene load_steps=3 format=3 uid="uid://cvquwoqa7jito"]
+[gd_scene load_steps=5 format=3 uid="uid://cvquwoqa7jito"]
 
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="1_88ge3"]
+[ext_resource type="Texture2D" uid="uid://b2anau4ms0fv8" path="res://Assets/hand-made/piza.png" id="3_3uvge"]
+[ext_resource type="Texture2D" uid="uid://o2n05i2a1toc" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_circle.png" id="3_k0mq6"]
 
-[sub_resource type="GDScript" id="GDScript_t0ba4"]
+[sub_resource type="GDScript" id="GDScript_d42ou"]
 resource_name = "table"
-script/source = "extends Sprite2D
+script/source = "extends KitchenSprite
+
+enum TABLE_STATE {
+	EMPTY,
+	NO_SAUCE,
+	READY,
+}
+
+@export var texs : Dictionary[TABLE_STATE, Texture2D] = {}
+
+@onready var pizza_sprite: Sprite2D = $PizzaSprite
+
+var state : TABLE_STATE :
+	set(s):
+		state = s
+		pizza_sprite.texture = texs.get(state, null)
 
 func _ready():
 	add_to_group(&\"Tables\")
+	
+	state = TABLE_STATE.EMPTY
+
+func next_state():
+	state += 1
+	
+	if state > TABLE_STATE.READY:
+		state = TABLE_STATE.EMPTY
 "
 
 [node name="Table" type="Sprite2D"]
-position = Vector2(512, 320)
 scale = Vector2(1.6, 1.6)
 texture = ExtResource("1_88ge3")
-script = SubResource("GDScript_t0ba4")
+script = SubResource("GDScript_d42ou")
+texs = Dictionary[int, Texture2D]({
+1: ExtResource("3_k0mq6"),
+2: ExtResource("3_3uvge")
+})
+
+[node name="PizzaSprite" type="Sprite2D" parent="."]
+scale = Vector2(0.7, 0.7)

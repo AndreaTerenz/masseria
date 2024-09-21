@@ -2,9 +2,10 @@
 
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="1_xlxiv"]
 
-[sub_resource type="GDScript" id="GDScript_xsk0r"]
+[sub_resource type="GDScript" id="GDScript_6wvlc"]
 resource_name = "oven"
-script/source = "extends KitchenSprite
+script/source = "class_name Oven
+extends KitchenSprite
 
 signal done
 
@@ -47,7 +48,7 @@ bg_color = Color(0.0241877, 0.718043, 0.359537, 1)
 [node name="Oven" type="Sprite2D"]
 scale = Vector2(1.6, 1.6)
 texture = ExtResource("1_xlxiv")
-script = SubResource("GDScript_xsk0r")
+script = SubResource("GDScript_6wvlc")
 
 [node name="UI" type="Panel" parent="."]
 clip_children = 1

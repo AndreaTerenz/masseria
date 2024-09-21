@@ -1,12 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://darf8jrsiosb6"]
+[gd_scene load_steps=4 format=3 uid="uid://darf8jrsiosb6"]
 
 [ext_resource type="Texture2D" uid="uid://o2n05i2a1toc" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_circle.png" id="1_dit0m"]
 [ext_resource type="Texture2D" uid="uid://biifatb5t0jmy" path="res://Assets/hand-made/PIZZATIME.png" id="1_ph3vt"]
-[ext_resource type="Texture2D" uid="uid://q5jfpgygsg1s" path="res://Assets/kenney_shape-characters/PNG/Default/blue_body_circle.png" id="2_x5eul"]
-[ext_resource type="Texture2D" uid="uid://d35x5r8fow2d1" path="res://Assets/kenney_shape-characters/PNG/Default/green_body_circle.png" id="3_vgk4o"]
-[ext_resource type="Texture2D" uid="uid://cop70cguifk75" path="res://Assets/kenney_shape-characters/PNG/Default/pink_body_circle.png" id="4_crbi4"]
-[ext_resource type="Texture2D" uid="uid://l2oniva8j8q2" path="res://Assets/kenney_shape-characters/PNG/Default/purple_body_circle.png" id="5_r37hm"]
-[ext_resource type="Texture2D" uid="uid://uee7jsw1ofty" path="res://Assets/kenney_shape-characters/PNG/Default/red_body_circle.png" id="6_u5qep"]
 
 [sub_resource type="GDScript" id="GDScript_c358m"]
 script/source = "extends Control
@@ -15,16 +10,6 @@ script/source = "extends Control
 
 func _ready() -> void:
 	custom_minimum_size.x = (front.texture.get_size() * front.scale).x / 2.0
-"
-
-[sub_resource type="GDScript" id="GDScript_1lov1"]
-resource_name = "random_pizza"
-script/source = "extends Sprite2D
-
-@export var pizzas : Array[CompressedTexture2D] = []
-
-# func _ready() -> void:
-# 	texture = pizzas.pick_random()
 "
 
 [node name="Pizza" type="Control"]
@@ -41,8 +26,6 @@ position = Vector2(0, 30)
 scale = Vector2(0.7, 0.7)
 texture = ExtResource("1_ph3vt")
 offset = Vector2(40, 0)
-script = SubResource("GDScript_1lov1")
-pizzas = Array[CompressedTexture2D]([ExtResource("1_dit0m"), ExtResource("2_x5eul"), ExtResource("3_vgk4o"), ExtResource("4_crbi4"), ExtResource("5_r37hm"), ExtResource("6_u5qep")])
 metadata/_edit_group_ = true
 
 [node name="Shadow" type="Sprite2D" parent="Front"]

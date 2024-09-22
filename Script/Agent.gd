@@ -13,6 +13,7 @@ enum STATE {
 }
 
 @export var mov_speed := 500.0
+@export var break_dance_speed := 2.0
 @export var path : Path2D
 
 @onready var bt_player: BTPlayer = $BTPlayer
@@ -77,30 +78,37 @@ func _ready() -> void:
 		
 	state = STATE.IDLE
 	
-func _on_broadcast(id, val):
+func _on_broadcast(id, _val):
 	if id == &"PISELLARE" and possible_actions[0] and state == STATE.IDLE:
 		state = STATE.FRIDGE
 		current_action = 0
 		
 # Probably useless
-func _on_direct_signal(id, val):
+func _on_direct_signal(_id, _val):
 	if state == STATE.BREAK:
 		state = STATE.IDLE
 		current_action = -1
+
+func idle_step(delta: float):
+	var offset := path.curve.get_closest_offset(global_position)
+	offset += delta * mov_speed
 	
-func _process(delta):
-	match state:
-		STATE.BREAK:
-			if position == break_location:
-				rotation_degrees += 1
-		STATE.IDLE:
-			var new_job = kitchen.request_job(possible_actions)
-			if new_job[0] != -1:
-				current_action = new_job[0]
-				action_target = new_job[1]
-				state = current_action + 1
-				if state == STATE.TABLE:
-					state = STATE.FRIDGE
+	if offset >= path.curve.get_baked_length():
+		offset = 0.
+
+	global_position = path.to_global(path.curve.sample_baked(offset))
+
+func request_new_job():
+	var new_job = kitchen.request_job(possible_actions)
+	if new_job[0] == -1:
+		return
+		
+	current_action = new_job[0]
+	action_target = new_job[1]
+	
+	state = current_action + 1
+	if state == STATE.TABLE:
+		state = STATE.FRIDGE
 	
 func get_possible_actions():
 	return [possible_actions.find(true), possible_actions.rfind(true)]

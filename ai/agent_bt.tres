@@ -1,9 +1,9 @@
-[gd_resource type="BehaviorTree" load_steps=131 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=135 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_y8ahv"]
 [ext_resource type="Script" path="res://ai/tasks/GoToIdlePath.gd" id="2_nv2oq"]
 [ext_resource type="Script" path="res://ai/tasks/AwaitSignal.gd" id="3_y3jh6"]
-[ext_resource type="Script" path="res://ai/tasks/IdleStep.gd" id="4_x3o0u"]
+[ext_resource type="Script" path="res://ai/tasks/Break.gd" id="4_y1mfo"]
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_b644n"]
 var/idle/name = &"idle"
@@ -568,8 +568,9 @@ custom_name = "check_wait"
 script = ExtResource("1_y8ahv")
 target_group = &"Break"
 
-[sub_resource type="BTWait" id="BTWait_bh2yi"]
-duration = 10.0
+[sub_resource type="BTAction" id="BTAction_wsaot"]
+script = ExtResource("4_y1mfo")
+time_limit = 10.0
 
 [sub_resource type="BBVariant" id="BBVariant_o0jp3"]
 type = 2
@@ -601,16 +602,34 @@ children = [SubResource("BTSetVar_ljn4j"), SubResource("BTSetVar_5eeav"), SubRes
 
 [sub_resource type="BTSequence" id="BTSequence_pad4m"]
 custom_name = "Break"
-children = [SubResource("BTCheckVar_vu2js"), SubResource("BTAction_cfxkk"), SubResource("BTWait_bh2yi"), SubResource("BTSequence_4v1db")]
+children = [SubResource("BTCheckVar_vu2js"), SubResource("BTAction_cfxkk"), SubResource("BTAction_wsaot"), SubResource("BTSequence_4v1db")]
 
 [sub_resource type="BTComment" id="BTComment_uc4cq"]
-custom_name = "If all above fail, step along idle path"
+custom_name = "If all above fail, step along idle path and check new job"
 
-[sub_resource type="BTAction" id="BTAction_pqujm"]
-script = ExtResource("4_x3o0u")
+[sub_resource type="BBNode" id="BBNode_3vr6y"]
+saved_value = NodePath(".")
+resource_name = "."
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_pkkoi"]
+node = SubResource("BBNode_3vr6y")
+method = &"idle_step"
+args_include_delta = true
+
+[sub_resource type="BBNode" id="BBNode_1g4nq"]
+saved_value = NodePath(".")
+resource_name = "."
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_exfy3"]
+node = SubResource("BBNode_1g4nq")
+method = &"request_new_job"
+
+[sub_resource type="BTSequence" id="BTSequence_leljs"]
+custom_name = "Idle"
+children = [SubResource("BTCallMethod_pkkoi"), SubResource("BTCallMethod_exfy3")]
 
 [sub_resource type="BTSelector" id="BTSelector_0xbrx"]
-children = [SubResource("BTSequence_s6ml5"), SubResource("BTSequence_oivck"), SubResource("BTSequence_kkgit"), SubResource("BTSequence_pld4j"), SubResource("BTSequence_pad4m"), SubResource("BTComment_uc4cq"), SubResource("BTAction_pqujm")]
+children = [SubResource("BTSequence_s6ml5"), SubResource("BTSequence_oivck"), SubResource("BTSequence_kkgit"), SubResource("BTSequence_pld4j"), SubResource("BTSequence_pad4m"), SubResource("BTComment_uc4cq"), SubResource("BTSequence_leljs")]
 
 [resource]
 blackboard_plan = SubResource("BlackboardPlan_b644n")

@@ -47,7 +47,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="DummyAgent" type="Sprite2D"]
+[node name="Agent" type="Sprite2D"]
 texture_filter = 1
 texture = ExtResource("1_6xupl")
 script = ExtResource("2_u83cq")

@@ -105,6 +105,22 @@
 			"description": "\"beliefs\" che un agente aggiorna dinamicamente la sua conoscenza del layout della cucina\nE fare il layout modificabile\n(E mentre gira si segna ciò che entra nel suo range visivo)",
 			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
 			"steps": []
+		},
+		{
+			"uuid": "a0e63e7f-212d-4bc8-b556-4bbf5b25f23d",
+			"title": "il _process di Agent.gd dovrebbe essere sempre fatto tramite il BT ",
+			"description": "dato che viene eseguito \"in contemporanea\" al BT, potrebbero interferire tra loro",
+			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
+			"steps": [
+				{
+					"details": "get_new_job()\n\ncreare un metodo a parte in Agent per ottenere il prossimo job, chiamandolo in un punto apposito del BTs",
+					"done": true
+				},
+				{
+					"details": "BreakTurn\n\ncome per l'azione IdleStep, ogni \"step\" della danzetta della pausa dovrebbe essere fatto con un'azione apposta nel BT",
+					"done": true
+				}
+			]
 		}
 	],
 	"layout": {

@@ -15,15 +15,17 @@ signal orders_changed(new_val: int, diff: int)
 
 @export var agent_scene : PackedScene = preload(\"res://Scenes/Agent.tscn\")
 
-@onready var timer = Timer.new()
+@onready var idle_path: Path2D = $IdlePath
+@onready var break_point: Sprite2D = $BreakPoint
 
+var timer := Timer.new()
 var jobs : Array[Array] = []
+var on_cooldown := false
 var orders := 0:
 	set(v):
 		var diff : int = v - orders
 		orders = v
 		orders_changed.emit(orders, diff)
-var on_cooldown = false
 
 func _ready():
 	# TODO: This fix is extremely ass. It works.
@@ -38,12 +40,12 @@ func _on_new_pizza() -> void:
 	orders += 1
 
 func _on_new_agent():
-	var agg = agent_scene.instantiate()
+	var agg : Agent = agent_scene.instantiate()
 	
-	agg.path = $IdlePath
+	agg.path = idle_path
 	agg.kitchen = self
 	# TODO: Is this the best way?
-	agg.break_location = $BreakPoint.position
+	agg.break_location = break_point.position
 	
 	add_child(agg)
 	

@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=139 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=147 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_y8ahv"]
 [ext_resource type="Script" path="res://ai/tasks/GoToIdlePath.gd" id="2_nv2oq"]
@@ -16,14 +16,15 @@ var/state/type = 2
 var/state/value = 0
 var/state/hint = 2
 var/state/hint_string = "IDLE,FRIDGE,OVEN,TABLE"
-var/current_oven/name = &"current_oven"
-var/current_oven/type = 24
-var/current_oven/hint = 34
-var/current_oven/hint_string = ""
 var/action_target/name = &"action_target"
 var/action_target/type = 24
 var/action_target/hint = 34
 var/action_target/hint_string = ""
+var/current_action/name = &"current_action"
+var/current_action/type = 2
+var/current_action/value = 0
+var/current_action/hint = 2
+var/current_action/hint_string = "DOUGH, DECORATE, COOK, SERVE"
 var/PASTAMAN/name = &"PASTAMAN"
 var/PASTAMAN/type = 1
 var/PASTAMAN/value = false
@@ -44,11 +45,6 @@ var/WAITER/type = 1
 var/WAITER/value = false
 var/WAITER/hint = 0
 var/WAITER/hint_string = "Can do action 4"
-var/current_action/name = &"current_action"
-var/current_action/type = 2
-var/current_action/value = 0
-var/current_action/hint = 2
-var/current_action/hint_string = "DOUGH, DECORATE, COOK, SERVE"
 
 [sub_resource type="BBVariant" id="BBVariant_lx0yt"]
 type = 2
@@ -60,13 +56,21 @@ variable = &"state"
 value = SubResource("BBVariant_lx0yt")
 custom_name = "check_fridge"
 
+[sub_resource type="BBStringName" id="BBStringName_dkt6h"]
+saved_value = &"Tables"
+resource_name = "Tables"
+
 [sub_resource type="BTAction" id="BTAction_lswe5"]
 script = ExtResource("1_y8ahv")
-target_group = &"Tables"
+target_group = SubResource("BBStringName_dkt6h")
+
+[sub_resource type="BBStringName" id="BBStringName_8413m"]
+saved_value = &"Fridges"
+resource_name = "Fridges"
 
 [sub_resource type="BTAction" id="BTAction_u26pg"]
 script = ExtResource("1_y8ahv")
-target_group = &"Fridges"
+target_group = SubResource("BBStringName_8413m")
 
 [sub_resource type="BTWait" id="BTWait_3qkw8"]
 duration = 2.0
@@ -104,9 +108,13 @@ variable = &"state"
 value = SubResource("BBVariant_8nf1a")
 custom_name = "check_table"
 
+[sub_resource type="BBStringName" id="BBStringName_nx8hj"]
+saved_value = &"Tables"
+resource_name = "Tables"
+
 [sub_resource type="BTAction" id="BTAction_mjyu7"]
 script = ExtResource("1_y8ahv")
-target_group = &"Tables"
+target_group = SubResource("BBStringName_nx8hj")
 
 [sub_resource type="BTWait" id="BTWait_iq4t6"]
 duration = 2.0
@@ -282,9 +290,13 @@ variable = &"state"
 value = SubResource("BBVariant_8rhvh")
 custom_name = "check_oven"
 
+[sub_resource type="BBStringName" id="BBStringName_k7glc"]
+saved_value = &"Tables"
+resource_name = "Tables"
+
 [sub_resource type="BTAction" id="BTAction_g4rw8"]
 script = ExtResource("1_y8ahv")
-target_group = &"Tables"
+target_group = SubResource("BBStringName_k7glc")
 
 [sub_resource type="BBNode" id="BBNode_2iseu"]
 saved_value = NodePath("Carrying")
@@ -322,14 +334,18 @@ resource_name = "<null>"
 property = &"action_target"
 value = SubResource("BBVariant_5vh4x")
 
+[sub_resource type="BBStringName" id="BBStringName_dysnu"]
+saved_value = &"Ovens"
+resource_name = "Ovens"
+
 [sub_resource type="BTAction" id="BTAction_gwq51"]
 script = ExtResource("1_y8ahv")
-target_group = &"Ovens"
+target_group = SubResource("BBStringName_dysnu")
 
 [sub_resource type="BBNode" id="BBNode_icqe1"]
 value_source = 1
-variable = &"current_oven"
-resource_name = "$current_oven"
+variable = &"action_target"
+resource_name = "$action_target"
 
 [sub_resource type="BTCallMethod" id="BTCallMethod_vxfxm"]
 node = SubResource("BBNode_icqe1")
@@ -344,20 +360,19 @@ node = SubResource("BBNode_g8u8d")
 method = &"hide"
 custom_name = "Hide the ingredient"
 
-[sub_resource type="BBStringName" id="BBStringName_8rr5f"]
+[sub_resource type="BBStringName" id="BBStringName_q37wi"]
 saved_value = &"done"
 resource_name = "done"
 
-[sub_resource type="BBNode" id="BBNode_pn1df"]
+[sub_resource type="BBNode" id="BBNode_o157k"]
 value_source = 1
-variable = &"current_oven"
-resource_name = "$current_oven"
+variable = &"action_target"
+resource_name = "$action_target"
 
 [sub_resource type="BTAction" id="BTAction_xjdal"]
-custom_name = "Await oven done"
 script = ExtResource("3_y3jh6")
-signal_source = SubResource("BBNode_pn1df")
-signal_name = SubResource("BBStringName_8rr5f")
+signal_source = SubResource("BBNode_o157k")
+signal_name = SubResource("BBStringName_q37wi")
 
 [sub_resource type="BBVariant" id="BBVariant_wtxsn"]
 type = 1
@@ -451,9 +466,13 @@ variable = &"state"
 value = SubResource("BBVariant_nv65k")
 custom_name = "check_exit"
 
+[sub_resource type="BBStringName" id="BBStringName_7v6hh"]
+saved_value = &"Ovens"
+resource_name = "Ovens"
+
 [sub_resource type="BTAction" id="BTAction_bb1sd"]
 script = ExtResource("1_y8ahv")
-target_group = &"Ovens"
+target_group = SubResource("BBStringName_7v6hh")
 
 [sub_resource type="BBNode" id="BBNode_ccf28"]
 saved_value = NodePath("Carrying")
@@ -491,9 +510,13 @@ resource_name = "<null>"
 property = &"action_target"
 value = SubResource("BBVariant_hwytb")
 
+[sub_resource type="BBStringName" id="BBStringName_8r3my"]
+saved_value = &"Exit"
+resource_name = "Exit"
+
 [sub_resource type="BTAction" id="BTAction_h6van"]
 script = ExtResource("1_y8ahv")
-target_group = &"Exit"
+target_group = SubResource("BBStringName_8r3my")
 
 [sub_resource type="BBVariant" id="BBVariant_hwmta"]
 type = 1
@@ -582,9 +605,13 @@ variable = &"state"
 value = SubResource("BBVariant_iydsi")
 custom_name = "check_wait"
 
+[sub_resource type="BBStringName" id="BBStringName_y0jhx"]
+saved_value = &"Break"
+resource_name = "Break"
+
 [sub_resource type="BTAction" id="BTAction_cfxkk"]
 script = ExtResource("1_y8ahv")
-target_group = &"Break"
+target_group = SubResource("BBStringName_y0jhx")
 
 [sub_resource type="BTAction" id="BTAction_wsaot"]
 script = ExtResource("4_y1mfo")

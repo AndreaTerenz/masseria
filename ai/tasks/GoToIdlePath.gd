@@ -31,6 +31,7 @@ func _tick(delta: float) -> Status:
 	var here : Vector2 = agent.global_position
 	
 	if here.distance_to(target) < 0.001:
+		agent.idle_path_offset = path.curve.get_closest_offset(path.to_local(here))
 		return SUCCESS
 	
 	agent.global_position = here.move_toward(target, delta * agent.mov_speed)

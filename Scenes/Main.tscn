@@ -15,7 +15,7 @@ signal orders_changed(new_val: int, diff: int)
 
 @export var agent_scene : PackedScene = preload(\"res://Scenes/Agent.tscn\")
 
-@onready var jobs_list: ScrollContainer = $JobsList
+@onready var jobs_list: ScrollContainer = %JobsList
 @onready var idle_path: Path2D = $IdlePath
 @onready var break_point: Sprite2D = $BreakPoint
 
@@ -185,50 +185,51 @@ func remove_job(idx: int):
 script = SubResource("GDScript_i6dm0")
 
 [node name="IdlePath" type="Path2D" parent="."]
+position = Vector2(128, 0)
 curve = SubResource("Curve2D_obaid")
 
 [node name="Oven" parent="." instance=ExtResource("1_nda1u")]
-position = Vector2(64, 584)
-
-[node name="Oven2" parent="." instance=ExtResource("1_nda1u")]
 position = Vector2(192, 584)
 
-[node name="Oven3" parent="." instance=ExtResource("1_nda1u")]
-position = Vector2(960, 584)
+[node name="Oven2" parent="." instance=ExtResource("1_nda1u")]
+position = Vector2(320, 584)
 
-[node name="Oven4" parent="." instance=ExtResource("1_nda1u")]
+[node name="Oven3" parent="." instance=ExtResource("1_nda1u")]
 position = Vector2(1088, 584)
 
-[node name="Table" parent="." instance=ExtResource("2_5wjk2")]
-position = Vector2(512, 320)
+[node name="Oven4" parent="." instance=ExtResource("1_nda1u")]
+position = Vector2(1216, 584)
 
-[node name="Table2" parent="." instance=ExtResource("2_5wjk2")]
+[node name="Table" parent="." instance=ExtResource("2_5wjk2")]
 position = Vector2(640, 320)
 
+[node name="Table2" parent="." instance=ExtResource("2_5wjk2")]
+position = Vector2(768, 320)
+
 [node name="Table3" parent="." instance=ExtResource("2_5wjk2")]
-position = Vector2(520, 584)
+position = Vector2(640, 584)
 
 [node name="Table4" parent="." instance=ExtResource("2_5wjk2")]
-position = Vector2(648, 584)
+position = Vector2(768, 584)
 
 [node name="Fridge" type="Sprite2D" parent="." groups=["Fridges"]]
-position = Vector2(1088, 128)
+position = Vector2(1216, 128)
 scale = Vector2(1.6, 3.2)
 texture = ExtResource("3_nlnuv")
 
 [node name="DoughFridge" type="Sprite2D" parent="." groups=["Fridges"]]
-position = Vector2(64, 128)
+position = Vector2(192, 128)
 scale = Vector2(1.6, 3.2)
 texture = ExtResource("3_nlnuv")
 
 [node name="Exit" type="Sprite2D" parent="." groups=["Exit"]]
-position = Vector2(576, 16)
+position = Vector2(704, 16)
 scale = Vector2(3.2, 0.4)
 texture = ExtResource("4_bx3c8")
 
 [node name="BreakPoint" type="Sprite2D" parent="." groups=["Break"]]
 modulate = Color(1, 1, 1, 0.270588)
-position = Vector2(1026, 385)
+position = Vector2(1154, 385)
 texture = ExtResource("5_kmdbf")
 
 [node name="BreakLabel" type="Label" parent="BreakPoint"]
@@ -240,15 +241,20 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0.501961, 1, 1)
 theme_override_font_sizes/font_size = 25
 text = "Break Time"
+metadata/_edit_use_anchors_ = true
 
-[node name="UI" type="Panel" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="UI" type="Panel" parent="CanvasLayer"]
+offset_left = 128.0
 offset_top = 648.0
 offset_right = 1280.0
 offset_bottom = 768.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_qkld0")
 script = SubResource("GDScript_ckxp2")
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="UI"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="CanvasLayer/UI"]
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
@@ -259,7 +265,7 @@ offset_bottom = -8.0
 grow_vertical = 2
 alignment = 1
 
-[node name="OrderCount" type="Label" parent="UI/VBoxContainer2"]
+[node name="OrderCount" type="Label" parent="CanvasLayer/UI/VBoxContainer2"]
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -267,7 +273,7 @@ theme_override_colors/font_shadow_color = Color(0.792157, 0.176471, 0, 1)
 theme_override_font_sizes/font_size = 24
 text = "Total orders: 0"
 
-[node name="PizzaList" type="HBoxContainer" parent="UI/VBoxContainer2" node_paths=PackedStringArray("UI")]
+[node name="PizzaList" type="HBoxContainer" parent="CanvasLayer/UI/VBoxContainer2" node_paths=PackedStringArray("UI")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 3
@@ -275,7 +281,7 @@ alignment = 1
 script = SubResource("GDScript_rxako")
 UI = NodePath("../..")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI"]
 layout_mode = 1
 anchors_preset = 11
 anchor_left = 1.0
@@ -287,43 +293,53 @@ grow_horizontal = 0
 grow_vertical = 2
 alignment = 1
 
-[node name="NewPizza" type="Button" parent="UI/VBoxContainer"]
+[node name="NewPizza" type="Button" parent="CanvasLayer/UI/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 28
 text = "New pizza"
 
-[node name="AddAgent" type="Button" parent="UI/VBoxContainer"]
+[node name="AddAgent" type="Button" parent="CanvasLayer/UI/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 28
 text = "Add agent"
 
-[node name="Score" type="Label" parent="UI"]
+[node name="Score" type="Label" parent="CanvasLayer/UI"]
 layout_mode = 0
 offset_left = 326.0
 offset_top = 5.0
 offset_right = 826.0
-offset_bottom = 105.0
+offset_bottom = 40.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0.501961, 1, 1)
 theme_override_font_sizes/font_size = 25
-text = "Score:
-0"
+text = "Score: 0"
 horizontal_alignment = 1
 script = ExtResource("6_8jt66")
 
-[node name="JobsList" type="ScrollContainer" parent="."]
-offset_left = 1152.0
-offset_right = 1280.0
-offset_bottom = 648.0
+[node name="JobsList" type="ScrollContainer" parent="CanvasLayer"]
+unique_name_in_owner = true
+offset_left = 1280.0
+offset_right = 1408.0
+offset_bottom = 768.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_qvvrj")
 script = SubResource("GDScript_yxx6q")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="JobsList"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/JobsList"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[connection signal="orders_changed" from="." to="UI" method="_on_kitchen_orders_changed"]
-[connection signal="pressed" from="UI/VBoxContainer/NewPizza" to="." method="_on_new_pizza"]
-[connection signal="pressed" from="UI/VBoxContainer/AddAgent" to="." method="_on_new_agent"]
+[node name="AgentsList" type="ScrollContainer" parent="CanvasLayer"]
+unique_name_in_owner = true
+offset_right = 128.0
+offset_bottom = 768.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_qvvrj")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AgentsList"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[connection signal="orders_changed" from="." to="CanvasLayer/UI" method="_on_kitchen_orders_changed"]
+[connection signal="pressed" from="CanvasLayer/UI/VBoxContainer/NewPizza" to="." method="_on_new_pizza"]
+[connection signal="pressed" from="CanvasLayer/UI/VBoxContainer/AddAgent" to="." method="_on_new_agent"]

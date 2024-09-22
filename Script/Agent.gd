@@ -12,17 +12,18 @@ enum STATE {
 	BREAK
 }
 
-@export var mov_speed := 500.0
+@export var mov_speed := 400.0
 @export var break_dance_speed := 2.0
 @export var path : Path2D
 
 @onready var bt_player: BTPlayer = $BTPlayer
+@onready var carrying : Node2D = $Carrying
 
 var agent_id : StringName = &"default"
 var possible_actions = [true, true, false, false]
 var kitchen = null
 var break_location = null
-
+var idle_path_offset := 0.0
 var action_target = null
 var current_action = -1
 var state := STATE.IDLE :
@@ -34,20 +35,20 @@ var state := STATE.IDLE :
 				action_target = null
 			elif current_action == 3:
 				emit_signal("delivered")
-			$Carrying.hide()
+			carrying.hide()
 				
 		match s:
 			STATE.OVEN:
 				action_target.occupied = false
-				$Carrying.play("pizza")
+				carrying.play("pizza")
 			STATE.SERVING:
 				action_target.occupied = false
-				$Carrying.play("cooked_pizza")
+				carrying.play("cooked_pizza")
 			STATE.TABLE:
 				if current_action == 0:
-					$Carrying.play("dough")
+					carrying.play("dough")
 				else:
-					$Carrying.play("tomato")
+					carrying.play("tomato")
 			STATE.BREAK:
 				current_action = -1
 		state = s
@@ -77,6 +78,8 @@ func _ready() -> void:
 		bt_player.blackboard.bind_var_to_property(v, self, v)
 		
 	state = STATE.IDLE
+	idle_path_offset = 0.0
+	global_position = path.to_global(path.curve.sample_baked(idle_path_offset))
 	
 func _on_broadcast(id, _val):
 	if id == &"PISELLARE" and possible_actions[0] and state == STATE.IDLE:
@@ -90,13 +93,12 @@ func _on_direct_signal(_id, _val):
 		current_action = -1
 
 func idle_step(delta: float):
-	var offset := path.curve.get_closest_offset(global_position)
-	offset += delta * mov_speed
+	idle_path_offset += delta * mov_speed
 	
-	if offset >= path.curve.get_baked_length():
-		offset = 0.
-
-	global_position = path.to_global(path.curve.sample_baked(offset))
+	if idle_path_offset >= path.curve.get_baked_length():
+		idle_path_offset = 0.
+		
+	global_position = path.to_global(path.curve.sample_baked(idle_path_offset))
 
 func request_new_job():
 	var new_job = kitchen.request_job(possible_actions)

@@ -2,37 +2,38 @@
 class_name MoveTo
 extends BTAction
 
-@export var target_group : StringName
+@export var target_group : BBStringName
 
 var here : Vector2 :
 	get:
 		return agent.global_position
 	set(h):
 		agent.global_position = h
-var group_valid: bool :
+var _group : StringName :
 	get:
-		if target_group.strip_edges() == "":
-			return false
-		if Engine.is_editor_hint():
-			return true
-			
-		return agent.get_tree().has_group(target_group) if agent else false
+		return saved_or_variable(target_group)
 
 var target : Vector2
 var to_oven := false
 
+func saved_or_variable(param: BBParam):
+	if param == null:
+		return "???"
+		
+	if param.value_source == BBParam.SAVED_VALUE:
+		return param.saved_value
+	
+	return "$" + (param.variable if Engine.is_editor_hint() else param.get_value(scene_root, blackboard))
+
 # Called to generate a display name for the task (requires @tool).
 func _generate_name() -> String:
-	return "Move to closest of : %s" % [target_group] if group_valid else "Move to idle path"
+	return "Move to closest of group %s" % [_group]
 
 
 # Called when the task is entered.
 func _enter() -> void:
-	var tmp : Node2D = get_closest_of(target_group)
+	var tmp : Node2D = get_closest_of(_group)
 	target = tmp.global_position
-	
-	if target_group == &"Ovens":
-		blackboard.set_var(&"current_oven", tmp)
 
 
 # Called each time this task is ticked (aka executed).

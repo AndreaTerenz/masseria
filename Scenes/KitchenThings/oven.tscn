@@ -25,8 +25,8 @@ func _can_occupied_change():
 	return not bar.visible
 
 func start():
-	# HACK: checking both should be enough to make sure that the oven isnt used twice at the same time
-	if occupied or bar.visible:
+	# HACK
+	if bar.visible:
 		return
 		
 	bar.visible = true

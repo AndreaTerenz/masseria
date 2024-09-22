@@ -2,5 +2,5 @@ extends Label
 
 var score := 0:
 	set(s):
-		text = "Score:\n" + str(s)
+		text = "Score: %s" % s
 		score = s

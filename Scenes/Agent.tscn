@@ -69,7 +69,6 @@ behavior_tree = ExtResource("5_qtdmf")
 blackboard_plan = SubResource("BlackboardPlan_jj6lk")
 
 [node name="Carrying" type="AnimatedSprite2D" parent="."]
-visible = false
 position = Vector2(0, -43)
 sprite_frames = SubResource("SpriteFrames_0lmpo")
 animation = &"cooked_pizza"

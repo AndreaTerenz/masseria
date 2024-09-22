@@ -19,7 +19,8 @@
 				"f8837433-d8ae-4428-9058-92e030d1415e",
 				"fa44320a-6f37-46d9-b6b4-12e52ca91088",
 				"ee866022-057a-4811-8766-b23f7f07b8e1",
-				"de1646b7-3654-4d8c-b800-56330c1b0007"
+				"de1646b7-3654-4d8c-b800-56330c1b0007",
+				"5bcfecb9-b33a-4e64-a8e3-b9c8fbc6f4b0"
 			]
 		},
 		{
@@ -84,6 +85,10 @@
 				{
 					"details": "aggiungere UI o simile per capire chi può fare cosa",
 					"done": false
+				},
+				{
+					"details": "lista jobs",
+					"done": false
 				}
 			]
 		},
@@ -91,6 +96,13 @@
 			"uuid": "de1646b7-3654-4d8c-b800-56330c1b0007",
 			"title": "mentre il forno cuoce uno può fare altro",
 			"description": "i.e., non ha senso dover aspettare fermo dal forno che cuocia la pizza\n\nnel caso, si posso avere come azioni distinte \"infornare la pizza\", \"girare la pizza nel forno X\" e \"tirar fuori la pizza dal forno X\"",
+			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
+			"steps": []
+		},
+		{
+			"uuid": "5bcfecb9-b33a-4e64-a8e3-b9c8fbc6f4b0",
+			"title": "Beliefs",
+			"description": "\"beliefs\" che un agente aggiorna dinamicamente la sua conoscenza del layout della cucina\nE fare il layout modificabile\n(E mentre gira si segna ciò che entra nel suo range visivo)",
 			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
 			"steps": []
 		}

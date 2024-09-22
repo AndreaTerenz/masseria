@@ -17,7 +17,7 @@ signal orders_changed(new_val: int, diff: int)
 
 @onready var timer = Timer.new()
 
-var jobs := []
+var jobs : Array[Array] = []
 var orders := 0:
 	set(v):
 		var diff : int = v - orders
@@ -28,7 +28,7 @@ var on_cooldown = false
 func _ready():
 	# TODO: This fix is extremely ass. It works.
 	add_child(timer)
-	timer.connect(\"timeout\", func():
+	timer.timeout.connect(func():
 		on_cooldown = false
 	)
 	timer.wait_time = 0.2
@@ -39,55 +39,63 @@ func _on_new_pizza() -> void:
 
 func _on_new_agent():
 	var agg = agent_scene.instantiate()
+	
 	agg.path = $IdlePath
 	agg.kitchen = self
 	# TODO: Is this the best way?
 	agg.break_location = $BreakPoint.position
+	
 	add_child(agg)
-	agg.connect(\"delivered\", func reduce(): orders-=1)
-	# AgentManager.register_agent(agg)
+	
+	agg.delivered.connect(func reduce():
+		orders-=1
+	)
 
 func add_job(id: int, location=null):
-	jobs.append([id, location])
-	print(\"Added job %s at %s\" % [id, location])
+	var j := [id, location]
+	jobs.append(j)
+	print(\"Added job %s at %s\" % j)
 	
 func request_job(curriculum):
-	var job_id = -1
-	var job_location = null
-	
 	if on_cooldown:
-		return [job_id, job_location]
+		#print(\"Job assignment on cooldown\")
+		return [-1, null]
+		
+	var idx := -1
+	var id_to_group := {
+		0: &\"Tables\",
+		2: &\"Ovens\"
+	}
 	
-	for job in jobs:
-		if not curriculum[job[0]]:
+	for i in len(jobs):
+		var job := jobs[i]
+		var id : int = job[0]
+		
+		if not curriculum[id]:
 			continue
 		
-		var valid_job = (job[0] == 1)
-		var id_to_group := {
-			0: &\"Tables\",
-			2: &\"Ovens\"
-		}
+		if not (id in id_to_group.keys()):
+			idx = i
+			break
 		
-		if not valid_job:
-			var group : StringName = id_to_group[job[0]]
-			
-			for child in get_children():
-				if child.is_in_group(group) and not child.occupied:
-					valid_job = true
-					break
-					
-			if not valid_job:
-				continue
-			
-		job_id = job[0]
-		job_location = job[1]
-		jobs.erase(job)
-		on_cooldown = true
-		timer.start()
-		print(\"Returned job \", job)
-		break
-			
-	return [job_id, job_location]
+		var group : StringName = id_to_group[id]
+		
+		if get_children().any(func (k): return k.is_in_group(group) and not k.occupied):
+			idx = i
+			break
+	
+	if idx == -1:
+		#print(\"No valid job found for curriculum: %s\" % [curriculum])
+		return [-1, null]
+		
+	var output := jobs[idx]
+	jobs.remove_at(idx)
+	on_cooldown = true
+	timer.start()
+	
+	print(\"Returned job %s\" % [output])
+
+	return output
 "
 
 [sub_resource type="Curve2D" id="Curve2D_obaid"]

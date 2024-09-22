@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=135 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=139 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_y8ahv"]
 [ext_resource type="Script" path="res://ai/tasks/GoToIdlePath.gd" id="2_nv2oq"]
@@ -335,6 +335,15 @@ resource_name = "$current_oven"
 node = SubResource("BBNode_icqe1")
 method = &"start"
 
+[sub_resource type="BBNode" id="BBNode_g8u8d"]
+saved_value = NodePath("Carrying")
+resource_name = "Carrying"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_q36ha"]
+node = SubResource("BBNode_g8u8d")
+method = &"hide"
+custom_name = "Hide the ingredient"
+
 [sub_resource type="BBStringName" id="BBStringName_8rr5f"]
 saved_value = &"done"
 resource_name = "done"
@@ -430,7 +439,7 @@ children = [SubResource("BTSequence_82x4c"), SubResource("BTProbabilitySelector_
 
 [sub_resource type="BTSequence" id="BTSequence_kkgit"]
 custom_name = "Oven"
-children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_g4rw8"), SubResource("BTCallMethod_jgm2i"), SubResource("BTSetAgentProperty_jp6ug"), SubResource("BTCallMethod_hve5q"), SubResource("BTSetAgentProperty_xnrjs"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTAction_xjdal"), SubResource("BTSelector_skyrv")]
+children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_g4rw8"), SubResource("BTCallMethod_jgm2i"), SubResource("BTSetAgentProperty_jp6ug"), SubResource("BTCallMethod_hve5q"), SubResource("BTSetAgentProperty_xnrjs"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTCallMethod_q36ha"), SubResource("BTAction_xjdal"), SubResource("BTSelector_skyrv")]
 
 [sub_resource type="BBVariant" id="BBVariant_nv65k"]
 type = 2
@@ -464,6 +473,15 @@ resource_name = "false"
 property = &"action_target.occupied"
 value = SubResource("BBVariant_kk0oa")
 custom_name = "Free the Oven"
+
+[sub_resource type="BBNode" id="BBNode_pfuml"]
+value_source = 1
+variable = &"action_target"
+resource_name = "$action_target"
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_kkthx"]
+node = SubResource("BBNode_pfuml")
+method = &"take_pizza"
 
 [sub_resource type="BBVariant" id="BBVariant_hwytb"]
 saved_value = null
@@ -552,7 +570,7 @@ children = [SubResource("BTSequence_8hcn4"), SubResource("BTSetVar_dt2cj")]
 
 [sub_resource type="BTSequence" id="BTSequence_pld4j"]
 custom_name = "Exit"
-children = [SubResource("BTCheckVar_81jxt"), SubResource("BTAction_bb1sd"), SubResource("BTCallMethod_8oj2t"), SubResource("BTSetAgentProperty_0qudw"), SubResource("BTSetAgentProperty_23pug"), SubResource("BTAction_h6van"), SubResource("BTSetAgentProperty_5bhwn"), SubResource("BTWait_fvqci"), SubResource("BTCallMethod_ndjxx"), SubResource("BTSetAgentProperty_wo7k8"), SubResource("BTProbabilitySelector_vj5lb")]
+children = [SubResource("BTCheckVar_81jxt"), SubResource("BTAction_bb1sd"), SubResource("BTCallMethod_8oj2t"), SubResource("BTSetAgentProperty_0qudw"), SubResource("BTCallMethod_kkthx"), SubResource("BTSetAgentProperty_23pug"), SubResource("BTAction_h6van"), SubResource("BTSetAgentProperty_5bhwn"), SubResource("BTWait_fvqci"), SubResource("BTCallMethod_ndjxx"), SubResource("BTSetAgentProperty_wo7k8"), SubResource("BTProbabilitySelector_vj5lb")]
 
 [sub_resource type="BBVariant" id="BBVariant_iydsi"]
 type = 2

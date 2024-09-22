@@ -20,7 +20,8 @@
 				"fa44320a-6f37-46d9-b6b4-12e52ca91088",
 				"ee866022-057a-4811-8766-b23f7f07b8e1",
 				"de1646b7-3654-4d8c-b800-56330c1b0007",
-				"5bcfecb9-b33a-4e64-a8e3-b9c8fbc6f4b0"
+				"5bcfecb9-b33a-4e64-a8e3-b9c8fbc6f4b0",
+				"c514f321-bd93-4a35-bd9a-9763f22a41c1"
 			]
 		},
 		{
@@ -83,6 +84,10 @@
 					"done": true
 				},
 				{
+					"details": "far vedere la pizza in forno",
+					"done": true
+				},
+				{
 					"details": "aggiungere UI o simile per capire chi può fare cosa",
 					"done": false
 				},
@@ -107,20 +112,11 @@
 			"steps": []
 		},
 		{
-			"uuid": "a0e63e7f-212d-4bc8-b556-4bbf5b25f23d",
-			"title": "il _process di Agent.gd dovrebbe essere sempre fatto tramite il BT ",
-			"description": "dato che viene eseguito \"in contemporanea\" al BT, potrebbero interferire tra loro",
+			"uuid": "c514f321-bd93-4a35-bd9a-9763f22a41c1",
+			"title": "wacky sound effect tipo paperissima",
+			"description": "",
 			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
-			"steps": [
-				{
-					"details": "get_new_job()\n\ncreare un metodo a parte in Agent per ottenere il prossimo job, chiamandolo in un punto apposito del BTs",
-					"done": true
-				},
-				{
-					"details": "BreakTurn\n\ncome per l'azione IdleStep, ogni \"step\" della danzetta della pausa dovrebbe essere fatto con un'azione apposta nel BT",
-					"done": true
-				}
-			]
+			"steps": []
 		}
 	],
 	"layout": {

@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://tw01u1ja1wh7"]
+[gd_scene load_steps=7 format=3 uid="uid://tw01u1ja1wh7"]
 
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="1_xlxiv"]
+[ext_resource type="Texture2D" uid="uid://biifatb5t0jmy" path="res://Assets/hand-made/PIZZATIME.png" id="2_ch62p"]
 
 [sub_resource type="GDScript" id="GDScript_6wvlc"]
 resource_name = "oven"
@@ -11,11 +12,13 @@ signal done
 
 @export var cook_time := 5.0
 
+@onready var cooked_pizza: Sprite2D = $CookedPizza
 @onready var bar: ProgressBar = $UI/ProgressBar
 
 func _ready() -> void:
 	add_to_group(&\"Ovens\")
 	
+	cooked_pizza.visible = false
 	bar.visible = false
 
 func start():
@@ -27,7 +30,11 @@ func start():
 	.finished.connect(func():
 		done.emit()
 		bar.visible = false
+		cooked_pizza.visible = true
 	)
+
+func take_pizza():
+	cooked_pizza.visible = false
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jl3f7"]
@@ -77,3 +84,7 @@ pivot_offset = Vector2(31, 0)
 theme_override_styles/background = SubResource("StyleBoxFlat_ejb3g")
 theme_override_styles/fill = SubResource("StyleBoxFlat_q43yi")
 show_percentage = false
+
+[node name="CookedPizza" type="Sprite2D" parent="."]
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("2_ch62p")

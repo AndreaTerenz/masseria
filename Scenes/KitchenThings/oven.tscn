@@ -20,8 +20,15 @@ func _ready() -> void:
 	
 	cooked_pizza.visible = false
 	bar.visible = false
+	
+func _can_occupied_change():
+	return not bar.visible
 
 func start():
+	# HACK: checking both should be enough to make sure that the oven isnt used twice at the same time
+	if occupied or bar.visible:
+		return
+		
 	bar.visible = true
 	
 	create_tween()\\

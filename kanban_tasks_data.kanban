@@ -93,7 +93,7 @@
 				},
 				{
 					"details": "lista jobs",
-					"done": false
+					"done": true
 				}
 			]
 		},

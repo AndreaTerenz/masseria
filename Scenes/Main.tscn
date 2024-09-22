@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=14 format=3 uid="uid://y03djfecm8p4"]
 
 [ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://Scenes/KitchenThings/oven.tscn" id="1_nda1u"]
 [ext_resource type="PackedScene" uid="uid://cvquwoqa7jito" path="res://Scenes/KitchenThings/table.tscn" id="2_5wjk2"]
@@ -15,6 +15,7 @@ signal orders_changed(new_val: int, diff: int)
 
 @export var agent_scene : PackedScene = preload(\"res://Scenes/Agent.tscn\")
 
+@onready var jobs_list: ScrollContainer = $JobsList
 @onready var idle_path: Path2D = $IdlePath
 @onready var break_point: Sprite2D = $BreakPoint
 
@@ -55,6 +56,8 @@ func _on_new_agent():
 
 func add_job(id: int, location=null):
 	var j := [id, location]
+	
+	jobs_list.add_job(j)
 	jobs.append(j)
 	print(\"Added job %s at %s\" % j)
 	
@@ -91,7 +94,10 @@ func request_job(curriculum):
 		return [-1, null]
 		
 	var output := jobs[idx]
+	
 	jobs.remove_at(idx)
+	jobs_list.remove_job(idx)
+	
 	on_cooldown = true
 	timer.start()
 	
@@ -105,6 +111,9 @@ _data = {
 "points": PackedVector2Array(0, 0, 0, 0, 384, 192, 0, 0, 0, 0, 768, 192, 0, 0, 0, 0, 832, 320, 0, 0, 0, 0, 768, 448, 0, 0, 0, 0, 384, 448, 0, 0, 0, 0, 320, 320, 0, 0, 0, 0, 384, 192)
 }
 point_count = 7
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qkld0"]
+bg_color = Color(0.133333, 0.141176, 0.152941, 1)
 
 [sub_resource type="GDScript" id="GDScript_ckxp2"]
 resource_name = "ui"
@@ -143,6 +152,33 @@ func remove_first():
 	var score = 100 - (Time.get_unix_time_from_system() - times.pop_front())
 	UI.score_label.score += score
 	
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qvvrj"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.133333, 0.141176, 0.152941, 1)
+
+[sub_resource type="GDScript" id="GDScript_yxx6q"]
+resource_name = "jobs"
+script/source = "extends ScrollContainer
+
+@onready var container: VBoxContainer = $VBoxContainer
+
+func add_job(job: Array):
+	var lbl := Label.new()
+	var place_name : String = job[1].name if job[1] != null else \"null\"
+	
+	lbl.text = \"%d @ %s\" % [job[0], place_name]
+	
+	container.add_child(lbl)
+	
+func remove_job(idx: int):
+	var to_remove = container.get_child(idx)
+	
+	to_remove.queue_free()
 "
 
 [node name="Kitchen" type="Node2D"]
@@ -207,8 +243,9 @@ text = "Break Time"
 
 [node name="UI" type="Panel" parent="."]
 offset_top = 648.0
-offset_right = 1152.0
+offset_right = 1280.0
 offset_bottom = 768.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_qkld0")
 script = SubResource("GDScript_ckxp2")
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="UI"]
@@ -275,6 +312,17 @@ text = "Score:
 0"
 horizontal_alignment = 1
 script = ExtResource("6_8jt66")
+
+[node name="JobsList" type="ScrollContainer" parent="."]
+offset_left = 1152.0
+offset_right = 1280.0
+offset_bottom = 648.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_qvvrj")
+script = SubResource("GDScript_yxx6q")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="JobsList"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [connection signal="orders_changed" from="." to="UI" method="_on_kitchen_orders_changed"]
 [connection signal="pressed" from="UI/VBoxContainer/NewPizza" to="." method="_on_new_pizza"]

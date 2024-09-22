@@ -55,6 +55,7 @@ func get_closest_of(group: StringName):
 			
 	var min_dist := INF
 	var closest = null
+	
 	for target in group_nodes:
 		var d : float = target.global_position.distance_to(here)
 		

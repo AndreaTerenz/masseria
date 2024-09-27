@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=20 format=3 uid="uid://y03djfecm8p4"]
 
 [ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://Scenes/KitchenThings/oven.tscn" id="1_nda1u"]
 [ext_resource type="PackedScene" uid="uid://cvquwoqa7jito" path="res://Scenes/KitchenThings/table.tscn" id="2_5wjk2"]
@@ -6,6 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="4_bx3c8"]
 [ext_resource type="Texture2D" uid="uid://droy782oinaw" path="res://icon.svg" id="5_kmdbf"]
 [ext_resource type="Script" path="res://Script/score.gd" id="6_8jt66"]
+[ext_resource type="Texture2D" uid="uid://j5wu6rulxfy0" path="res://Assets/stolen/Peppino.png" id="7_g2chq"]
+[ext_resource type="Texture2D" uid="uid://mxkvm6iwx44u" path="res://Assets/stolen/Gustavo.png" id="8_naeej"]
 
 [sub_resource type="GDScript" id="GDScript_i6dm0"]
 resource_name = "kitchen"
@@ -236,55 +238,57 @@ func setup(n, a):
 	actions_lbl.text = \", \\n\".join(jobs_str)
 "
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g5qx7"]
+
 [node name="Kitchen" type="Node2D"]
 script = SubResource("GDScript_i6dm0")
 
 [node name="IdlePath" type="Path2D" parent="."]
-position = Vector2(128, 0)
+position = Vector2(128, 128)
 curve = SubResource("Curve2D_obaid")
 
 [node name="Oven" parent="." instance=ExtResource("1_nda1u")]
-position = Vector2(192, 584)
+position = Vector2(192, 704)
 
 [node name="Oven2" parent="." instance=ExtResource("1_nda1u")]
-position = Vector2(320, 584)
+position = Vector2(320, 704)
 
 [node name="Oven3" parent="." instance=ExtResource("1_nda1u")]
-position = Vector2(1088, 584)
+position = Vector2(1088, 704)
 
 [node name="Oven4" parent="." instance=ExtResource("1_nda1u")]
-position = Vector2(1216, 584)
+position = Vector2(1216, 704)
 
 [node name="Table" parent="." instance=ExtResource("2_5wjk2")]
-position = Vector2(640, 320)
+position = Vector2(640, 448)
 
 [node name="Table2" parent="." instance=ExtResource("2_5wjk2")]
-position = Vector2(768, 320)
+position = Vector2(768, 448)
 
 [node name="Table3" parent="." instance=ExtResource("2_5wjk2")]
-position = Vector2(640, 584)
+position = Vector2(640, 704)
 
 [node name="Table4" parent="." instance=ExtResource("2_5wjk2")]
-position = Vector2(768, 584)
+position = Vector2(768, 704)
 
 [node name="Fridge" type="Sprite2D" parent="." groups=["Fridges"]]
-position = Vector2(1216, 128)
+position = Vector2(1216, 256)
 scale = Vector2(1.6, 3.2)
 texture = ExtResource("3_nlnuv")
 
 [node name="DoughFridge" type="Sprite2D" parent="." groups=["Fridges"]]
-position = Vector2(192, 128)
+position = Vector2(192, 256)
 scale = Vector2(1.6, 3.2)
 texture = ExtResource("3_nlnuv")
 
 [node name="Exit" type="Sprite2D" parent="." groups=["Exit"]]
-position = Vector2(704, 16)
+position = Vector2(704, 144)
 scale = Vector2(3.2, 0.4)
 texture = ExtResource("4_bx3c8")
 
 [node name="BreakPoint" type="Sprite2D" parent="." groups=["Break"]]
 modulate = Color(1, 1, 1, 0.270588)
-position = Vector2(1154, 385)
+position = Vector2(1154, 513)
 texture = ExtResource("5_kmdbf")
 
 [node name="BreakLabel" type="Label" parent="BreakPoint"]
@@ -303,9 +307,9 @@ layer = 5
 
 [node name="UI" type="Panel" parent="CanvasLayer"]
 offset_left = 128.0
-offset_top = 648.0
+offset_top = 768.0
 offset_right = 1280.0
-offset_bottom = 768.0
+offset_bottom = 896.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_qkld0")
 script = SubResource("GDScript_ckxp2")
 
@@ -376,8 +380,9 @@ script = ExtResource("6_8jt66")
 [node name="JobsList" type="ScrollContainer" parent="CanvasLayer"]
 unique_name_in_owner = true
 offset_left = 1280.0
+offset_top = 128.0
 offset_right = 1408.0
-offset_bottom = 768.0
+offset_bottom = 896.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_qvvrj")
 script = SubResource("GDScript_yxx6q")
 
@@ -387,8 +392,9 @@ size_flags_horizontal = 3
 
 [node name="AgentsList" type="ScrollContainer" parent="CanvasLayer"]
 unique_name_in_owner = true
+offset_top = 128.0
 offset_right = 128.0
-offset_bottom = 768.0
+offset_bottom = 896.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_qvvrj")
 horizontal_scroll_mode = 3
 script = SubResource("GDScript_jx185")
@@ -413,6 +419,86 @@ text = "Name"
 [node name="Actions" type="Label" parent="CanvasLayer/AgentsList/VBoxContainer/Template/VBoxContainer"]
 layout_mode = 2
 text = "[0,1]"
+
+[node name="Panel" type="Panel" parent="CanvasLayer"]
+offset_right = 1408.0
+offset_bottom = 128.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_qvvrj")
+
+[node name="Label" type="Label" parent="CanvasLayer/Panel"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -11.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(1, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_constants/shadow_outline_size = 5
+theme_override_font_sizes/font_size = 66
+text = "PAPA'S MASSERIA"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="CanvasLayer/Panel"]
+clip_children = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1080.0
+offset_right = -112.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_g5qx7")
+
+[node name="TextureRect2" type="TextureRect" parent="CanvasLayer/Panel/Panel"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -216.0
+offset_right = 6.0
+offset_bottom = 32.0
+grow_horizontal = 0
+grow_vertical = 2
+texture = ExtResource("8_naeej")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="Panel2" type="Panel" parent="CanvasLayer/Panel"]
+clip_children = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 80.0
+offset_right = -1112.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_g5qx7")
+
+[node name="TextureRect2" type="TextureRect" parent="CanvasLayer/Panel/Panel2"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -256.0
+offset_top = 8.0
+offset_right = 40.0
+offset_bottom = 83.0
+grow_horizontal = 0
+grow_vertical = 2
+texture = ExtResource("7_g2chq")
+expand_mode = 3
+stretch_mode = 5
 
 [connection signal="orders_changed" from="." to="CanvasLayer/UI" method="_on_kitchen_orders_changed"]
 [connection signal="pressed" from="CanvasLayer/UI/VBoxContainer/NewPizza" to="." method="_on_new_pizza"]

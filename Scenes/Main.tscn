@@ -222,8 +222,18 @@ script/source = "extends PanelContainer
 @onready var actions_lbl = $VBoxContainer/Actions
 
 func setup(n, a):
+	var jobs_str = []
+	if a[0]:
+		jobs_str.append(\"Impastatore\")
+	if a[1]:
+		jobs_str.append(\"Decoratore\")
+	if a[2]:
+		jobs_str.append(\"Pizzaiolo\")
+	if a[3]:
+		jobs_str.append(\"Cameriere\")
+	
 	name_lbl.text = \"%s\" % n
-	actions_lbl.text = \"%s\" % [a]
+	actions_lbl.text = \", \\n\".join(jobs_str)
 "
 
 [node name="Kitchen" type="Node2D"]

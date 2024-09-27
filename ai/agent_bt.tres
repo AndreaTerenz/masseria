@@ -665,6 +665,7 @@ method = &"request_new_job"
 [sub_resource type="BBVariant" id="BBVariant_tl7v8"]
 type = 2
 saved_value = 0
+resource_name = "0"
 
 [sub_resource type="BTCheckVar" id="BTCheckVar_vkmyg"]
 variable = &"state"

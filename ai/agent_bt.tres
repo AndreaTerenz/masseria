@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=147 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=151 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_y8ahv"]
 [ext_resource type="Script" path="res://ai/tasks/GoToIdlePath.gd" id="2_nv2oq"]
@@ -240,7 +240,6 @@ resource_name = "-1"
 [sub_resource type="BTSetVar" id="BTSetVar_2uopa"]
 variable = &"current_action"
 value = SubResource("BBVariant_ph6h7")
-operation = 1
 
 [sub_resource type="BTAction" id="BTAction_jbqbo"]
 script = ExtResource("2_nv2oq")
@@ -290,6 +289,9 @@ variable = &"state"
 value = SubResource("BBVariant_8rhvh")
 custom_name = "check_oven"
 
+[sub_resource type="BTComment" id="BTComment_oom0y"]
+custom_name = "Go to table with pizza I guess"
+
 [sub_resource type="BBStringName" id="BBStringName_k7glc"]
 saved_value = &"Tables"
 resource_name = "Tables"
@@ -333,6 +335,9 @@ resource_name = "<null>"
 [sub_resource type="BTSetAgentProperty" id="BTSetAgentProperty_xnrjs"]
 property = &"action_target"
 value = SubResource("BBVariant_5vh4x")
+
+[sub_resource type="BTComment" id="BTComment_30jlo"]
+custom_name = "90 minuti di applausi"
 
 [sub_resource type="BBStringName" id="BBStringName_dysnu"]
 saved_value = &"Ovens"
@@ -425,7 +430,6 @@ resource_name = "-1"
 [sub_resource type="BTSetVar" id="BTSetVar_u0e56"]
 variable = &"current_action"
 value = SubResource("BBVariant_m6o2r")
-operation = 1
 
 [sub_resource type="BTAction" id="BTAction_33b3w"]
 script = ExtResource("2_nv2oq")
@@ -454,7 +458,7 @@ children = [SubResource("BTSequence_82x4c"), SubResource("BTProbabilitySelector_
 
 [sub_resource type="BTSequence" id="BTSequence_kkgit"]
 custom_name = "Oven"
-children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTAction_g4rw8"), SubResource("BTCallMethod_jgm2i"), SubResource("BTSetAgentProperty_jp6ug"), SubResource("BTCallMethod_hve5q"), SubResource("BTSetAgentProperty_xnrjs"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTCallMethod_q36ha"), SubResource("BTAction_xjdal"), SubResource("BTSelector_skyrv")]
+children = [SubResource("BTCheckVar_ph7rp"), SubResource("BTComment_oom0y"), SubResource("BTAction_g4rw8"), SubResource("BTCallMethod_jgm2i"), SubResource("BTSetAgentProperty_jp6ug"), SubResource("BTCallMethod_hve5q"), SubResource("BTSetAgentProperty_xnrjs"), SubResource("BTComment_30jlo"), SubResource("BTAction_gwq51"), SubResource("BTCallMethod_vxfxm"), SubResource("BTCallMethod_q36ha"), SubResource("BTAction_xjdal"), SubResource("BTSelector_skyrv")]
 
 [sub_resource type="BBVariant" id="BBVariant_nv65k"]
 type = 2
@@ -567,7 +571,6 @@ resource_name = "-1"
 [sub_resource type="BTSetVar" id="BTSetVar_s1cvx"]
 variable = &"current_action"
 value = SubResource("BBVariant_k7peg")
-operation = 1
 
 [sub_resource type="BTAction" id="BTAction_10if8"]
 script = ExtResource("2_nv2oq")
@@ -635,7 +638,6 @@ resource_name = "-1"
 [sub_resource type="BTSetVar" id="BTSetVar_5eeav"]
 variable = &"current_action"
 value = SubResource("BBVariant_01v54")
-operation = 1
 
 [sub_resource type="BTAction" id="BTAction_qmun7"]
 script = ExtResource("2_nv2oq")
@@ -652,6 +654,22 @@ children = [SubResource("BTCheckVar_vu2js"), SubResource("BTAction_cfxkk"), SubR
 [sub_resource type="BTComment" id="BTComment_uc4cq"]
 custom_name = "If all above fail, step along idle path and check new job"
 
+[sub_resource type="BBNode" id="BBNode_1g4nq"]
+saved_value = NodePath(".")
+resource_name = "."
+
+[sub_resource type="BTCallMethod" id="BTCallMethod_exfy3"]
+node = SubResource("BBNode_1g4nq")
+method = &"request_new_job"
+
+[sub_resource type="BBVariant" id="BBVariant_tl7v8"]
+type = 2
+saved_value = 0
+
+[sub_resource type="BTCheckVar" id="BTCheckVar_vkmyg"]
+variable = &"state"
+value = SubResource("BBVariant_tl7v8")
+
 [sub_resource type="BBNode" id="BBNode_3vr6y"]
 saved_value = NodePath(".")
 resource_name = "."
@@ -661,17 +679,9 @@ node = SubResource("BBNode_3vr6y")
 method = &"idle_step"
 args_include_delta = true
 
-[sub_resource type="BBNode" id="BBNode_1g4nq"]
-saved_value = NodePath(".")
-resource_name = "."
-
-[sub_resource type="BTCallMethod" id="BTCallMethod_exfy3"]
-node = SubResource("BBNode_1g4nq")
-method = &"request_new_job"
-
 [sub_resource type="BTSequence" id="BTSequence_leljs"]
 custom_name = "Idle"
-children = [SubResource("BTCallMethod_pkkoi"), SubResource("BTCallMethod_exfy3")]
+children = [SubResource("BTCallMethod_exfy3"), SubResource("BTCheckVar_vkmyg"), SubResource("BTCallMethod_pkkoi")]
 
 [sub_resource type="BTSelector" id="BTSelector_0xbrx"]
 children = [SubResource("BTSequence_s6ml5"), SubResource("BTSequence_oivck"), SubResource("BTSequence_kkgit"), SubResource("BTSequence_pld4j"), SubResource("BTSequence_pad4m"), SubResource("BTComment_uc4cq"), SubResource("BTSequence_leljs")]

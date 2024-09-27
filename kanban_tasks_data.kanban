@@ -23,7 +23,8 @@
 				"5bcfecb9-b33a-4e64-a8e3-b9c8fbc6f4b0",
 				"c514f321-bd93-4a35-bd9a-9763f22a41c1",
 				"452733cc-2f26-42dc-909c-953dcea89485",
-				"d6d40bc5-50dc-413d-a41b-b65b74b5b621"
+				"d6d40bc5-50dc-413d-a41b-b65b74b5b621",
+				"b86a85ce-8d5e-408e-88d1-b36be74bfe41"
 			]
 		},
 		{
@@ -132,6 +133,13 @@
 			"title": "Bugfx: something about returning to the idle path may be broken...",
 			"description": "",
 			"category": "1ed90daf-cb60-49ec-bdc2-f70093eb4b41",
+			"steps": []
+		},
+		{
+			"uuid": "b86a85ce-8d5e-408e-88d1-b36be74bfe41",
+			"title": "Rename tree tasks",
+			"description": "Di più\n",
+			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
 			"steps": []
 		}
 	],

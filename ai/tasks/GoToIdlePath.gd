@@ -30,7 +30,7 @@ func _enter() -> void:
 func _tick(delta: float) -> Status:
 	var here : Vector2 = agent.global_position
 	
-	if here.distance_to(target) < 0.001:
+	if here.is_equal_approx(target):
 		agent.idle_path_offset = path.curve.get_closest_offset(path.to_local(here))
 		return SUCCESS
 	
@@ -39,4 +39,4 @@ func _tick(delta: float) -> Status:
 	return RUNNING
 
 func get_closest_path_point():
-	return path.curve.get_closest_point(path.to_local(here))
+	return path.to_global(path.curve.get_closest_point(path.to_local(here)))

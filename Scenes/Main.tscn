@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=17 format=3 uid="uid://y03djfecm8p4"]
 
 [ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://Scenes/KitchenThings/oven.tscn" id="1_nda1u"]
 [ext_resource type="PackedScene" uid="uid://cvquwoqa7jito" path="res://Scenes/KitchenThings/table.tscn" id="2_5wjk2"]
@@ -16,6 +16,7 @@ signal orders_changed(new_val: int, diff: int)
 @export var agent_scene : PackedScene = preload(\"res://Scenes/Agent.tscn\")
 
 @onready var jobs_list: ScrollContainer = %JobsList
+@onready var agents_list = %AgentsList
 @onready var idle_path: Path2D = $IdlePath
 @onready var break_point: Sprite2D = $BreakPoint
 
@@ -50,6 +51,8 @@ func _on_new_agent():
 	
 	add_child(agg)
 	
+	agents_list.add_agent(agg)
+	
 	agg.delivered.connect(func reduce():
 		orders-=1
 	)
@@ -59,7 +62,7 @@ func add_job(id: int, location=null):
 	
 	jobs_list.add_job(j)
 	jobs.append(j)
-	print(\"Added job %s at %s\" % j)
+	#print(\"Added job %s at %s\" % j)
 	
 func request_job(curriculum):
 	if on_cooldown:
@@ -101,7 +104,7 @@ func request_job(curriculum):
 	on_cooldown = true
 	timer.start()
 	
-	print(\"Returned job %s\" % [output])
+	#print(\"Returned job %s\" % [output])
 
 	return output
 "
@@ -179,6 +182,48 @@ func remove_job(idx: int):
 	var to_remove = container.get_child(idx)
 	
 	to_remove.queue_free()
+"
+
+[sub_resource type="GDScript" id="GDScript_jx185"]
+resource_name = "agents_list"
+script/source = "extends ScrollContainer
+
+@onready var container = $VBoxContainer
+
+var template : Control
+
+func _ready():
+	template = container.get_child(0)
+	container.remove_child(template)
+	
+func add_agent(a: Agent):
+	var tmp := template.duplicate()
+	
+	container.add_child(tmp)
+	tmp.setup(a.agent_id, a.possible_actions)
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_37v5x"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(0.0214346, 0.0214346, 0.0214346, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="GDScript" id="GDScript_subwx"]
+resource_name = "agent_list_element_template"
+script/source = "extends PanelContainer
+
+@onready var name_lbl = $VBoxContainer/Name
+@onready var actions_lbl = $VBoxContainer/Actions
+
+func setup(n, a):
+	name_lbl.text = \"%s\" % n
+	actions_lbl.text = \"%s\" % [a]
 "
 
 [node name="Kitchen" type="Node2D"]
@@ -335,10 +380,29 @@ unique_name_in_owner = true
 offset_right = 128.0
 offset_bottom = 768.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_qvvrj")
+horizontal_scroll_mode = 3
+script = SubResource("GDScript_jx185")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AgentsList"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Template" type="PanelContainer" parent="CanvasLayer/AgentsList/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_37v5x")
+script = SubResource("GDScript_subwx")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AgentsList/VBoxContainer/Template"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="CanvasLayer/AgentsList/VBoxContainer/Template/VBoxContainer"]
+layout_mode = 2
+text = "Name"
+
+[node name="Actions" type="Label" parent="CanvasLayer/AgentsList/VBoxContainer/Template/VBoxContainer"]
+layout_mode = 2
+text = "[0,1]"
 
 [connection signal="orders_changed" from="." to="CanvasLayer/UI" method="_on_kitchen_orders_changed"]
 [connection signal="pressed" from="CanvasLayer/UI/VBoxContainer/NewPizza" to="." method="_on_new_pizza"]

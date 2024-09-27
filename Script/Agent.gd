@@ -56,6 +56,8 @@ var state := STATE.IDLE :
 func _ready() -> void:
 	add_to_group(&"Agents")
 	
+	possible_actions.shuffle()
+	
 	AgentManager.register_agent(self)
 	AgentManager.broadcast.connect(func(id: StringName, data: Variant):
 		print("Agent %s received broadcast '%s'" % [agent_id, id])
@@ -64,8 +66,6 @@ func _ready() -> void:
 
 	oscillate_sprite($LeftHand)
 	oscillate_sprite($RightHand)
-	
-	possible_actions.shuffle()
 	
 	var action_bb_vars := [&"PASTAMAN", &"DECORATOR", &"COOK", &"WAITER"]
 	

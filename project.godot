@@ -24,6 +24,7 @@ AgentManager="*res://Script/AgentManager.gd"
 
 window/size/viewport_width=1408
 window/size/viewport_height=768
+window/size/resizable=false
 
 [editor_plugins]
 

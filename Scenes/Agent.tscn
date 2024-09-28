@@ -1,7 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://bi2rau283g2l6"]
+[gd_scene load_steps=13 format=3 uid="uid://bi2rau283g2l6"]
 
 [ext_resource type="Texture2D" uid="uid://q5jfpgygsg1s" path="res://Assets/kenney_shape-characters/PNG/Default/blue_body_circle.png" id="1_6xupl"]
 [ext_resource type="Script" path="res://Script/Agent.gd" id="2_u83cq"]
+[ext_resource type="Texture2D" uid="uid://cmgblggqri7mn" path="res://Assets/kenney_shape-characters/PNG/Default/grey_body_circle.png" id="3_3ijh3"]
 [ext_resource type="Texture2D" uid="uid://4hhhopdfwqnw" path="res://Assets/kenney_shape-characters/PNG/Default/green_hand_point.png" id="3_wi01w"]
 [ext_resource type="Texture2D" uid="uid://dwolodcr7db16" path="res://Assets/kenney_shape-characters/PNG/Default/face_h.png" id="4_oaehy"]
 [ext_resource type="BehaviorTree" uid="uid://bv6csbkmtc48m" path="res://ai/agent_bt.tres" id="5_qtdmf"]
@@ -51,6 +52,10 @@ animations = [{
 texture_filter = 1
 texture = ExtResource("1_6xupl")
 script = ExtResource("2_u83cq")
+
+[node name="Face" type="Sprite2D" parent="."]
+modulate = Color(0.637333, 0.32, 1, 1)
+texture = ExtResource("3_3ijh3")
 
 [node name="LeftHand" type="Sprite2D" parent="."]
 position = Vector2(60, 2)

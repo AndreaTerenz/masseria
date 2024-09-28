@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="4_bx3c8"]
 [ext_resource type="Texture2D" uid="uid://droy782oinaw" path="res://icon.svg" id="5_kmdbf"]
 [ext_resource type="Script" path="res://Script/score.gd" id="6_8jt66"]
+[ext_resource type="StyleBox" path="res://Assets/themes/agent_bg.tres" id="7_3vsm4"]
 [ext_resource type="Texture2D" uid="uid://j5wu6rulxfy0" path="res://Assets/stolen/Peppino.png" id="7_g2chq"]
 [ext_resource type="Texture2D" uid="uid://mxkvm6iwx44u" path="res://Assets/stolen/Gustavo.png" id="8_naeej"]
 
@@ -202,19 +203,8 @@ func add_agent(a: Agent):
 	var tmp := template.duplicate()
 	
 	container.add_child(tmp)
-	tmp.setup(a.agent_id, a.possible_actions)
+	tmp.setup(a.agent_id, a.possible_actions, a.color)
 "
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_37v5x"]
-content_margin_left = 5.0
-content_margin_top = 5.0
-content_margin_right = 5.0
-content_margin_bottom = 5.0
-bg_color = Color(0.0214346, 0.0214346, 0.0214346, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 
 [sub_resource type="GDScript" id="GDScript_subwx"]
 resource_name = "agent_list_element_template"
@@ -223,7 +213,7 @@ script/source = "extends PanelContainer
 @onready var name_lbl = $VBoxContainer/Name
 @onready var actions_lbl = $VBoxContainer/Actions
 
-func setup(n, a):
+func setup(n, a, c):
 	var jobs_str = []
 	if a[0]:
 		jobs_str.append(\"Impastatore\")
@@ -236,6 +226,22 @@ func setup(n, a):
 	
 	name_lbl.text = \"%s\" % n
 	actions_lbl.text = \", \\n\".join(jobs_str)
+	c -= Color.from_hsv(0,0,0.5,0.5)
+	
+	# I don't think there's a better way, if you find one ty
+	var stylebox = StyleBoxFlat.new()
+	stylebox.set_bg_color(c)
+	stylebox.corner_radius_bottom_left = 6
+	stylebox.corner_radius_bottom_right = 6
+	stylebox.corner_radius_top_left = 6
+	stylebox.corner_radius_top_right = 6
+	
+	stylebox.content_margin_bottom = 5
+	stylebox.content_margin_top = 5
+	stylebox.content_margin_left = 5
+	stylebox.content_margin_right = 5
+	add_theme_stylebox_override(\"panel\", stylebox)
+	
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g5qx7"]
@@ -406,7 +412,7 @@ size_flags_vertical = 3
 
 [node name="Template" type="PanelContainer" parent="CanvasLayer/AgentsList/VBoxContainer"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_37v5x")
+theme_override_styles/panel = ExtResource("7_3vsm4")
 script = SubResource("GDScript_subwx")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AgentsList/VBoxContainer/Template"]
@@ -414,10 +420,14 @@ layout_mode = 2
 
 [node name="Name" type="Label" parent="CanvasLayer/AgentsList/VBoxContainer/Template/VBoxContainer"]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 text = "Name"
 
 [node name="Actions" type="Label" parent="CanvasLayer/AgentsList/VBoxContainer/Template/VBoxContainer"]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 text = "[0,1]"
 
 [node name="Panel" type="Panel" parent="CanvasLayer"]
@@ -490,10 +500,10 @@ anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -256.0
-offset_top = 8.0
-offset_right = 40.0
-offset_bottom = 83.0
+offset_left = -215.0
+offset_top = 16.0
+offset_right = 6.0
+offset_bottom = 40.0
 grow_horizontal = 0
 grow_vertical = 2
 texture = ExtResource("7_g2chq")

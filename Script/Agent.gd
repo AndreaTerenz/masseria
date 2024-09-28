@@ -20,6 +20,7 @@ enum STATE {
 @onready var carrying : Node2D = $Carrying
 
 var agent_id : StringName = &"default"
+var color: Color
 var possible_actions = [true, true, false, false]
 var kitchen = null
 var break_location = null
@@ -57,6 +58,7 @@ func _ready() -> void:
 	add_to_group(&"Agents")
 	
 	possible_actions.shuffle()
+	color = Color.from_hsv(randf(), 0.75, 1)
 	
 	AgentManager.register_agent(self)
 	AgentManager.broadcast.connect(func(id: StringName, data: Variant):
@@ -80,6 +82,9 @@ func _ready() -> void:
 	state = STATE.IDLE
 	idle_path_offset = 0.0
 	global_position = path.to_global(path.curve.sample_baked(idle_path_offset))
+	
+	$Face.modulate = color
+
 	
 func _on_broadcast(id, _val):
 	if id == &"PISELLARE" and possible_actions[0] and state == STATE.IDLE:

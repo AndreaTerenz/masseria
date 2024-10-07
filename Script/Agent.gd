@@ -21,12 +21,19 @@ enum STATE {
 
 var agent_id : StringName = &"default"
 var color: Color
-var possible_actions = [true, true, false, false]
+var possible_jobs = [true, true, false, false]
 var kitchen = null
 var break_location = null
 var idle_path_offset := 0.0
 var action_target = null
 var current_action = -1
+
+# RL stuff
+var m = 0.0
+var q = 0.0
+var lr = 0.5
+var rl_steps = 0
+
 var state := STATE.IDLE :
 	set(s):
 		if s in [STATE.IDLE, STATE.BREAK]:
@@ -57,7 +64,7 @@ var state := STATE.IDLE :
 func _ready() -> void:
 	add_to_group(&"Agents")
 	
-	possible_actions.shuffle()
+	possible_jobs.shuffle()
 	color = Color.from_hsv(randf(), 0.75, 1)
 	
 	AgentManager.register_agent(self)
@@ -72,7 +79,7 @@ func _ready() -> void:
 	var action_bb_vars := [&"PASTAMAN", &"DECORATOR", &"COOK", &"WAITER"]
 	
 	for i in range(len(action_bb_vars)):
-		bt_player.blackboard.set_var(action_bb_vars[i], possible_actions[i])
+		bt_player.blackboard.set_var(action_bb_vars[i], possible_jobs[i])
 	
 	
 	var to_bind := [&"state", &"current_action", &"action_target"]
@@ -87,7 +94,7 @@ func _ready() -> void:
 
 	
 func _on_broadcast(id, _val):
-	if id == &"PISELLARE" and possible_actions[0] and state == STATE.IDLE:
+	if id == &"PISELLARE" and possible_jobs[0] and state == STATE.IDLE:
 		state = STATE.FRIDGE
 		current_action = 0
 		
@@ -106,7 +113,7 @@ func idle_step(delta: float):
 	global_position = path.to_global(path.curve.sample_baked(idle_path_offset))
 
 func request_new_job():
-	var new_job = kitchen.request_job(possible_actions)
+	var new_job = kitchen.request_job(possible_jobs)
 	if new_job[0] == -1:
 		return
 		
@@ -117,8 +124,33 @@ func request_new_job():
 	if state == STATE.TABLE:
 		state = STATE.FRIDGE
 	
-func get_possible_actions():
-	return [possible_actions.find(true), possible_actions.rfind(true)]
+func get_possible_jobs():
+	return [possible_jobs.find(true), possible_jobs.rfind(true)]
+	
+func calculate_table_action():
+	if current_action == 0:
+		var dough = action_target.get_dough()
+		var action = []
+		for dim in range(dough.size()):
+			action.append(dough[dim] * m + q)
+		var reward = action_target.evaluate_dough(action)
+
+		var err_m = 0.0
+		var err_q = 0.0
+		for dim in range(dough.size()):
+			err_m += reward[dim] * dough[dim]
+			err_q += reward[dim]
+		err_m /= dough.size()
+		err_q /= dough.size()
+		
+		m -= -lr * err_m
+		q -= -lr * err_q
+		
+		# print("M for Agent ", agent_id, ": ", m, ", Q: ", q)
+		
+		rl_steps += 1
+		if rl_steps == 20 and lr > 0.1:
+			lr /= 2
 	
 func oscillate_sprite(sprite):
 	var r_tween := create_tween().set_loops()

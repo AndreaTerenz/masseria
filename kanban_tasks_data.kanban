@@ -16,7 +16,6 @@
 			"uuid": "72ce5985-14ec-42c5-9243-489237a7680a",
 			"title": "Todo",
 			"tasks": [
-				"f8837433-d8ae-4428-9058-92e030d1415e",
 				"fa44320a-6f37-46d9-b6b4-12e52ca91088",
 				"ee866022-057a-4811-8766-b23f7f07b8e1",
 				"de1646b7-3654-4d8c-b800-56330c1b0007",
@@ -31,7 +30,8 @@
 			"uuid": "16311a70-545d-4b6b-8438-bd82d92e1176",
 			"title": "Doing",
 			"tasks": [
-				"3add422c-677e-4f36-9d50-f91bf972a8f5"
+				"3add422c-677e-4f36-9d50-f91bf972a8f5",
+				"f8837433-d8ae-4428-9058-92e030d1415e"
 			]
 		}
 	],
@@ -50,8 +50,8 @@
 			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
 			"steps": [
 				{
-					"details": "aggiungere un qualcosa che faccia da punteggio",
-					"done": false
+					"details": "aggiungere un qualcosa che faccia da punteggio\n\n(Aggiungere pure punteggio dell'ultima pizza e punteggio medio per pizza)",
+					"done": true
 				}
 			]
 		},
@@ -103,7 +103,7 @@
 		{
 			"uuid": "de1646b7-3654-4d8c-b800-56330c1b0007",
 			"title": "mentre il forno cuoce uno può fare altro",
-			"description": "i.e., non ha senso dover aspettare fermo dal forno che cuocia la pizza\n\nnel caso, si posso avere come azioni distinte \"infornare la pizza\", \"girare la pizza nel forno X\" e \"tirar fuori la pizza dal forno X\"",
+			"description": "(Non sono d'accordo)\ni.e., non ha senso dover aspettare fermo dal forno che cuocia la pizza\n\nnel caso, si posso avere come azioni distinte \"infornare la pizza\", \"girare la pizza nel forno X\" e \"tirar fuori la pizza dal forno X\"",
 			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
 			"steps": []
 		},

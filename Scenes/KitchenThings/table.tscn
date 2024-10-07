@@ -1,12 +1,19 @@
 [gd_scene load_steps=5 format=3 uid="uid://cvquwoqa7jito"]
 
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="1_88ge3"]
+[ext_resource type="Texture2D" uid="uid://kl5x0xty3lvs" path="res://Assets/hand-made/laid_out_dough.png" id="2_hvjwn"]
 [ext_resource type="Texture2D" uid="uid://b2anau4ms0fv8" path="res://Assets/hand-made/piza.png" id="3_3uvge"]
-[ext_resource type="Texture2D" uid="uid://o2n05i2a1toc" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_circle.png" id="3_k0mq6"]
 
 [sub_resource type="GDScript" id="GDScript_d42ou"]
 resource_name = "table"
 script/source = "extends KitchenSprite
+
+const PIZZA_SIDES = 6
+const NOISE_AMOUNT = 0.5
+const DOUGH_VALUE = 25
+var polygon : Array[Vector2]
+var current_dough : Array[Vector2]
+var center = Vector2(0, 0)
 
 enum TABLE_STATE {
 	EMPTY,
@@ -15,8 +22,9 @@ enum TABLE_STATE {
 }
 
 @export var texs : Dictionary[TABLE_STATE, Texture2D] = {}
-
 @onready var pizza_sprite: Sprite2D = $PizzaSprite
+var pizza_shape = load(\"res://Scenes/pizza_rl.tscn\")
+signal base_prepared
 
 var state : TABLE_STATE :
 	set(s):
@@ -25,14 +33,59 @@ var state : TABLE_STATE :
 
 func _ready():
 	add_to_group(&\"Tables\")
-	
 	state = TABLE_STATE.EMPTY
+	
+	var vertex_rotation = 2 * PI / PIZZA_SIDES
+	for v in range(PIZZA_SIDES):
+		polygon.append(Vector2(-1,0).rotated(vertex_rotation * v))
+		
+	connect(\"base_prepared\", get_parent()._add_score)
 
 func next_state():
 	state += 1
 	
 	if state > TABLE_STATE.READY:
 		state = TABLE_STATE.EMPTY
+		
+func get_dough():
+	current_dough = polygon.duplicate(true)
+	for v in range(polygon.size()):
+		current_dough[v] = current_dough[v].lerp(center, randf() * NOISE_AMOUNT)
+	var noisy_dough = []
+	for v in range(polygon.size()):
+		noisy_dough.append(current_dough[v].distance_to(center))
+	return noisy_dough
+	
+func evaluate_dough(dough):
+	var differences = []
+	var total = 0.0
+	for v in range(polygon.size()):
+		differences.append(current_dough[v].distance_to(polygon[v]) - dough[v])
+		total += abs(differences[v])
+	total /= PIZZA_SIDES
+	emit_signal(\"base_prepared\", DOUGH_VALUE * (1 - total))
+	
+	var result_pizza = pizza_shape.instantiate()
+	add_child(result_pizza)
+	result_pizza.get_node(\"Base\").polygon = polygon
+	result_pizza.get_node(\"Base\").color = Color(\"gray\")
+	result_pizza.get_node(\"Base\").scale *= 30
+	var d_poly = []
+	for v in range(polygon.size()):
+		d_poly.append(polygon[v] * (1 -  differences[v]))
+	result_pizza.get_node(\"Dough\").polygon = d_poly
+	result_pizza.get_node(\"Dough\").color = Color(\"orange\")
+	result_pizza.get_node(\"Dough\").scale *= 30
+	result_pizza.get_node(\"Score\").text = \"+\" + str(DOUGH_VALUE * (1 - total))
+	
+	var twin = create_tween()
+	twin.tween_property(result_pizza, \"position\", result_pizza.position - Vector2(0,100), 2).from(0)
+	twin.connect(\"finished\", func (): result_pizza.queue_free())
+	
+	var twin_2 = create_tween()
+	twin_2.tween_property(result_pizza, \"modulate:a\", 0, 2).from(1).set_trans(Tween.TRANS_QUAD)
+	
+	return differences
 "
 
 [node name="Table" type="Sprite2D"]
@@ -40,7 +93,7 @@ scale = Vector2(1.6, 1.6)
 texture = ExtResource("1_88ge3")
 script = SubResource("GDScript_d42ou")
 texs = Dictionary[int, Texture2D]({
-1: ExtResource("3_k0mq6"),
+1: ExtResource("2_hvjwn"),
 2: ExtResource("3_3uvge")
 })
 

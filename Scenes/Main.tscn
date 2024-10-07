@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="4_bx3c8"]
 [ext_resource type="Texture2D" uid="uid://droy782oinaw" path="res://icon.svg" id="5_kmdbf"]
 [ext_resource type="Script" path="res://Script/score.gd" id="6_8jt66"]
-[ext_resource type="StyleBox" uid="uid://bpu6c4vbin663" path="res://Assets/themes/agent_bg.tres" id="7_3vsm4"]
+[ext_resource type="StyleBox" uid="uid://bpu6c4vbin663" path="res://Assets/themes/UI_stylebox.tres" id="7_3vsm4"]
 [ext_resource type="Texture2D" uid="uid://j5wu6rulxfy0" path="res://Assets/stolen/Peppino.png" id="7_g2chq"]
 [ext_resource type="Texture2D" uid="uid://mxkvm6iwx44u" path="res://Assets/stolen/Gustavo.png" id="8_naeej"]
 
@@ -59,6 +59,9 @@ func _on_new_agent():
 	agg.delivered.connect(func reduce():
 		orders-=1
 	)
+	
+func _add_score(score):
+	$CanvasLayer/UI/Score.score += score
 
 func add_job(id: int, location=null):
 	var j := [id, location]
@@ -144,19 +147,35 @@ script/source = "extends HBoxContainer
 
 @export var pizza_scene : PackedScene = preload(\"res://Scenes/Pizza.tscn\")
 @export var UI: Panel
+var score_display = load(\"res://Scenes/pizza_rl.tscn\")
 
 var offset := -1.0
+var pizzas := []
 var times := []
 
 func add_pizza():
 	var pizza = pizza_scene.instantiate()
 	times.append(Time.get_unix_time_from_system())
+	pizzas.append(pizza)
 	add_child(pizza)
 
 func remove_first():
-	remove_child(get_child(0))
-	var score = 100 - (Time.get_unix_time_from_system() - times.pop_front())
+	remove_child(pizzas.pop_front())
+	var score = max(100 - (Time.get_unix_time_from_system() - times.pop_front()), 0)
 	UI.score_label.score += score
+	
+	var added_score = score_display.instantiate()
+	add_child(added_score)
+	added_score.get_node(\"Score\").text = \"+\" + str(score)
+	added_score.position = $\"../../Score\".position + Vector2(256, 0)
+	added_score.get_node(\"Score\").set(\"theme_override_font_sizes/font_size\", 24)
+
+	var twin = create_tween()
+	twin.tween_property(added_score, \"position\", added_score.position + Vector2(0,100), 2).from(0)
+	twin.connect(\"finished\", func (): added_score.queue_free())
+	var twin_2 = create_tween()
+	twin_2.tween_property(added_score, \"modulate:a\", 0, 2).from(1).set_trans(Tween.TRANS_QUAD)
+	
 	
 "
 
@@ -203,7 +222,7 @@ func add_agent(a: Agent):
 	var tmp := template.duplicate()
 	
 	container.add_child(tmp)
-	tmp.setup(a.agent_id, a.possible_actions, a.color)
+	tmp.setup(a.agent_id, a.possible_jobs, a.color)
 "
 
 [sub_resource type="GDScript" id="GDScript_subwx"]

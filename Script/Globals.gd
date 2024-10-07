@@ -12,6 +12,8 @@ static var italian_names = [
 	"Nicole", "Paola", "Sara", "Serena", "Silvia", "Sofia", "Stefania", "Valentina", "Vittoria", "Veronica",
 	"Andrea", "Gabriele", "Nicola", "Samuele", "Sasha", "Luca", "Elia", "Gianni"]
 
+const GAME_SPEED = 2
+
 func _ready() -> void:
 	seed(42)
 	italian_names.shuffle()

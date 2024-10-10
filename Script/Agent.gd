@@ -20,19 +20,27 @@ enum STATE {
 @onready var carrying : Node2D = $Carrying
 
 var agent_id : StringName = &"default"
+var readable_id : String :
+	get:
+		if not agent_id.is_valid_int():
+			return agent_id
+			
+		return Global.italian_names[int(agent_id) % Global.italian_names.size()]
+
 var color: Color
-var possible_jobs = [true, true, false, false]
-var kitchen = null
+var possible_jobs : Array[bool] = [true, true, false, false]
+var kitchen : Node2D = null
+#var break_location := Vector2.ZERO
 var break_location = null
 var idle_path_offset := 0.0
-var action_target = null
-var current_action = -1
+var action_target : Node2D = null
+var current_action := -1
 
 # RL stuff
-var m = 0.0
-var q = 0.0
-var lr = 0.5
-var rl_steps = 0
+var m := 0.0
+var q := 0.0
+var lr := 0.5
+var rl_steps := 0
 
 var state := STATE.IDLE :
 	set(s):

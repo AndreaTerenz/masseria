@@ -16,20 +16,16 @@
 			"uuid": "72ce5985-14ec-42c5-9243-489237a7680a",
 			"title": "Todo",
 			"tasks": [
-				"fa44320a-6f37-46d9-b6b4-12e52ca91088",
 				"ee866022-057a-4811-8766-b23f7f07b8e1",
 				"de1646b7-3654-4d8c-b800-56330c1b0007",
 				"5bcfecb9-b33a-4e64-a8e3-b9c8fbc6f4b0",
-				"c514f321-bd93-4a35-bd9a-9763f22a41c1",
-				"452733cc-2f26-42dc-909c-953dcea89485",
-				"d6d40bc5-50dc-413d-a41b-b65b74b5b621"
+				"c514f321-bd93-4a35-bd9a-9763f22a41c1"
 			]
 		},
 		{
 			"uuid": "16311a70-545d-4b6b-8438-bd82d92e1176",
 			"title": "Doing",
 			"tasks": [
-				"3add422c-677e-4f36-9d50-f91bf972a8f5",
 				"f8837433-d8ae-4428-9058-92e030d1415e"
 			]
 		}
@@ -76,30 +72,6 @@
 			"steps": []
 		},
 		{
-			"uuid": "3add422c-677e-4f36-9d50-f91bf972a8f5",
-			"title": "Profumare la UI",
-			"description": "",
-			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
-			"steps": [
-				{
-					"details": "si dovrebbe vedere se c'è una pizza abbandonata su un tavolo",
-					"done": true
-				},
-				{
-					"details": "far vedere la pizza in forno",
-					"done": true
-				},
-				{
-					"details": "aggiungere UI o simile per capire chi può fare cosa",
-					"done": false
-				},
-				{
-					"details": "lista jobs",
-					"done": true
-				}
-			]
-		},
-		{
 			"uuid": "de1646b7-3654-4d8c-b800-56330c1b0007",
 			"title": "mentre il forno cuoce uno può fare altro",
 			"description": "(Non sono d'accordo)\ni.e., non ha senso dover aspettare fermo dal forno che cuocia la pizza\n\nnel caso, si posso avere come azioni distinte \"infornare la pizza\", \"girare la pizza nel forno X\" e \"tirar fuori la pizza dal forno X\"",
@@ -124,13 +96,6 @@
 			"uuid": "452733cc-2f26-42dc-909c-953dcea89485",
 			"title": "Bugfix: Quando ci sono tante pizze da fare i forni sono (penso) usati da più gente",
 			"description": "Si vedono progressbar con forni senza pizze dentro, per esempio",
-			"category": "1ed90daf-cb60-49ec-bdc2-f70093eb4b41",
-			"steps": []
-		},
-		{
-			"uuid": "d6d40bc5-50dc-413d-a41b-b65b74b5b621",
-			"title": "Bugfx: something about returning to the idle path may be broken...",
-			"description": "",
 			"category": "1ed90daf-cb60-49ec-bdc2-f70093eb4b41",
 			"steps": []
 		},

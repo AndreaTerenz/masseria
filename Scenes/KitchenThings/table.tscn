@@ -79,7 +79,7 @@ func evaluate_dough(dough):
 	result_pizza.get_node(\"Score\").text = \"+\" + str(DOUGH_VALUE * (1 - total))
 	
 	var twin = create_tween()
-	twin.tween_property(result_pizza, \"position\", result_pizza.position - Vector2(0,100), 2).from(0)
+	twin.tween_property(result_pizza, \"position\", result_pizza.position - Vector2(0,100), 2).from(Vector2.ZERO)
 	twin.connect(\"finished\", func (): result_pizza.queue_free())
 	
 	var twin_2 = create_tween()

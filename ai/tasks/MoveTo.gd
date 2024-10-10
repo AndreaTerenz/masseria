@@ -40,7 +40,7 @@ func _enter() -> void:
 func _tick(delta: float) -> Status:
 	var here : Vector2 = agent.global_position
 	
-	if here.distance_to(target) < 0.001:
+	if here.is_equal_approx(target):
 		return SUCCESS
 	
 	agent.global_position = here.move_toward(target, delta * agent.mov_speed)
@@ -66,10 +66,11 @@ func get_closest_of(group: StringName):
 		if d < min_dist:
 			min_dist = d
 			closest = target
-			
-	if group not in [&"Fridges", &"Break"] and closest:
+	
+	if group not in [&"Fridges"] and closest:
 		agent.action_target = closest
-		if group != &"Exit":
+		
+		if group not in [&"Exit", &"Break"]:
 			agent.action_target.occupied = true
 	
 	return closest

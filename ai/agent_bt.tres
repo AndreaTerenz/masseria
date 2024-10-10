@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=152 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=155 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_y8ahv"]
 [ext_resource type="Script" path="res://ai/tasks/GoToIdlePath.gd" id="2_nv2oq"]
@@ -513,7 +513,7 @@ saved_value = &"Ovens"
 resource_name = "Ovens"
 
 [sub_resource type="BTAction" id="BTAction_bb1sd"]
-custom_name = "Move to the assigned Oven (call to Move_To)"
+custom_name = "Move to the assigned Oven"
 script = ExtResource("1_y8ahv")
 target_group = SubResource("BBStringName_7v6hh")
 
@@ -544,7 +544,7 @@ resource_name = "$action_target"
 [sub_resource type="BTCallMethod" id="BTCallMethod_kkthx"]
 node = SubResource("BBNode_pfuml")
 method = &"take_pizza"
-custom_name = "Take out the Pizza (call to take_pizza)"
+custom_name = "Take out the Pizza"
 
 [sub_resource type="BBVariant" id="BBVariant_hwytb"]
 saved_value = null
@@ -560,7 +560,7 @@ saved_value = &"Exit"
 resource_name = "Exit"
 
 [sub_resource type="BTAction" id="BTAction_h6van"]
-custom_name = "Move towards the Exit (call to Move_To)"
+custom_name = "Move towards the Exit"
 script = ExtResource("1_y8ahv")
 target_group = SubResource("BBStringName_8r3my")
 
@@ -618,7 +618,7 @@ value = SubResource("BBVariant_k7peg")
 custom_name = "Set Agent's current Action to NONE"
 
 [sub_resource type="BTAction" id="BTAction_10if8"]
-custom_name = "Return to the Idle Path (call to GoToIdlePath)"
+custom_name = "Return to the Idle Path"
 script = ExtResource("2_nv2oq")
 target_group = &""
 
@@ -637,9 +637,12 @@ variable = &"state"
 value = SubResource("BBVariant_6jw03")
 custom_name = "Set state to WAITING"
 
+[sub_resource type="BTSequence" id="BTSequence_e5fqw"]
+children = [SubResource("BTSetVar_dt2cj")]
+
 [sub_resource type="BTProbabilitySelector" id="BTProbabilitySelector_vj5lb"]
 custom_name = "Next Action Selector"
-children = [SubResource("BTSequence_8hcn4"), SubResource("BTSetVar_dt2cj")]
+children = [SubResource("BTSequence_8hcn4"), SubResource("BTSequence_e5fqw")]
 
 [sub_resource type="BTSequence" id="BTSequence_pld4j"]
 custom_name = "Exit"
@@ -655,12 +658,21 @@ variable = &"state"
 value = SubResource("BBVariant_iydsi")
 custom_name = "Check if Agent's State is WAITING"
 
+[sub_resource type="BBVariant" id="BBVariant_jrb0c"]
+saved_value = null
+resource_name = "<null>"
+
+[sub_resource type="BTSetAgentProperty" id="BTSetAgentProperty_o55j2"]
+property = &"action_target"
+value = SubResource("BBVariant_jrb0c")
+custom_name = "Set Agent's Target to NONE"
+
 [sub_resource type="BBStringName" id="BBStringName_y0jhx"]
 saved_value = &"Break"
 resource_name = "Break"
 
 [sub_resource type="BTAction" id="BTAction_cfxkk"]
-custom_name = "Move to the Break Zone (call to Move_To)"
+custom_name = "Move to the Break Zone"
 script = ExtResource("1_y8ahv")
 target_group = SubResource("BBStringName_y0jhx")
 
@@ -690,7 +702,7 @@ value = SubResource("BBVariant_01v54")
 custom_name = "Set Agent's current Action to NONE"
 
 [sub_resource type="BTAction" id="BTAction_qmun7"]
-custom_name = "Return to the Idle path (call to GoToIdlePath)"
+custom_name = "Return to the Idle path"
 script = ExtResource("2_nv2oq")
 target_group = &""
 
@@ -700,7 +712,7 @@ children = [SubResource("BTSetVar_ljn4j"), SubResource("BTSetVar_5eeav"), SubRes
 
 [sub_resource type="BTSequence" id="BTSequence_pad4m"]
 custom_name = "Break"
-children = [SubResource("BTCheckVar_vu2js"), SubResource("BTAction_cfxkk"), SubResource("BTAction_wsaot"), SubResource("BTSequence_4v1db")]
+children = [SubResource("BTCheckVar_vu2js"), SubResource("BTSetAgentProperty_o55j2"), SubResource("BTAction_cfxkk"), SubResource("BTAction_wsaot"), SubResource("BTSequence_4v1db")]
 
 [sub_resource type="BTComment" id="BTComment_uc4cq"]
 custom_name = "If all above fail, step along idle path and check new job"

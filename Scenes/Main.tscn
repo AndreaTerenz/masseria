@@ -113,6 +113,16 @@ func request_job(curriculum):
 	#print(\"Returned job %s\" % [output])
 
 	return output
+
+
+func _on_test_pressed() -> void:
+	for p in range(14):
+		_on_new_pizza()
+		
+	for a in range(8):
+		_on_new_agent()
+		await get_tree().create_timer(0.1).timeout
+		
 "
 
 [sub_resource type="Curve2D" id="Curve2D_obaid"]
@@ -171,7 +181,7 @@ func remove_first():
 	added_score.get_node(\"Score\").set(\"theme_override_font_sizes/font_size\", 24)
 
 	var twin = create_tween()
-	twin.tween_property(added_score, \"position\", added_score.position + Vector2(0,100), 2).from(0)
+	twin.tween_property(added_score, \"position\", added_score.position + Vector2(0,100), 2).from(Vector2.ZERO)
 	twin.connect(\"finished\", func (): added_score.queue_free())
 	var twin_2 = create_tween()
 	twin_2.tween_property(added_score, \"modulate:a\", 0, 2).from(1).set_trans(Tween.TRANS_QUAD)
@@ -222,7 +232,7 @@ func add_agent(a: Agent):
 	var tmp := template.duplicate()
 	
 	container.add_child(tmp)
-	tmp.setup(a.agent_id, a.possible_jobs, a.color)
+	tmp.setup(a.readable_id, a.possible_jobs, a.color)
 "
 
 [sub_resource type="GDScript" id="GDScript_subwx"]
@@ -232,7 +242,7 @@ script/source = "extends PanelContainer
 @onready var name_lbl = $VBoxContainer/Name
 @onready var actions_lbl = $VBoxContainer/Actions
 
-func setup(n, a, c):
+func setup(n, a: Array[bool], c):
 	var jobs_str = []
 	if a[0]:
 		jobs_str.append(\"Impastatore\")
@@ -243,24 +253,14 @@ func setup(n, a, c):
 	if a[3]:
 		jobs_str.append(\"Cameriere\")
 	
-	name_lbl.text = Global.italian_names[int(n) % Global.italian_names.size()]
+	name_lbl.text = n
 	actions_lbl.text = \", \\n\".join(jobs_str)
 	c -= Color.from_hsv(0,0,0.5,0.5)
 	
-	# I don't think there's a better way, if you find one ty
-	var stylebox = StyleBoxFlat.new()
+	var stylebox = get_theme_stylebox(\"panel\").duplicate()
 	stylebox.set_bg_color(c)
-	stylebox.corner_radius_bottom_left = 6
-	stylebox.corner_radius_bottom_right = 6
-	stylebox.corner_radius_top_left = 6
-	stylebox.corner_radius_top_right = 6
 	
-	stylebox.content_margin_bottom = 5
-	stylebox.content_margin_top = 5
-	stylebox.content_margin_left = 5
-	stylebox.content_margin_right = 5
 	add_theme_stylebox_override(\"panel\", stylebox)
-	
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g5qx7"]
@@ -402,6 +402,16 @@ text = "Score: 0"
 horizontal_alignment = 1
 script = ExtResource("6_8jt66")
 
+[node name="Test" type="Button" parent="CanvasLayer/UI"]
+layout_mode = 2
+offset_left = 544.0
+offset_top = 64.0
+offset_right = 609.0
+offset_bottom = 111.0
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 28
+text = "Test"
+
 [node name="JobsList" type="ScrollContainer" parent="CanvasLayer"]
 unique_name_in_owner = true
 z_index = 1
@@ -532,3 +542,4 @@ stretch_mode = 5
 [connection signal="orders_changed" from="." to="CanvasLayer/UI" method="_on_kitchen_orders_changed"]
 [connection signal="pressed" from="CanvasLayer/UI/VBoxContainer/NewPizza" to="." method="_on_new_pizza"]
 [connection signal="pressed" from="CanvasLayer/UI/VBoxContainer/AddAgent" to="." method="_on_new_agent"]
+[connection signal="pressed" from="CanvasLayer/UI/Test" to="." method="_on_test_pressed"]

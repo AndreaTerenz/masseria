@@ -31,6 +31,8 @@ var orders := 0:
 		var diff : int = v - orders
 		orders = v
 		orders_changed.emit(orders, diff)
+var patience := Timer.new()
+var emergency = false
 
 func _ready():
 	# TODO: This fix is extremely ass. It works.
@@ -39,6 +41,16 @@ func _ready():
 		on_cooldown = false
 	)
 	timer.wait_time = 0.2
+	
+	add_child(patience)
+	patience.timeout.connect(func():
+		emergency = true
+	)
+	patience.wait_time = 3
+	
+	for oven in get_children():
+		if oven.is_in_group(\"Ovens\"):
+			oven.connect(\"done\", func(): add_job(3, oven))
 
 func _on_new_pizza() -> void:
 	add_job(0, null)
@@ -68,40 +80,48 @@ func add_job(id: int, location=null):
 	
 	jobs_list.add_job(j)
 	jobs.append(j)
-	#print(\"Added job %s at %s\" % j)
+	
+	if patience.is_stopped():
+		patience.start()
 	
 func request_job(curriculum):
 	if on_cooldown:
 		#print(\"Job assignment on cooldown\")
 		return [-1, null]
-		
+	
 	var idx := -1
 	var id_to_group := {
-		0: &\"Tables\",
-		2: &\"Ovens\"
-	}
-	
-	for i in len(jobs):
-		var job := jobs[i]
-		var id : int = job[0]
+			0: &\"Tables\",
+			2: &\"Ovens\"
+		}
+	if emergency:
+		if get_children().any(func (k): return k.is_in_group(id_to_group[0]) and not k.occupied):
+			idx = 0
+		else:
+			emergency = false
+			patience.start()
+	else:
+		for i in len(jobs):
+			var job := jobs[i]
+			var id : int = job[0]
+			
+			if not curriculum[id]:
+				continue
+			
+			if not (id in id_to_group.keys()):
+				idx = i
+				break
+			
+			var group : StringName = id_to_group[id]
+			
+			if get_children().any(func (k): return k.is_in_group(group) and not k.occupied):
+				idx = i
+				break
 		
-		if not curriculum[id]:
-			continue
-		
-		if not (id in id_to_group.keys()):
-			idx = i
-			break
-		
-		var group : StringName = id_to_group[id]
-		
-		if get_children().any(func (k): return k.is_in_group(group) and not k.occupied):
-			idx = i
-			break
-	
 	if idx == -1:
 		#print(\"No valid job found for curriculum: %s\" % [curriculum])
 		return [-1, null]
-		
+			
 	var output := jobs[idx]
 	
 	jobs.remove_at(idx)
@@ -109,8 +129,11 @@ func request_job(curriculum):
 	
 	on_cooldown = true
 	timer.start()
-	
-	#print(\"Returned job %s\" % [output])
+	emergency = false
+	if not patience.is_stopped():
+		patience.stop()
+	if len(jobs) > 0:
+		patience.start()
 
 	return output
 
@@ -171,17 +194,17 @@ func add_pizza():
 
 func remove_first():
 	remove_child(pizzas.pop_front())
-	var score = max(100 - (Time.get_unix_time_from_system() - times.pop_front()), 0)
+	var score = max(75 - (Time.get_unix_time_from_system() - times.pop_front()), 0)
 	UI.score_label.score += score
 	
 	var added_score = score_display.instantiate()
 	add_child(added_score)
 	added_score.get_node(\"Score\").text = \"+\" + str(score)
-	added_score.position = $\"../../Score\".position + Vector2(256, 0)
+	added_score.global_position = $\"../../../../Exit\".position + Vector2(0, 50)
 	added_score.get_node(\"Score\").set(\"theme_override_font_sizes/font_size\", 24)
 
 	var twin = create_tween()
-	twin.tween_property(added_score, \"position\", added_score.position + Vector2(0,100), 2).from(Vector2.ZERO)
+	twin.tween_property(added_score, \"position\", added_score.position + Vector2(0,100), 2).from(added_score.position)
 	twin.connect(\"finished\", func (): added_score.queue_free())
 	var twin_2 = create_tween()
 	twin_2.tween_property(added_score, \"modulate:a\", 0, 2).from(1).set_trans(Tween.TRANS_QUAD)

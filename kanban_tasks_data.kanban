@@ -16,8 +16,6 @@
 			"uuid": "72ce5985-14ec-42c5-9243-489237a7680a",
 			"title": "Todo",
 			"tasks": [
-				"ee866022-057a-4811-8766-b23f7f07b8e1",
-				"de1646b7-3654-4d8c-b800-56330c1b0007",
 				"5bcfecb9-b33a-4e64-a8e3-b9c8fbc6f4b0",
 				"c514f321-bd93-4a35-bd9a-9763f22a41c1"
 			]
@@ -25,9 +23,7 @@
 		{
 			"uuid": "16311a70-545d-4b6b-8438-bd82d92e1176",
 			"title": "Doing",
-			"tasks": [
-				"f8837433-d8ae-4428-9058-92e030d1415e"
-			]
+			"tasks": []
 		}
 	],
 	"tasks": [
@@ -37,18 +33,6 @@
 			"description": "e.g., se devo infornare ma i forni sono pieni non eseguo l'azione (<=> non consumo il job)\n",
 			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
 			"steps": []
-		},
-		{
-			"uuid": "f8837433-d8ae-4428-9058-92e030d1415e",
-			"title": "RL stuff",
-			"description": "",
-			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
-			"steps": [
-				{
-					"details": "aggiungere un qualcosa che faccia da punteggio\n\n(Aggiungere pure punteggio dell'ultima pizza e punteggio medio per pizza)",
-					"done": true
-				}
-			]
 		},
 		{
 			"uuid": "fbed7cff-0b67-453c-89a5-d8fa69625ade",
@@ -65,23 +49,9 @@
 			"steps": []
 		},
 		{
-			"uuid": "ee866022-057a-4811-8766-b23f7f07b8e1",
-			"title": "Fare pizze anche quando si è in pochi",
-			"description": "\n1. arriva una nuova task\n2. la preferenza/esperienza di ognuno in quella task (NEVERMIND CALCOLATA COME FOR NOW) viene usata come probabilità che accetti di svolgere quella cosa\n3. Se nessuno sceglie AgentManager ne sceglie uno a caso\nQuando c'è solo gente che non sa/vuole fare quella roba, 2 viene saltato per forza e succede 3",
-			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
-			"steps": []
-		},
-		{
-			"uuid": "de1646b7-3654-4d8c-b800-56330c1b0007",
-			"title": "mentre il forno cuoce uno può fare altro",
-			"description": "(Non sono d'accordo)\ni.e., non ha senso dover aspettare fermo dal forno che cuocia la pizza\n\nnel caso, si posso avere come azioni distinte \"infornare la pizza\", \"girare la pizza nel forno X\" e \"tirar fuori la pizza dal forno X\"",
-			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
-			"steps": []
-		},
-		{
 			"uuid": "5bcfecb9-b33a-4e64-a8e3-b9c8fbc6f4b0",
 			"title": "Beliefs",
-			"description": "\"beliefs\" che un agente aggiorna dinamicamente la sua conoscenza del layout della cucina\nE fare il layout modificabile\n(E mentre gira si segna ciò che entra nel suo range visivo)",
+			"description": "Forse da evitare, c'è già abbastanza roba\n\n\"beliefs\" che un agente aggiorna dinamicamente la sua conoscenza del layout della cucina\nE fare il layout modificabile\n(E mentre gira si segna ciò che entra nel suo range visivo)",
 			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
 			"steps": []
 		},

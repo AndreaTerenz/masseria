@@ -1,6 +1,5 @@
-[gd_scene load_steps=13 format=3 uid="uid://bi2rau283g2l6"]
+[gd_scene load_steps=14 format=3 uid="uid://bi2rau283g2l6"]
 
-[ext_resource type="Texture2D" uid="uid://q5jfpgygsg1s" path="res://Assets/kenney_shape-characters/PNG/Default/blue_body_circle.png" id="1_6xupl"]
 [ext_resource type="Script" path="res://Script/Agent.gd" id="2_u83cq"]
 [ext_resource type="Texture2D" uid="uid://cmgblggqri7mn" path="res://Assets/kenney_shape-characters/PNG/Default/grey_body_circle.png" id="3_3ijh3"]
 [ext_resource type="Texture2D" uid="uid://4hhhopdfwqnw" path="res://Assets/kenney_shape-characters/PNG/Default/green_hand_point.png" id="3_wi01w"]
@@ -48,9 +47,14 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Agent" type="Sprite2D"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_2kdas"]
+radius = 150.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vs2xc"]
+radius = 40.0125
+
+[node name="Agent" type="CharacterBody2D"]
 texture_filter = 1
-texture = ExtResource("1_6xupl")
 script = ExtResource("2_u83cq")
 
 [node name="Face" type="Sprite2D" parent="."]
@@ -77,3 +81,13 @@ blackboard_plan = SubResource("BlackboardPlan_jj6lk")
 position = Vector2(0, -43)
 sprite_frames = SubResource("SpriteFrames_0lmpo")
 animation = &"cooked_pizza"
+
+[node name="ViewRange" type="Area2D" parent="."]
+
+[node name="RangeShape" type="CollisionShape2D" parent="ViewRange"]
+shape = SubResource("CircleShape2D_2kdas")
+
+[node name="Hitbox" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_vs2xc")
+
+[connection signal="body_entered" from="ViewRange" to="." method="_on_view_range_body_entered"]

@@ -42,6 +42,7 @@ func start():
 
 func take_pizza():
 	cooked_pizza.visible = false
+	occupied = false
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jl3f7"]

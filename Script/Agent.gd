@@ -9,7 +9,16 @@ enum STATE {
 	TABLE, #2
 	OVEN, #3 -> starting point of action 2
 	SERVING, #4 -> starting point of action 3
-	BREAK
+	BREAK, #5
+	HELP #6
+}
+
+enum ACTION {
+	NULL = -1,
+	DOUGH = 0,
+	SAUCE = 1,
+	OVEN = 2,
+	SERVE = 3
 }
 
 @export var mov_speed := 400.0
@@ -34,7 +43,9 @@ var kitchen : Node2D = null
 var break_location = null
 var idle_path_offset := 0.0
 var action_target : Node2D = null
-var current_action := -1
+var current_action := ACTION.NULL
+var patience := Timer.new()
+var waiting = false
 
 # RL stuff
 var m := 0.0
@@ -46,28 +57,30 @@ var state := STATE.IDLE :
 	set(s):
 		if s in [STATE.IDLE, STATE.BREAK]:
 			self.rotation_degrees = 0
-			if current_action not in [-1, 3]:
-				kitchen.add_job(current_action+1, action_target)
-				action_target = null
-			elif current_action == 3:
+			if current_action == ACTION.OVEN:
+				# Do nothing, the oven will add the job once the pizza is ready
+				pass
+			elif current_action == ACTION.SERVE:
 				emit_signal("delivered")
 			carrying.hide()
+		elif s == STATE.HELP:
+			waiting = true
 				
 		match s:
 			STATE.OVEN:
 				action_target.occupied = false
 				carrying.play("pizza")
 			STATE.SERVING:
-				action_target.occupied = false
 				carrying.play("cooked_pizza")
 			STATE.TABLE:
-				if current_action == 0:
+				if current_action == ACTION.DOUGH:
 					carrying.play("dough")
 				else:
 					carrying.play("tomato")
 			STATE.BREAK:
-				current_action = -1
+				current_action = ACTION.NULL
 		state = s
+		# print("Agent ", agent_id, " switched to ", s)
 
 func _ready() -> void:
 	add_to_group(&"Agents")
@@ -90,7 +103,7 @@ func _ready() -> void:
 		bt_player.blackboard.set_var(action_bb_vars[i], possible_jobs[i])
 	
 	
-	var to_bind := [&"state", &"current_action", &"action_target"]
+	var to_bind := [&"state", &"current_action", &"action_target", &"waiting"]
 	for v in to_bind:
 		bt_player.blackboard.bind_var_to_property(v, self, v)
 		
@@ -99,18 +112,29 @@ func _ready() -> void:
 	global_position = path.to_global(path.curve.sample_baked(idle_path_offset))
 	
 	$Face.modulate = color
+	
+	add_child(patience)
+	patience.timeout.connect(func():
+		current_action += 1
+		
+		state = current_action + 1
+		if state == STATE.TABLE:
+			state = STATE.FRIDGE
+	)
+	patience.wait_time = 3
+	patience.one_shot = true
 
 	
 func _on_broadcast(id, _val):
 	if id == &"PISELLARE" and possible_jobs[0] and state == STATE.IDLE:
 		state = STATE.FRIDGE
-		current_action = 0
+		current_action = ACTION.DOUGH
 		
 # Probably useless
 func _on_direct_signal(_id, _val):
 	if state == STATE.BREAK:
 		state = STATE.IDLE
-		current_action = -1
+		current_action = ACTION.NULL
 
 func idle_step(delta: float):
 	idle_path_offset += delta * mov_speed
@@ -122,7 +146,7 @@ func idle_step(delta: float):
 
 func request_new_job():
 	var new_job = kitchen.request_job(possible_jobs)
-	if new_job[0] == -1:
+	if new_job[0] == ACTION.NULL:
 		return
 		
 	current_action = new_job[0]
@@ -136,7 +160,7 @@ func get_possible_jobs():
 	return [possible_jobs.find(true), possible_jobs.rfind(true)]
 	
 func calculate_table_action():
-	if current_action == 0:
+	if current_action == ACTION.DOUGH:
 		var dough = action_target.get_dough()
 		var action = []
 		for dim in range(dough.size()):
@@ -164,3 +188,29 @@ func oscillate_sprite(sprite):
 	var r_tween := create_tween().set_loops()
 	r_tween.tween_property(sprite, "rotation_degrees", -90, 0.5).from(0)
 	r_tween.tween_property(sprite, "rotation_degrees", 0, 0.5).from(-90)
+
+func _on_view_range_body_entered(body):
+	if waiting:
+		print("View results: ", body.get_class(), self.get_class(), body != self)
+		if body.get_class() == self.get_class() and body != self:
+			body.ask_for_help(current_action+1, action_target, self)
+			print("Agent ", agent_id, " asked agent ", body.agent_id, " for help")
+			
+func ask_for_help(target_job, target, requester):
+	if possible_jobs[target_job] and state == STATE.IDLE:
+		requester.accept_request()
+		
+		current_action = target_job
+		action_target = target
+
+		state = current_action + 1
+		if state == STATE.TABLE:
+			state = STATE.FRIDGE
+
+func accept_request():
+	action_target = null
+	waiting = false
+	patience.stop()
+
+func start_patience():
+	patience.start()

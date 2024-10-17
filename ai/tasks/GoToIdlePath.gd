@@ -28,8 +28,6 @@ func _enter() -> void:
 
 # Called each time this task is ticked (aka executed).
 func _tick(delta: float) -> Status:
-	var here : Vector2 = agent.global_position
-	
 	if here.is_equal_approx(target):
 		agent.idle_path_offset = path.curve.get_closest_offset(path.to_local(here))
 		return SUCCESS

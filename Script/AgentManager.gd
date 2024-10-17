@@ -52,17 +52,17 @@ func remove_agent(id := str(-1)):
 func send_broadcast(signal_id: StringName, signal_data = null):
 	broadcast.emit(signal_id, signal_data)
 	
-func set_global(key: StringName, data: Variant):
-	data[key] = data
+func set_global(key: StringName, value: Variant):
+	data[key] = value
 	
-func get_global(key: StringName, data: Variant, default = null):
+func get_global(key: StringName, default = null):
 	return data.get(key, default)
 
 # Deprecated
 func generate_agent_id():
 	const ID_ALPHABET := "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	const ID_LENGTH := 24
-	var word: String
+	var word := ""
 	var n_char = len(ID_ALPHABET)
 	for i in range(ID_LENGTH):
 		word += ID_ALPHABET[randi_range(0, n_char-1)]

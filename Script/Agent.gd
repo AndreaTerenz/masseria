@@ -2,6 +2,8 @@ class_name Agent
 extends Node2D
 
 signal delivered
+signal state_changed(s)
+signal action_changed(a)
 
 enum STATE {
 	IDLE, #0
@@ -27,6 +29,9 @@ enum ACTION {
 
 @onready var bt_player: BTPlayer = $BTPlayer
 @onready var carrying : Node2D = $Carrying
+@onready var left_hand = $LeftHand
+@onready var right_hand = $RightHand
+@onready var face = $Face
 
 var agent_id : StringName = &"default"
 var readable_id : String :
@@ -43,7 +48,13 @@ var kitchen : Node2D = null
 var break_location = null
 var idle_path_offset := 0.0
 var action_target : Node2D = null
-var current_action := ACTION.NULL
+var current_action := ACTION.NULL :
+	set(a):
+		if a == current_action:
+			return
+			
+		current_action = a
+		action_changed.emit(a)
 var patience := Timer.new()
 var waiting = false
 
@@ -80,7 +91,7 @@ var state := STATE.IDLE :
 			STATE.BREAK:
 				current_action = ACTION.NULL
 		state = s
-		# print("Agent ", agent_id, " switched to ", s)
+		state_changed.emit(s)
 
 func _ready() -> void:
 	add_to_group(&"Agents")
@@ -94,14 +105,13 @@ func _ready() -> void:
 		_on_broadcast(id, data)
 	)
 
-	oscillate_sprite($LeftHand)
-	oscillate_sprite($RightHand)
+	oscillate_sprite(left_hand)
+	oscillate_sprite(right_hand)
 	
 	var action_bb_vars := [&"PASTAMAN", &"DECORATOR", &"COOK", &"WAITER"]
 	
 	for i in range(len(action_bb_vars)):
 		bt_player.blackboard.set_var(action_bb_vars[i], possible_jobs[i])
-	
 	
 	var to_bind := [&"state", &"current_action", &"action_target", &"waiting"]
 	for v in to_bind:
@@ -111,9 +121,11 @@ func _ready() -> void:
 	idle_path_offset = 0.0
 	global_position = path.to_global(path.curve.sample_baked(idle_path_offset))
 	
-	$Face.modulate = color
+	face.modulate = color
 	
 	add_child(patience)
+	patience.wait_time = 3
+	patience.one_shot = true
 	patience.timeout.connect(func():
 		current_action += 1
 		
@@ -121,9 +133,6 @@ func _ready() -> void:
 		if state == STATE.TABLE:
 			state = STATE.FRIDGE
 	)
-	patience.wait_time = 3
-	patience.one_shot = true
-
 	
 func _on_broadcast(id, _val):
 	if id == &"PISELLARE" and possible_jobs[0] and state == STATE.IDLE:
@@ -160,29 +169,33 @@ func get_possible_jobs():
 	return [possible_jobs.find(true), possible_jobs.rfind(true)]
 	
 func calculate_table_action():
-	if current_action == ACTION.DOUGH:
-		var dough = action_target.get_dough()
-		var action = []
-		for dim in range(dough.size()):
-			action.append(dough[dim] * m + q)
-		var reward = action_target.evaluate_dough(action)
+	if current_action != ACTION.DOUGH:
+		return
+		
+	#assert(action_target != null)
+		
+	var dough = action_target.get_dough()
+	var action = []
+	for dim in range(dough.size()):
+		action.append(dough[dim] * m + q)
+	var reward = action_target.evaluate_dough(action)
 
-		var err_m = 0.0
-		var err_q = 0.0
-		for dim in range(dough.size()):
-			err_m += reward[dim] * dough[dim]
-			err_q += reward[dim]
-		err_m /= dough.size()
-		err_q /= dough.size()
-		
-		m -= -lr * err_m
-		q -= -lr * err_q
-		
-		# print("M for Agent ", agent_id, ": ", m, ", Q: ", q)
-		
-		rl_steps += 1
-		if rl_steps == 20 and lr > 0.1:
-			lr /= 2
+	var err_m = 0.0
+	var err_q = 0.0
+	for dim in range(dough.size()):
+		err_m += reward[dim] * dough[dim]
+		err_q += reward[dim]
+	err_m /= dough.size()
+	err_q /= dough.size()
+	
+	m -= -lr * err_m
+	q -= -lr * err_q
+	
+	# print("M for Agent ", agent_id, ": ", m, ", Q: ", q)
+	
+	rl_steps += 1
+	if rl_steps == 20 and lr > 0.1:
+		lr /= 2
 	
 func oscillate_sprite(sprite):
 	var r_tween := create_tween().set_loops()
@@ -190,22 +203,31 @@ func oscillate_sprite(sprite):
 	r_tween.tween_property(sprite, "rotation_degrees", 0, 0.5).from(-90)
 
 func _on_view_range_body_entered(body):
-	if waiting:
-		print("View results: ", body.get_class(), self.get_class(), body != self)
-		if body.get_class() == self.get_class() and body != self:
-			body.ask_for_help(current_action+1, action_target, self)
-			print("Agent ", agent_id, " asked agent ", body.agent_id, " for help")
+	if not waiting:
+		return
+	
+	var can_help : bool = (body.get_class() == self.get_class() and body != self)
+	
+	print("View results: %s - %s" % [body, can_help])
+	
+	if not can_help:
+		return
+		
+	body.ask_for_help(current_action+1, action_target, self)
+	print("Agent %s asked agent %s for help" % [agent_id, body.agent_id])
 			
 func ask_for_help(target_job, target, requester):
-	if possible_jobs[target_job] and state == STATE.IDLE:
-		requester.accept_request()
+	if not possible_jobs[target_job] or state != STATE.IDLE:
+		return
 		
-		current_action = target_job
-		action_target = target
+	requester.accept_request()
+	
+	current_action = target_job
+	action_target = target
 
-		state = current_action + 1
-		if state == STATE.TABLE:
-			state = STATE.FRIDGE
+	state = current_action + 1
+	if state == STATE.TABLE:
+		state = STATE.FRIDGE
 
 func accept_request():
 	action_target = null
@@ -214,3 +236,12 @@ func accept_request():
 
 func start_patience():
 	patience.start()
+
+static func readable_job(job_idx: int) -> String:
+	return ["Impastatore", "Decoratore", "Pizzaiolo", "Cameriere"][job_idx]
+
+static func readable_state(s: STATE) -> String:
+	return STATE.keys()[s]
+
+static func readable_action(a: ACTION) -> String:
+	return ACTION.keys()[a]

@@ -38,8 +38,6 @@ func _enter() -> void:
 
 # Called each time this task is ticked (aka executed).
 func _tick(delta: float) -> Status:
-	var here : Vector2 = agent.global_position
-	
 	if here.is_equal_approx(target):
 		return SUCCESS
 	
@@ -50,22 +48,23 @@ func _tick(delta: float) -> Status:
 func get_closest_of(group: StringName):
 	if agent.action_target and group != &"Fridges":
 		return agent.action_target
-	
-	var here : Vector2 = agent.global_position
+
 	var group_nodes := agent.get_tree().get_nodes_in_group(group)
 			
 	var min_dist := INF
 	var closest = null
 	
-	for target in group_nodes:
-		var d : float = target.global_position.distance_to(here)
-		
-		if group in [&"Tables", &"Ovens"] and target.occupied:
+	for node in group_nodes:
+		if group in [&"Tables", &"Ovens"] and node.occupied:
 			continue
+			
+		var d : float = node.global_position.distance_to(here)
 		
-		if d < min_dist:
-			min_dist = d
-			closest = target
+		if d >= min_dist:
+			continue
+			
+		min_dist = d
+		closest = node
 	
 	if group not in [&"Fridges"] and closest:
 		agent.action_target = closest

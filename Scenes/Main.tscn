@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=21 format=3 uid="uid://y03djfecm8p4"]
 
 [ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://Scenes/KitchenThings/oven.tscn" id="1_nda1u"]
 [ext_resource type="PackedScene" uid="uid://cvquwoqa7jito" path="res://Scenes/KitchenThings/table.tscn" id="2_5wjk2"]
@@ -22,38 +22,56 @@ signal orders_changed(new_val: int, diff: int)
 @onready var agents_list = %AgentsList
 @onready var idle_path: Path2D = $IdlePath
 @onready var break_point: Sprite2D = $BreakPoint
+@onready var exit = $Exit
+@onready var ui = $CanvasLayer/UI
+
+var orders := 0:
+	set(v):
+		var diff : int = v - orders
+		
+		orders = v
+		orders_changed.emit(orders, diff)
+		
+		var now := Time.get_unix_time_from_system()
+		
+		if diff > 0:
+			add_job(0, null)
+			times.append(now)
+		else:
+			#HACK: Assumes (correctly for now) that the pizza being
+			#delivered is the first in the queue
+			var score = max(75 - (now - times.pop_front()), 0)
+			ui.add_score(score)
+			exit.show_delivery_score(score)
 
 var timer := Timer.new()
 var jobs : Array[Array] = []
 var on_cooldown := false
-var orders := 0:
-	set(v):
-		var diff : int = v - orders
-		orders = v
-		orders_changed.emit(orders, diff)
 var patience := Timer.new()
 var emergency = false
+var times := []
 
 func _ready():
 	# TODO: This fix is extremely ass. It works.
 	add_child(timer)
+	timer.wait_time = 0.2
 	timer.timeout.connect(func():
 		on_cooldown = false
 	)
-	timer.wait_time = 0.2
 	
 	add_child(patience)
+	patience.wait_time = 3
 	patience.timeout.connect(func():
 		emergency = true
 	)
-	patience.wait_time = 3
 	
-	for oven in get_children():
-		if oven.is_in_group(\"Ovens\"):
-			oven.connect(\"done\", func(): add_job(3, oven))
+	for oven in get_tree().get_nodes_in_group(&\"Ovens\"):
+		oven.done.connect(func(): add_job(3, oven))
+		
+	for table in get_tree().get_nodes_in_group(&\"Tables\"):
+		table.dough_done.connect(func(s): ui.add_score(s))
 
 func _on_new_pizza() -> void:
-	add_job(0, null)
 	orders += 1
 
 func _on_new_agent():
@@ -73,7 +91,7 @@ func _on_new_agent():
 	)
 	
 func _add_score(score):
-	$CanvasLayer/UI/Score.score += score
+	ui.add_score(score)
 
 func add_job(id: int, location=null):
 	var j := [id, location]
@@ -154,6 +172,24 @@ _data = {
 }
 point_count = 7
 
+[sub_resource type="GDScript" id="GDScript_qnhjc"]
+resource_name = "exit"
+script/source = "extends Sprite2D
+
+@export var score_display = preload(\"res://Scenes/pizza_rl.tscn\")
+
+func show_delivery_score(score: float):
+	var added_score = score_display.instantiate()
+	
+	add_child(added_score)
+	
+	added_score.top_level = true
+	added_score.global_position = position + Vector2.DOWN * 50.
+	
+	added_score.set_score(score, 24)
+	added_score.run_tween(Vector2.DOWN, added_score.position)
+"
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qkld0"]
 bg_color = Color(0.133333, 0.141176, 0.152941, 1)
 
@@ -172,6 +208,9 @@ func _on_kitchen_orders_changed(new_val: int, diff: int) -> void:
 		pizza_list.add_pizza()
 	else:
 		pizza_list.remove_first()
+
+func add_score(score:float):
+	score_label.score += score
 "
 
 [sub_resource type="GDScript" id="GDScript_rxako"]
@@ -179,37 +218,17 @@ resource_name = "orders_view"
 script/source = "extends HBoxContainer
 
 @export var pizza_scene : PackedScene = preload(\"res://Scenes/Pizza.tscn\")
-@export var UI: Panel
-var score_display = load(\"res://Scenes/pizza_rl.tscn\")
 
 var offset := -1.0
 var pizzas := []
-var times := []
 
 func add_pizza():
 	var pizza = pizza_scene.instantiate()
-	times.append(Time.get_unix_time_from_system())
 	pizzas.append(pizza)
 	add_child(pizza)
 
 func remove_first():
 	remove_child(pizzas.pop_front())
-	var score = max(75 - (Time.get_unix_time_from_system() - times.pop_front()), 0)
-	UI.score_label.score += score
-	
-	var added_score = score_display.instantiate()
-	add_child(added_score)
-	added_score.get_node(\"Score\").text = \"+\" + str(score)
-	added_score.global_position = $\"../../../../Exit\".position + Vector2(0, 50)
-	added_score.get_node(\"Score\").set(\"theme_override_font_sizes/font_size\", 24)
-
-	var twin = create_tween()
-	twin.tween_property(added_score, \"position\", added_score.position + Vector2(0,100), 2).from(added_score.position)
-	twin.connect(\"finished\", func (): added_score.queue_free())
-	var twin_2 = create_tween()
-	twin_2.tween_property(added_score, \"modulate:a\", 0, 2).from(1).set_trans(Tween.TRANS_QUAD)
-	
-	
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qvvrj"]
@@ -333,6 +352,7 @@ texture = ExtResource("3_nlnuv")
 position = Vector2(704, 144)
 scale = Vector2(3.2, 0.4)
 texture = ExtResource("4_bx3c8")
+script = SubResource("GDScript_qnhjc")
 
 [node name="BreakPoint" type="Sprite2D" parent="." groups=["Break"]]
 modulate = Color(1, 1, 1, 0.270588)
@@ -380,13 +400,12 @@ theme_override_colors/font_shadow_color = Color(0.792157, 0.176471, 0, 1)
 theme_override_font_sizes/font_size = 24
 text = "Total orders: 0"
 
-[node name="PizzaList" type="HBoxContainer" parent="CanvasLayer/UI/VBoxContainer2" node_paths=PackedStringArray("UI")]
+[node name="PizzaList" type="HBoxContainer" parent="CanvasLayer/UI/VBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 3
 alignment = 1
 script = SubResource("GDScript_rxako")
-UI = NodePath("../..")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI"]
 layout_mode = 1

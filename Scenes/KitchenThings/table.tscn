@@ -8,12 +8,11 @@
 resource_name = "table"
 script/source = "extends KitchenSprite
 
+signal dough_done(score)
+
 const PIZZA_SIDES = 6
 const NOISE_AMOUNT = 0.5
 const DOUGH_VALUE = 25
-var polygon : Array[Vector2]
-var current_dough : Array[Vector2]
-var center = Vector2(0, 0)
 
 enum TABLE_STATE {
 	EMPTY,
@@ -22,9 +21,13 @@ enum TABLE_STATE {
 }
 
 @export var texs : Dictionary[TABLE_STATE, Texture2D] = {}
+@export var pizza_shape = preload(\"res://Scenes/pizza_rl.tscn\")
+
 @onready var pizza_sprite: Sprite2D = $PizzaSprite
-var pizza_shape = load(\"res://Scenes/pizza_rl.tscn\")
-signal base_prepared
+
+var polygon : Array[Vector2]
+var current_dough : Array[Vector2]
+var center := Vector2.ZERO
 
 var state : TABLE_STATE :
 	set(s):
@@ -35,11 +38,10 @@ func _ready():
 	add_to_group(&\"Tables\")
 	state = TABLE_STATE.EMPTY
 	
-	var vertex_rotation = 2 * PI / PIZZA_SIDES
+	# Chad Tau vs cringe Pi
+	var vertex_rotation = TAU / PIZZA_SIDES
 	for v in range(PIZZA_SIDES):
-		polygon.append(Vector2(-1,0).rotated(vertex_rotation * v))
-		
-	connect(\"base_prepared\", get_parent()._add_score)
+		polygon.append(Vector2.LEFT.rotated(vertex_rotation * v))
 
 func next_state():
 	state += 1
@@ -49,41 +51,38 @@ func next_state():
 		
 func get_dough():
 	current_dough = polygon.duplicate(true)
-	for v in range(polygon.size()):
-		current_dough[v] = current_dough[v].lerp(center, randf() * NOISE_AMOUNT)
 	var noisy_dough = []
-	for v in range(polygon.size()):
-		noisy_dough.append(current_dough[v].distance_to(center))
+	
+	for v in range(len(polygon)):
+		var tmp = current_dough[v].lerp(center, randf() * NOISE_AMOUNT)
+		
+		current_dough[v] = tmp
+		noisy_dough.append(tmp.distance_to(center))
+		
 	return noisy_dough
 	
 func evaluate_dough(dough):
-	var differences = []
-	var total = 0.0
-	for v in range(polygon.size()):
-		differences.append(current_dough[v].distance_to(polygon[v]) - dough[v])
-		total += abs(differences[v])
-	total /= PIZZA_SIDES
-	emit_signal(\"base_prepared\", DOUGH_VALUE * (1 - total))
+	var differences := []
+	var score := 0.0
+	var d_poly := []
+	
+	for v in range(len(polygon)):
+		var diff : float = current_dough[v].distance_to(polygon[v]) - dough[v]
+		
+		differences.append(diff)
+		d_poly.append(polygon[v] * (1 -  diff))
+		score += abs(diff) / PIZZA_SIDES
+	
+	score = DOUGH_VALUE * (1 - score)
+	
+	dough_done.emit(score)
 	
 	var result_pizza = pizza_shape.instantiate()
 	add_child(result_pizza)
-	result_pizza.get_node(\"Base\").polygon = polygon
-	result_pizza.get_node(\"Base\").color = Color(\"gray\")
-	result_pizza.get_node(\"Base\").scale *= 30
-	var d_poly = []
-	for v in range(polygon.size()):
-		d_poly.append(polygon[v] * (1 -  differences[v]))
-	result_pizza.get_node(\"Dough\").polygon = d_poly
-	result_pizza.get_node(\"Dough\").color = Color(\"orange\")
-	result_pizza.get_node(\"Dough\").scale *= 30
-	result_pizza.get_node(\"Score\").text = \"+\" + str(DOUGH_VALUE * (1 - total))
 	
-	var twin = create_tween()
-	twin.tween_property(result_pizza, \"position\", result_pizza.position - Vector2(0,100), 2).from(Vector2.ZERO)
-	twin.connect(\"finished\", func (): result_pizza.queue_free())
-	
-	var twin_2 = create_tween()
-	twin_2.tween_property(result_pizza, \"modulate:a\", 0, 2).from(1).set_trans(Tween.TRANS_QUAD)
+	result_pizza.set_polygons(polygon, d_poly)
+	result_pizza.set_score(score)
+	result_pizza.run_tween()
 	
 	return differences
 "

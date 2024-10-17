@@ -1,12 +1,43 @@
-[gd_scene format=3 uid="uid://coya4ckv4oln5"]
+[gd_scene load_steps=2 format=3 uid="uid://coya4ckv4oln5"]
+
+[sub_resource type="GDScript" id="GDScript_x0ks5"]
+resource_name = "pizza_rl"
+script/source = "extends Node2D
+
+@onready var base : Polygon2D = $Base
+@onready var dough : Polygon2D = $Dough
+@onready var score_lbl : Label = $Score
+
+func set_score(score, font_size := -1):
+	score_lbl.text = \"+ %.2f\"  % score
+
+	if font_size != -1:
+		score_lbl.set(\"theme_override_font_sizes/font_size\", font_size)
+
+func set_polygons(base_poly: PackedVector2Array, dough_poly: PackedVector2Array):
+	base.polygon = base_poly
+	dough.polygon = dough_poly
+
+func run_tween(direction := Vector2.UP, move_from := Vector2.ZERO):
+	var twin := create_tween()
+	twin.tween_property(self, \"position\", direction * 100., 2).from(move_from).as_relative()
+	twin.parallel().tween_property(self, \"modulate:a\", 0, 2).from(1).set_trans(Tween.TRANS_QUAD)
+	
+	await twin.finished
+	
+	queue_free()
+"
 
 [node name="Pizza" type="Node2D"]
+script = SubResource("GDScript_x0ks5")
 
 [node name="Base" type="Polygon2D" parent="."]
-color = Color(0.5, 0.5, 0.5, 1)
+scale = Vector2(30, 30)
+color = Color(0.659352, 0.659351, 0.659352, 1)
 
 [node name="Dough" type="Polygon2D" parent="."]
-color = Color(1, 0.501961, 0, 1)
+scale = Vector2(30, 30)
+color = Color(1, 0.733333, 0, 1)
 
 [node name="Score" type="Label" parent="."]
 z_index = 3

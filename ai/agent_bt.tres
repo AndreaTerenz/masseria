@@ -645,6 +645,7 @@ custom_name = "Check if Agent's State is HELP"
 [sub_resource type="BBVariant" id="BBVariant_3erqa"]
 type = 1
 saved_value = false
+resource_name = "false"
 
 [sub_resource type="BTCheckVar" id="BTCheckVar_6n17p"]
 variable = &"waiting"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=22 format=3 uid="uid://y03djfecm8p4"]
 
 [ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://Scenes/KitchenThings/oven.tscn" id="1_nda1u"]
 [ext_resource type="PackedScene" uid="uid://cvquwoqa7jito" path="res://Scenes/KitchenThings/table.tscn" id="2_5wjk2"]
@@ -9,6 +9,7 @@
 [ext_resource type="StyleBox" uid="uid://bpu6c4vbin663" path="res://Assets/themes/UI_stylebox.tres" id="7_3vsm4"]
 [ext_resource type="Texture2D" uid="uid://j5wu6rulxfy0" path="res://Assets/stolen/Peppino.png" id="7_g2chq"]
 [ext_resource type="Texture2D" uid="uid://mxkvm6iwx44u" path="res://Assets/stolen/Gustavo.png" id="8_naeej"]
+[ext_resource type="Texture2D" uid="uid://bs03s033hcl8x" path="res://Assets/tile.png" id="10_y8vr1"]
 
 [sub_resource type="GDScript" id="GDScript_i6dm0"]
 resource_name = "kitchen"
@@ -309,6 +310,16 @@ func setup(n, a: Array[bool], c):
 
 [node name="Kitchen" type="Node2D"]
 script = SubResource("GDScript_i6dm0")
+
+[node name="Floor" type="Sprite2D" parent="."]
+z_index = -5
+texture_repeat = 2
+position = Vector2(128.005, 96)
+scale = Vector2(0.204581, 0.21)
+texture = ExtResource("10_y8vr1")
+offset = Vector2(2815, 1600)
+region_enabled = true
+region_rect = Rect2(0, 0, 5632, 3200)
 
 [node name="IdlePath" type="Path2D" parent="."]
 position = Vector2(128, 128)

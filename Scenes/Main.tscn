@@ -385,9 +385,25 @@ position = Vector2(1216, 256)
 scale = Vector2(1.6, 3.2)
 texture = ExtResource("3_nlnuv")
 
+[node name="Sprite2D" type="Sprite2D" parent="Fridge"]
+visible = false
+modulate = Color(0, 0, 0, 0.580392)
+show_behind_parent = true
+z_index = -2
+scale = Vector2(1.0625, 1.0625)
+texture = ExtResource("3_nlnuv")
+
 [node name="DoughFridge" type="Sprite2D" parent="." groups=["Fridges"]]
 position = Vector2(192, 256)
 scale = Vector2(1.6, 3.2)
+texture = ExtResource("3_nlnuv")
+
+[node name="Sprite2D" type="Sprite2D" parent="DoughFridge"]
+visible = false
+modulate = Color(0, 0, 0, 0.580392)
+show_behind_parent = true
+z_index = -2
+scale = Vector2(1.0625, 1.0625)
 texture = ExtResource("3_nlnuv")
 
 [node name="Exit" type="Sprite2D" parent="." groups=["Exit"]]

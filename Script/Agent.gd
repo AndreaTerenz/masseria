@@ -41,13 +41,6 @@ var readable_id : String :
 			
 		return Global.italian_names[int(agent_id) % Global.italian_names.size()]
 
-var color: Color
-var possible_jobs : Array[bool] = [true, true, false, false]
-var kitchen : Node2D = null
-#var break_location := Vector2.ZERO
-var break_location = null
-var idle_path_offset := 0.0
-var action_target : Node2D = null
 var current_action := ACTION.NULL :
 	set(a):
 		if a == current_action:
@@ -55,6 +48,38 @@ var current_action := ACTION.NULL :
 			
 		current_action = a
 		action_changed.emit(a)
+		
+var action_target : Node2D = null :
+	set(new):
+		var current = action_target
+		
+		if new == null and current == null:
+			return
+		
+		# I HAVE TO DO IT LIKE THIS BECAUSE GODOT IS VERY STUPID AND EVALUATES THE ASSERT MESSAGE
+		# EVEN BEFORE CHECKING THE ASSERT CONDITION ITSELF
+		if not (new == null or current == null):
+			assert(false, "%s is trying to use %s but is already using %s" % [readable_id, new.name, current.name])
+		if not (new == null or not new.occupied):
+			assert(false, "%s is trying to use %s but it is already being used by " % [readable_id, new.name, new.user.readable_id])
+		
+		if new != null:
+			print("%s occupied %s" % [readable_id, new.name])
+		elif current != null:
+			print("%s released %s" % [readable_id, current.name])
+		
+		if new != null:
+			new.user = self
+		else:
+			current.user = null
+			
+		action_target = new
+		
+var color: Color
+var possible_jobs : Array[bool] = [true, true, false, false]
+var kitchen : Node2D = null
+var break_location := Vector2.ZERO
+var idle_path_offset := 0.0
 var patience := Timer.new()
 var waiting = false
 
@@ -79,7 +104,7 @@ var state := STATE.IDLE :
 				
 		match s:
 			STATE.OVEN:
-				action_target.occupied = false
+				action_target.user = null
 				carrying.play("pizza")
 			STATE.SERVING:
 				carrying.play("cooked_pizza")
@@ -172,17 +197,17 @@ func calculate_table_action():
 	if current_action != ACTION.DOUGH:
 		return
 		
-	#assert(action_target != null)
+	assert(action_target != null)
 		
 	var dough = action_target.get_dough()
 	var action = []
-	for dim in range(dough.size()):
+	for dim in range(len(dough)):
 		action.append(dough[dim] * m + q)
 	var reward = action_target.evaluate_dough(action)
 
 	var err_m = 0.0
 	var err_q = 0.0
-	for dim in range(dough.size()):
+	for dim in range(len(dough)):
 		err_m += reward[dim] * dough[dim]
 		err_q += reward[dim]
 	err_m /= dough.size()
@@ -208,13 +233,13 @@ func _on_view_range_body_entered(body):
 	
 	var can_help : bool = (body.get_class() == self.get_class() and body != self)
 	
-	print("View results: %s - %s" % [body, can_help])
+	#print("View results: %s - %s" % [body, can_help])
 	
 	if not can_help:
 		return
 		
 	body.ask_for_help(current_action+1, action_target, self)
-	print("Agent %s asked agent %s for help" % [agent_id, body.agent_id])
+	#print("Agent %s asked agent %s for help" % [agent_id, body.agent_id])
 			
 func ask_for_help(target_job, target, requester):
 	if not possible_jobs[target_job] or state != STATE.IDLE:

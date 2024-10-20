@@ -50,7 +50,7 @@ func get_closest_of(group: StringName):
 		return agent.action_target
 
 	var group_nodes := agent.get_tree().get_nodes_in_group(group)
-			
+	
 	var min_dist := INF
 	var closest = null
 	
@@ -65,11 +65,10 @@ func get_closest_of(group: StringName):
 			
 		min_dist = d
 		closest = node
+			
+	assert(closest != null)
 	
 	if group not in [&"Fridges"] and closest:
 		agent.action_target = closest
-		
-		if group not in [&"Exit", &"Break"]:
-			agent.action_target.occupied = true
 	
 	return closest

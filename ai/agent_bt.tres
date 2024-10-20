@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=156 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=160 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_y8ahv"]
 [ext_resource type="Script" path="res://ai/tasks/GoToIdlePath.gd" id="2_nv2oq"]
@@ -129,6 +129,28 @@ target_group = SubResource("BBStringName_nx8hj")
 duration = 2.0
 custom_name = "Prepare the Pizza (wait 2 sec)"
 
+[sub_resource type="BBVariant" id="BBVariant_cgby8"]
+saved_value = null
+resource_name = "<null>"
+
+[sub_resource type="BTCheckAgentProperty" id="BTCheckAgentProperty_4l47i"]
+property = &"action_target"
+value = SubResource("BBVariant_cgby8")
+
+[sub_resource type="BBNode" id="BBNode_l0lxe"]
+saved_value = NodePath(".")
+resource_name = "."
+
+[sub_resource type="BTEvaluateExpression" id="BTEvaluateExpression_imh0y"]
+node = SubResource("BBNode_l0lxe")
+expression_string = "print('!!!!!!!!! no action target for ', readable_id)"
+
+[sub_resource type="BTSequence" id="BTSequence_wddwc"]
+children = [SubResource("BTCheckAgentProperty_4l47i"), SubResource("BTEvaluateExpression_imh0y")]
+
+[sub_resource type="BTAlwaysSucceed" id="BTAlwaysSucceed_p1y24"]
+children = [SubResource("BTSequence_wddwc")]
+
 [sub_resource type="BBNode" id="BBNode_g707e"]
 saved_value = NodePath(".")
 resource_name = "."
@@ -137,14 +159,6 @@ resource_name = "."
 node = SubResource("BBNode_g707e")
 method = &"calculate_table_action"
 custom_name = "Execute RL Step (call to calculate_action)"
-
-[sub_resource type="BBNode" id="BBNode_l0lxe"]
-saved_value = NodePath(".")
-resource_name = "."
-
-[sub_resource type="BTEvaluateExpression" id="BTEvaluateExpression_imh0y"]
-node = SubResource("BBNode_l0lxe")
-expression_string = "print(readable_id, ' ', action_target)"
 
 [sub_resource type="BBNode" id="BBNode_oebdf"]
 value_source = 1
@@ -295,7 +309,7 @@ custom_name = "Hide the ingredient"
 
 [sub_resource type="BTSequence" id="BTSequence_oivck"]
 custom_name = "Table"
-children = [SubResource("BTCheckVar_gnb4p"), SubResource("BTAction_mjyu7"), SubResource("BTWait_iq4t6"), SubResource("BTCallMethod_onjb2"), SubResource("BTEvaluateExpression_imh0y"), SubResource("BTCallMethod_77d8m"), SubResource("BTCallMethod_gkn7w"), SubResource("BTSelector_7dx6t"), SubResource("BTCallMethod_ls2d7")]
+children = [SubResource("BTCheckVar_gnb4p"), SubResource("BTAction_mjyu7"), SubResource("BTWait_iq4t6"), SubResource("BTAlwaysSucceed_p1y24"), SubResource("BTCallMethod_onjb2"), SubResource("BTCallMethod_77d8m"), SubResource("BTCallMethod_gkn7w"), SubResource("BTSelector_7dx6t"), SubResource("BTCallMethod_ls2d7")]
 
 [sub_resource type="BBVariant" id="BBVariant_8rhvh"]
 type = 2

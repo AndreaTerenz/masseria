@@ -24,3 +24,5 @@ mono_crash.*.json
 Builds/
 addons/limboai/bin/~liblimboai.windows.editor.x86_64.dll
 addons/limboai/bin/~liblimboai.windows.editor.x86_64.dll~RF25bcf22.TMP
+
+Builds/

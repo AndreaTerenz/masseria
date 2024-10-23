@@ -19,8 +19,8 @@ func register_agent(a: Agent):
 	agents_created += 1
 	
 	print("Added agent %s" % a.agent_id)
-	print("Agent %s can do actions %s and %s" % 
-		[a.agent_id, a.get_possible_jobs()[0], a.get_possible_jobs()[1]])
+	# print("Agent %s can do actions %s and %s" % 
+	# 	[a.agent_id, a.get_possible_jobs()[0], a.get_possible_jobs()[1]])
 	
 func remove_agent(id := str(-1)):
 	if len(agents) == 0:

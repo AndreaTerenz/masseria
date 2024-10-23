@@ -22,10 +22,8 @@ func _ready() -> void:
 	cooked_pizza.visible = false
 	bar.visible = false
 	user_lbl.visible = false
+	is_self_oven = true
 	
-func _can_user_change():
-	return true #not bar.visible
-		
 func _on_user_changed():
 	user_lbl.visible = user != null
 	user_lbl.text = user.readable_id if user != null else \"\"
@@ -36,6 +34,7 @@ func start():
 		return
 		
 	bar.visible = true
+	occupied = true
 	
 	create_tween()\\
 	.tween_property(bar, \"value\", 100.0, cook_time)\\
@@ -48,7 +47,9 @@ func start():
 
 func take_pizza():
 	cooked_pizza.visible = false
+	occupied = false
 	user = null
+	self.self_modulate = Color.WHITE
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jl3f7"]

@@ -33,7 +33,9 @@ func _generate_name() -> String:
 # Called when the task is entered.
 func _enter() -> void:
 	var tmp : Node2D = get_closest_of(_group)
-	target = tmp.global_position
+	if tmp != null:
+		target = tmp.global_position
+		
 
 
 # Called each time this task is ticked (aka executed).
@@ -47,6 +49,8 @@ func _tick(delta: float) -> Status:
 
 func get_closest_of(group: StringName):
 	if agent.action_target and group != &"Fridges":
+		if group not in [&"Fridges", &"Exit"]:
+			agent.action_target.user = agent
 		return agent.action_target
 
 	var group_nodes := agent.get_tree().get_nodes_in_group(group)
@@ -65,10 +69,11 @@ func get_closest_of(group: StringName):
 			
 		min_dist = d
 		closest = node
-			
-	assert(closest != null)
-	
+
 	if group not in [&"Fridges"] and closest:
 		agent.action_target = closest
+		if group not in [&"Exit", &"Break"]:
+			closest.user = agent
+			closest.occupied = true
 	
 	return closest

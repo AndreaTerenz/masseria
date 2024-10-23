@@ -338,8 +338,8 @@ func setup(ag: Agent):
 
 [node name="Kitchen" type="Node2D"]
 script = SubResource("GDScript_i6dm0")
-test_agents_count = 4
-test_pizzas_count = 5
+test_agents_count = 12
+test_pizzas_count = 50
 
 [node name="Floor" type="Sprite2D" parent="."]
 visible = false

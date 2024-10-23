@@ -54,6 +54,7 @@ func next_state():
 	
 	if state > TABLE_STATE.READY:
 		state = TABLE_STATE.EMPTY
+		user = null
 		
 func get_dough():
 	current_dough = polygon.duplicate(true)

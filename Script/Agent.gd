@@ -20,7 +20,7 @@ enum ACTION {
 	DOUGH = 0,
 	SAUCE = 1,
 	OVEN = 2,
-	SERVE = 3
+	SERVE = 3,
 }
 
 @export var mov_speed := 400.0
@@ -34,6 +34,7 @@ enum ACTION {
 @onready var face = $Face
 
 var agent_id : StringName = &"default"
+var debug = false
 var readable_id : String :
 	get:
 		if not agent_id.is_valid_int():
@@ -60,18 +61,17 @@ var action_target : Node2D = null :
 		# EVEN BEFORE CHECKING THE ASSERT CONDITION ITSELF
 		if not (new == null or current == null):
 			assert(false, "%s is trying to use %s but is already using %s" % [readable_id, new.name, current.name])
-		if not (new == null or not new.occupied):
-			assert(false, "%s is trying to use %s but it is already being used by " % [readable_id, new.name, new.user.readable_id])
 		
-		if new != null:
-			print("%s occupied %s" % [readable_id, new.name])
-		elif current != null:
-			print("%s released %s" % [readable_id, current.name])
-		
-		if new != null:
-			new.user = self
-		else:
-			current.user = null
+		if state not in [STATE.SERVING, STATE.BREAK] and debug:
+			if new != null:
+				print("%s, during action %s, occupied %s" % [readable_id, readable_action(current_action), new.name])
+			elif current != null:
+				print("%s, during action %s, released %s" % [readable_id, readable_action(current_action), current.name])
+			
+			if new != null:
+				new.user = self
+			# if current != null and not current.is_self_oven:
+			# 	current.user = null
 			
 		action_target = new
 		
@@ -99,12 +99,9 @@ var state := STATE.IDLE :
 			elif current_action == ACTION.SERVE:
 				emit_signal("delivered")
 			carrying.hide()
-		elif s == STATE.HELP:
-			waiting = true
 				
 		match s:
 			STATE.OVEN:
-				action_target.user = null
 				carrying.play("pizza")
 			STATE.SERVING:
 				carrying.play("cooked_pizza")
@@ -115,6 +112,8 @@ var state := STATE.IDLE :
 					carrying.play("tomato")
 			STATE.BREAK:
 				current_action = ACTION.NULL
+			STATE.HELP:
+				waiting = true
 		state = s
 		state_changed.emit(s)
 
@@ -153,10 +152,14 @@ func _ready() -> void:
 	patience.one_shot = true
 	patience.timeout.connect(func():
 		current_action += 1
+		if current_action == ACTION.OVEN:
+			action_target.occupied = false
 		
 		state = current_action + 1
 		if state == STATE.TABLE:
 			state = STATE.FRIDGE
+			
+		waiting = false
 	)
 	
 func _on_broadcast(id, _val):
@@ -243,7 +246,7 @@ func _on_view_range_body_entered(body):
 			
 func ask_for_help(target_job, target, requester):
 	if not possible_jobs[target_job] or state != STATE.IDLE:
-		return
+		return false
 		
 	requester.accept_request()
 	
@@ -253,6 +256,8 @@ func ask_for_help(target_job, target, requester):
 	state = current_action + 1
 	if state == STATE.TABLE:
 		state = STATE.FRIDGE
+	
+	return true
 
 func accept_request():
 	action_target = null
@@ -261,6 +266,10 @@ func accept_request():
 
 func start_patience():
 	patience.start()
+	
+func send_order_back():
+	kitchen.add_job(current_action, null)
+	print("Added back job ", current_action)
 
 static func readable_job(job_idx: int) -> String:
 	return ["Impastatore", "Decoratore", "Pizzaiolo", "Cameriere"][job_idx]
@@ -269,4 +278,4 @@ static func readable_state(s: STATE) -> String:
 	return STATE.keys()[s]
 
 static func readable_action(a: ACTION) -> String:
-	return ACTION.keys()[a]
+	return ACTION.keys()[a + 1]

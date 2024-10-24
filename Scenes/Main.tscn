@@ -1,15 +1,18 @@
-[gd_scene load_steps=22 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=25 format=3 uid="uid://y03djfecm8p4"]
 
+[ext_resource type="Texture2D" uid="uid://cyu2y8yyd8s88" path="res://Assets/hand-made/image_2024-10-24_10-37-44.png" id="1_bqitt"]
 [ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://Scenes/KitchenThings/oven.tscn" id="1_nda1u"]
 [ext_resource type="PackedScene" uid="uid://cvquwoqa7jito" path="res://Scenes/KitchenThings/table.tscn" id="2_5wjk2"]
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="3_nlnuv"]
+[ext_resource type="Texture2D" uid="uid://b441h4hvelfjc" path="res://Assets/hand-made/Oven.png" id="3_odpk4"]
+[ext_resource type="Texture2D" uid="uid://cxgtjgjtoxamq" path="res://Assets/hand-made/Table.png" id="4_71lp5"]
 [ext_resource type="Texture2D" uid="uid://c8fnt88ij35hb" path="res://Assets/kenney_shape-characters/PNG/Default/yellow_body_square.png" id="4_bx3c8"]
 [ext_resource type="Texture2D" uid="uid://droy782oinaw" path="res://icon.svg" id="5_kmdbf"]
+[ext_resource type="Texture2D" uid="uid://v7mgmaex7kxf" path="res://Assets/hand-made/Fridge.png" id="6_3nnoc"]
 [ext_resource type="Script" path="res://Script/score.gd" id="6_8jt66"]
 [ext_resource type="StyleBox" uid="uid://bpu6c4vbin663" path="res://Assets/themes/UI_stylebox.tres" id="7_3vsm4"]
 [ext_resource type="Texture2D" uid="uid://j5wu6rulxfy0" path="res://Assets/stolen/Peppino.png" id="7_g2chq"]
 [ext_resource type="Texture2D" uid="uid://mxkvm6iwx44u" path="res://Assets/stolen/Gustavo.png" id="8_naeej"]
-[ext_resource type="Texture2D" uid="uid://bs03s033hcl8x" path="res://Assets/tile.png" id="10_y8vr1"]
 
 [sub_resource type="GDScript" id="GDScript_i6dm0"]
 resource_name = "kitchen"
@@ -342,12 +345,11 @@ test_agents_count = 12
 test_pizzas_count = 50
 
 [node name="Floor" type="Sprite2D" parent="."]
-visible = false
 z_index = -5
 texture_repeat = 2
 position = Vector2(128.005, 96)
 scale = Vector2(0.204581, 0.21)
-texture = ExtResource("10_y8vr1")
+texture = ExtResource("1_bqitt")
 offset = Vector2(2815, 1600)
 region_enabled = true
 region_rect = Rect2(0, 0, 5632, 3200)
@@ -358,32 +360,40 @@ curve = SubResource("Curve2D_obaid")
 
 [node name="Oven" parent="." instance=ExtResource("1_nda1u")]
 position = Vector2(192, 704)
+texture = ExtResource("3_odpk4")
 
 [node name="Oven2" parent="." instance=ExtResource("1_nda1u")]
 position = Vector2(320, 704)
+texture = ExtResource("3_odpk4")
 
 [node name="Oven3" parent="." instance=ExtResource("1_nda1u")]
 position = Vector2(1088, 704)
+texture = ExtResource("3_odpk4")
 
 [node name="Oven4" parent="." instance=ExtResource("1_nda1u")]
 position = Vector2(1216, 704)
+texture = ExtResource("3_odpk4")
 
 [node name="Table" parent="." instance=ExtResource("2_5wjk2")]
 position = Vector2(640, 448)
+texture = ExtResource("4_71lp5")
 
 [node name="Table2" parent="." instance=ExtResource("2_5wjk2")]
 position = Vector2(768, 448)
+texture = ExtResource("4_71lp5")
 
 [node name="Table3" parent="." instance=ExtResource("2_5wjk2")]
 position = Vector2(640, 704)
+texture = ExtResource("4_71lp5")
 
 [node name="Table4" parent="." instance=ExtResource("2_5wjk2")]
 position = Vector2(768, 704)
+texture = ExtResource("4_71lp5")
 
 [node name="Fridge" type="Sprite2D" parent="." groups=["Fridges"]]
 position = Vector2(1216, 256)
-scale = Vector2(1.6, 3.2)
-texture = ExtResource("3_nlnuv")
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("6_3nnoc")
 
 [node name="Sprite2D" type="Sprite2D" parent="Fridge"]
 visible = false
@@ -395,8 +405,9 @@ texture = ExtResource("3_nlnuv")
 
 [node name="DoughFridge" type="Sprite2D" parent="." groups=["Fridges"]]
 position = Vector2(192, 256)
-scale = Vector2(1.6, 3.2)
-texture = ExtResource("3_nlnuv")
+rotation = 3.14159
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("6_3nnoc")
 
 [node name="Sprite2D" type="Sprite2D" parent="DoughFridge"]
 visible = false

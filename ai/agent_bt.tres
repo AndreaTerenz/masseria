@@ -71,6 +71,7 @@ target_group = SubResource("BBStringName_dkt6h")
 
 [sub_resource type="BBVariant" id="BBVariant_0y8m7"]
 saved_value = null
+resource_name = "<null>"
 
 [sub_resource type="BTCheckVar" id="BTCheckVar_3bnbd"]
 variable = &"action_target"

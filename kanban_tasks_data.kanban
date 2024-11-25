@@ -16,14 +16,18 @@
 			"uuid": "72ce5985-14ec-42c5-9243-489237a7680a",
 			"title": "Todo",
 			"tasks": [
+				"c01f2c64-24ba-4376-9c96-43b8ec9e8780",
 				"5bcfecb9-b33a-4e64-a8e3-b9c8fbc6f4b0",
-				"c514f321-bd93-4a35-bd9a-9763f22a41c1"
+				"c514f321-bd93-4a35-bd9a-9763f22a41c1",
+				"353da11e-cf15-45b0-b70c-fde7de81469d"
 			]
 		},
 		{
 			"uuid": "16311a70-545d-4b6b-8438-bd82d92e1176",
 			"title": "Doing",
-			"tasks": []
+			"tasks": [
+				"48038b48-ee46-44cc-bb61-ad69302af353"
+			]
 		}
 	],
 	"tasks": [
@@ -50,7 +54,7 @@
 		},
 		{
 			"uuid": "5bcfecb9-b33a-4e64-a8e3-b9c8fbc6f4b0",
-			"title": "Beliefs",
+			"title": "Cucina variabile a runtime",
 			"description": "Forse da evitare, c'è già abbastanza roba\n\n\"beliefs\" che un agente aggiorna dinamicamente la sua conoscenza del layout della cucina\nE fare il layout modificabile\n(E mentre gira si segna ciò che entra nel suo range visivo)",
 			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
 			"steps": []
@@ -73,6 +77,27 @@
 			"uuid": "b86a85ce-8d5e-408e-88d1-b36be74bfe41",
 			"title": "Rename tree tasks",
 			"description": "Di più\n",
+			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
+			"steps": []
+		},
+		{
+			"uuid": "353da11e-cf15-45b0-b70c-fde7de81469d",
+			"title": "New task",
+			"description": "",
+			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
+			"steps": []
+		},
+		{
+			"uuid": "48038b48-ee46-44cc-bb61-ad69302af353",
+			"title": "Speed button",
+			"description": "Cambiare la velocità della simulazione tra 0.5x, 1x, 2x, 5x, 10x",
+			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
+			"steps": []
+		},
+		{
+			"uuid": "c01f2c64-24ba-4376-9c96-43b8ec9e8780",
+			"title": "Più cucine",
+			"description": "Basically 3/4 layout diversi prefabbricati\n",
 			"category": "5e1f8015-b2bc-4369-821d-50c86715b127",
 			"steps": []
 		}

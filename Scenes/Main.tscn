@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=27 format=3 uid="uid://y03djfecm8p4"]
 
 [ext_resource type="Texture2D" uid="uid://cyu2y8yyd8s88" path="res://Assets/hand-made/image_2024-10-24_10-37-44.png" id="1_bqitt"]
 [ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://Scenes/KitchenThings/oven.tscn" id="1_nda1u"]
@@ -42,8 +42,9 @@ var orders := 0:
 		var now := Time.get_unix_time_from_system()
 		
 		if diff > 0:
-			add_job(0, null)
-			times.append(now)
+			for _i in range(diff):
+				add_job(0, null)
+				times.append(now)
 		else:
 			assert(len(times) >= 1, \"Pizza was delivered but none were in the queue\")
 			
@@ -79,9 +80,14 @@ func _ready():
 		
 	for table in get_tree().get_nodes_in_group(&\"Tables\"):
 		table.dough_done.connect(func(s): ui.add_score(s))
-
-func _on_new_pizza() -> void:
-	orders += 1
+	
+func add_pizzas(amount: int):
+	orders += amount
+	
+func add_agents(amount: int):
+	for a in range(amount):
+		_on_new_agent()
+		await get_tree().create_timer(0.1).timeout 
 
 func _on_new_agent():
 	var agg : Agent = agent_scene.instantiate()
@@ -166,12 +172,8 @@ func request_job(curriculum):
 
 
 func _on_test_pressed() -> void:
-	for p in range(test_pizzas_count):
-		_on_new_pizza()
-		
-	for a in range(test_agents_count):
-		_on_new_agent()
-		await get_tree().create_timer(0.1).timeout
+	add_pizzas(test_pizzas_count)
+	add_agents(test_agents_count)
 		
 "
 
@@ -199,24 +201,46 @@ func show_delivery_score(score: float):
 	added_score.run_tween(Vector2.DOWN, added_score.position)
 "
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4kpch"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.11, 0.11, 0.11, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+shadow_color = Color(0.86, 0.86, 0.86, 1)
+shadow_size = 2
+
+[sub_resource type="Theme" id="Theme_grg3l"]
+Button/font_sizes/font_size = 19
+Button/styles/normal = SubResource("StyleBoxFlat_4kpch")
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qkld0"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
 bg_color = Color(0.133333, 0.141176, 0.152941, 1)
 
 [sub_resource type="GDScript" id="GDScript_ckxp2"]
 resource_name = "ui"
 script/source = "extends Control
 
-@onready var order_count: Label = $VBoxContainer2/OrderCount
-@onready var pizza_list: HBoxContainer = $VBoxContainer2/PizzaList
-@onready var score_label: Label = $Score
+@onready var order_count: Label = %OrderCount
+@onready var pizza_list: HBoxContainer = %PizzaList
+@onready var score_label: Label = %Score
 
 func _on_kitchen_orders_changed(new_val: int, diff: int) -> void:
 	order_count.text = \"Total orders: %d\" % new_val
 	
-	if diff > 0:
-		pizza_list.add_pizza()
-	else:
-		pizza_list.remove_first()
+	for i in range(absi(diff)):
+		if diff > 0:
+			pizza_list.add_pizza()
+		else:
+			pizza_list.remove_first()
 
 func add_score(score:float):
 	score_label.score += score
@@ -240,6 +264,36 @@ func remove_first():
 	assert(len(pizzas) > 0)
 	
 	remove_child(pizzas.pop_front())
+"
+
+[sub_resource type="GDScript" id="GDScript_4kpch"]
+resource_name = "pizza_adder"
+script/source = "extends Button
+
+@export
+var amount := 1
+@export
+var kitchen : Node
+
+func _ready() -> void:
+	pressed.connect(func():
+		kitchen.add_pizzas(amount)
+	)
+"
+
+[sub_resource type="GDScript" id="GDScript_grg3l"]
+resource_name = "agent_adder"
+script/source = "extends Button
+
+@export
+var amount := 1
+@export
+var kitchen : Node
+
+func _ready() -> void:
+	pressed.connect(func():
+		kitchen.add_agents(amount)
+	)
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qvvrj"]
@@ -338,8 +392,6 @@ func setup(ag: Agent):
 
 [node name="Kitchen" type="Node2D"]
 script = SubResource("GDScript_i6dm0")
-test_agents_count = 12
-test_pizzas_count = 50
 
 [node name="Floor" type="Sprite2D" parent="."]
 z_index = -5
@@ -431,26 +483,28 @@ metadata/_edit_use_anchors_ = true
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 5
 
-[node name="UI" type="Panel" parent="CanvasLayer"]
+[node name="UI" type="PanelContainer" parent="CanvasLayer"]
 offset_left = 128.0
 offset_top = 768.0
 offset_right = 1280.0
 offset_bottom = 896.0
+theme = SubResource("Theme_grg3l")
 theme_override_styles/panel = SubResource("StyleBoxFlat_qkld0")
 script = SubResource("GDScript_ckxp2")
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="CanvasLayer/UI"]
+[node name="Control" type="Control" parent="CanvasLayer/UI"]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="CanvasLayer/UI/Control"]
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 8.0
-offset_right = 909.0
-offset_bottom = -8.0
+offset_right = 492.0
 grow_vertical = 2
 alignment = 1
 
-[node name="OrderCount" type="Label" parent="CanvasLayer/UI/VBoxContainer2"]
+[node name="OrderCount" type="Label" parent="CanvasLayer/UI/Control/VBoxContainer2"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -458,59 +512,106 @@ theme_override_colors/font_shadow_color = Color(0.792157, 0.176471, 0, 1)
 theme_override_font_sizes/font_size = 24
 text = "Total orders: 0"
 
-[node name="PizzaList" type="HBoxContainer" parent="CanvasLayer/UI/VBoxContainer2"]
+[node name="PizzaList" type="HBoxContainer" parent="CanvasLayer/UI/Control/VBoxContainer2"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 3
 alignment = 1
 script = SubResource("GDScript_rxako")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/Control"]
 layout_mode = 1
 anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -160.0
-offset_right = -15.0
+offset_left = -171.0
 grow_horizontal = 0
 grow_vertical = 2
 alignment = 1
+metadata/_edit_group_ = true
 
-[node name="NewPizza" type="Button" parent="CanvasLayer/UI/VBoxContainer"]
+[node name="Test" type="Button" parent="CanvasLayer/UI/Control/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 6
-theme_override_font_sizes/font_size = 28
-text = "New pizza"
+text = "Run test"
 
-[node name="AddAgent" type="Button" parent="CanvasLayer/UI/VBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer/UI/Control/VBoxContainer"]
+layout_mode = 2
+columns = 4
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/Control/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Pizzas: "
+
+[node name="AdddPizza1" type="Button" parent="CanvasLayer/UI/Control/VBoxContainer/GridContainer" node_paths=PackedStringArray("kitchen")]
 layout_mode = 2
 size_flags_vertical = 6
-theme_override_font_sizes/font_size = 28
-text = "Add agent"
+text = "+1"
+script = SubResource("GDScript_4kpch")
+kitchen = NodePath("../../../../../..")
 
-[node name="Score" type="Label" parent="CanvasLayer/UI"]
-layout_mode = 0
-offset_left = 326.0
-offset_top = 5.0
-offset_right = 826.0
-offset_bottom = 40.0
+[node name="AdddPizza5" type="Button" parent="CanvasLayer/UI/Control/VBoxContainer/GridContainer" node_paths=PackedStringArray("kitchen")]
+layout_mode = 2
+size_flags_vertical = 6
+text = "+5"
+script = SubResource("GDScript_4kpch")
+amount = 5
+kitchen = NodePath("../../../../../..")
+
+[node name="AdddPizza10" type="Button" parent="CanvasLayer/UI/Control/VBoxContainer/GridContainer" node_paths=PackedStringArray("kitchen")]
+layout_mode = 2
+size_flags_vertical = 6
+text = "+10"
+script = SubResource("GDScript_4kpch")
+amount = 10
+kitchen = NodePath("../../../../../..")
+
+[node name="Label2" type="Label" parent="CanvasLayer/UI/Control/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Agents:"
+
+[node name="AddAgent1" type="Button" parent="CanvasLayer/UI/Control/VBoxContainer/GridContainer" node_paths=PackedStringArray("kitchen")]
+layout_mode = 2
+size_flags_vertical = 6
+text = "+1"
+script = SubResource("GDScript_grg3l")
+kitchen = NodePath("../../../../../..")
+
+[node name="AddAgent5" type="Button" parent="CanvasLayer/UI/Control/VBoxContainer/GridContainer" node_paths=PackedStringArray("kitchen")]
+layout_mode = 2
+size_flags_vertical = 6
+text = "+5"
+script = SubResource("GDScript_grg3l")
+amount = 5
+kitchen = NodePath("../../../../../..")
+
+[node name="AddAgent10" type="Button" parent="CanvasLayer/UI/Control/VBoxContainer/GridContainer" node_paths=PackedStringArray("kitchen")]
+layout_mode = 2
+size_flags_vertical = 6
+text = "+10"
+script = SubResource("GDScript_grg3l")
+amount = 10
+kitchen = NodePath("../../../../../..")
+
+[node name="Score" type="Label" parent="CanvasLayer/UI/Control"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -250.0
+offset_right = 250.0
+offset_bottom = 35.0
+grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0.501961, 1, 1)
 theme_override_font_sizes/font_size = 25
 text = "Score: 0"
 horizontal_alignment = 1
 script = ExtResource("6_8jt66")
-
-[node name="Test" type="Button" parent="CanvasLayer/UI"]
-layout_mode = 2
-offset_left = 544.0
-offset_top = 64.0
-offset_right = 609.0
-offset_bottom = 111.0
-size_flags_vertical = 6
-theme_override_font_sizes/font_size = 28
-text = "Test"
 
 [node name="JobsList" type="ScrollContainer" parent="CanvasLayer"]
 unique_name_in_owner = true
@@ -660,6 +761,4 @@ expand_mode = 3
 stretch_mode = 5
 
 [connection signal="orders_changed" from="." to="CanvasLayer/UI" method="_on_kitchen_orders_changed"]
-[connection signal="pressed" from="CanvasLayer/UI/VBoxContainer/NewPizza" to="." method="_on_new_pizza"]
-[connection signal="pressed" from="CanvasLayer/UI/VBoxContainer/AddAgent" to="." method="_on_new_agent"]
-[connection signal="pressed" from="CanvasLayer/UI/Test" to="." method="_on_test_pressed"]
+[connection signal="pressed" from="CanvasLayer/UI/Control/VBoxContainer/Test" to="." method="_on_test_pressed"]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://bi2rau283g2l6"]
 
-[ext_resource type="Script" path="res://Script/Agent.gd" id="2_u83cq"]
+[ext_resource type="Script" uid="uid://bgyyjshiklsyr" path="res://Script/Agent.gd" id="2_u83cq"]
 [ext_resource type="Texture2D" uid="uid://cmgblggqri7mn" path="res://Assets/kenney_shape-characters/PNG/Default/grey_body_circle.png" id="3_3ijh3"]
 [ext_resource type="Texture2D" uid="uid://4hhhopdfwqnw" path="res://Assets/kenney_shape-characters/PNG/Default/green_hand_point.png" id="3_wi01w"]
 [ext_resource type="Texture2D" uid="uid://dwolodcr7db16" path="res://Assets/kenney_shape-characters/PNG/Default/face_h.png" id="4_oaehy"]

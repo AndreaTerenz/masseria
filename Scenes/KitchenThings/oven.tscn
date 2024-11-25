@@ -1,5 +1,6 @@
-[gd_scene load_steps=7 format=3 uid="uid://tw01u1ja1wh7"]
+[gd_scene load_steps=8 format=3 uid="uid://tw01u1ja1wh7"]
 
+[ext_resource type="Texture2D" uid="uid://b441h4hvelfjc" path="res://Assets/hand-made/Oven.png" id="1_3atip"]
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="1_xlxiv"]
 [ext_resource type="Texture2D" uid="uid://biifatb5t0jmy" path="res://Assets/hand-made/PIZZATIME.png" id="2_ch62p"]
 
@@ -23,6 +24,7 @@ func _ready() -> void:
 	bar.visible = false
 	user_lbl.visible = false
 	is_self_oven = true
+	bar.value = 0.
 	
 func _on_user_changed():
 	user_lbl.visible = user != null
@@ -59,17 +61,18 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ejb3g"]
+bg_color = Color(0.1408, 0.22, 0.16852, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q43yi"]
-bg_color = Color(0.0241877, 0.718043, 0.359537, 1)
+bg_color = Color(0, 0.72, 0.048, 1)
 
 [node name="Oven" type="Sprite2D"]
 scale = Vector2(1.6, 1.6)
-texture = ExtResource("1_xlxiv")
+texture = ExtResource("1_3atip")
 script = SubResource("GDScript_6wvlc")
 
 [node name="UI" type="Panel" parent="."]
@@ -98,6 +101,7 @@ grow_vertical = 2
 pivot_offset = Vector2(31, 0)
 theme_override_styles/background = SubResource("StyleBoxFlat_ejb3g")
 theme_override_styles/fill = SubResource("StyleBoxFlat_q43yi")
+value = 33.87
 show_percentage = false
 
 [node name="CookedPizza" type="Sprite2D" parent="."]

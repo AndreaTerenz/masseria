@@ -1,8 +1,8 @@
 [gd_resource type="BehaviorTree" load_steps=168 format=3 uid="uid://bv6csbkmtc48m"]
 
-[ext_resource type="Script" path="res://ai/tasks/MoveTo.gd" id="1_y8ahv"]
-[ext_resource type="Script" path="res://ai/tasks/GoToIdlePath.gd" id="2_nv2oq"]
-[ext_resource type="Script" path="res://ai/tasks/Break.gd" id="4_y1mfo"]
+[ext_resource type="Script" uid="uid://bulx3ielux6rn" path="res://ai/tasks/MoveTo.gd" id="1_y8ahv"]
+[ext_resource type="Script" uid="uid://ct0hw4l5xkoxj" path="res://ai/tasks/GoToIdlePath.gd" id="2_nv2oq"]
+[ext_resource type="Script" uid="uid://cyut15koxb4ul" path="res://ai/tasks/Break.gd" id="4_y1mfo"]
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_b644n"]
 var/idle/name = &"idle"

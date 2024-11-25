@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://cvquwoqa7jito"]
+[gd_scene load_steps=6 format=3 uid="uid://cvquwoqa7jito"]
 
 [ext_resource type="Texture2D" uid="uid://dltdiujt2av7s" path="res://Assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="1_88ge3"]
+[ext_resource type="Texture2D" uid="uid://cxgtjgjtoxamq" path="res://Assets/hand-made/Table.png" id="1_j5yd3"]
 [ext_resource type="Texture2D" uid="uid://kl5x0xty3lvs" path="res://Assets/hand-made/laid_out_dough.png" id="2_hvjwn"]
 [ext_resource type="Texture2D" uid="uid://b2anau4ms0fv8" path="res://Assets/hand-made/piza.png" id="3_3uvge"]
 
@@ -96,7 +97,7 @@ func evaluate_dough(dough):
 
 [node name="Table" type="Sprite2D"]
 scale = Vector2(1.6, 1.6)
-texture = ExtResource("1_88ge3")
+texture = ExtResource("1_j5yd3")
 script = SubResource("GDScript_d42ou")
 texs = Dictionary[int, Texture2D]({
 1: ExtResource("2_hvjwn"),

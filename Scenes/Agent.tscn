@@ -75,6 +75,7 @@ texture = ExtResource("4_oaehy")
 
 [node name="BTPlayer" type="BTPlayer" parent="."]
 behavior_tree = ExtResource("5_qtdmf")
+update_mode = 2
 blackboard_plan = SubResource("BlackboardPlan_jj6lk")
 
 [node name="Carrying" type="AnimatedSprite2D" parent="."]

@@ -17,6 +17,8 @@ signal done
 @onready var bar: ProgressBar = $UI/ProgressBar
 @onready var user_lbl : Label = $User
 
+var tween : Tween
+
 func _ready() -> void:
 	add_to_group(&\"Ovens\")
 	
@@ -25,6 +27,8 @@ func _ready() -> void:
 	user_lbl.visible = false
 	is_self_oven = true
 	bar.value = 0.
+	
+	
 	
 func _on_user_changed():
 	user_lbl.visible = user != null
@@ -38,14 +42,22 @@ func start():
 	bar.visible = true
 	occupied = true
 	
-	create_tween()\\
-	.tween_property(bar, \"value\", 100.0, cook_time)\\
-	.from(0.0)\\
-	.finished.connect(func():
-		done.emit()
-		bar.visible = false
-		cooked_pizza.visible = true
-	)
+	tween = create_tween()
+	
+	tween.pause()
+	tween.finished.connect(tween_done)
+	tween.tween_property(bar, \"value\", 100.0, cook_time).from(0.0)
+	
+func _process(delta: float) -> void:
+	if not bar.visible:
+		return
+		
+	tween.custom_step(delta * Globals.GAME_SPEED)
+
+func tween_done():
+	done.emit()
+	bar.visible = false
+	cooked_pizza.visible = true
 
 func take_pizza():
 	cooked_pizza.visible = false

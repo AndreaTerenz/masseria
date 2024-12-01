@@ -23,7 +23,7 @@ enum ACTION {
 	SERVE = 3,
 }
 
-@export var mov_speed := 400.0
+@export var base_speed := 400.0
 @export var break_dance_speed := 2.0
 @export var path : Path2D
 
@@ -40,7 +40,10 @@ var readable_id : String :
 		if not agent_id.is_valid_int():
 			return agent_id
 			
-		return Global.italian_names[int(agent_id) % Global.italian_names.size()]
+		return Globals.italian_names[int(agent_id) % Globals.italian_names.size()]
+var mov_speed : float :
+	get:
+		return base_speed * Globals.GAME_SPEED
 
 var current_action := ACTION.NULL :
 	set(a):
@@ -172,9 +175,12 @@ func _on_direct_signal(_id, _val):
 	if state == STATE.BREAK:
 		state = STATE.IDLE
 		current_action = ACTION.NULL
+		
+func _process(delta: float) -> void:
+	bt_player.update(delta * Globals.GAME_SPEED)
 
 func idle_step(delta: float):
-	idle_path_offset += delta * mov_speed
+	idle_path_offset += delta * mov_speed 
 	
 	if idle_path_offset >= path.curve.get_baked_length():
 		idle_path_offset = 0.

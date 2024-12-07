@@ -126,8 +126,8 @@ func _ready() -> void:
 	possible_jobs.shuffle()
 	color = Color.from_hsv(randf(), 0.75, 1)
 	
-	AgentManager.register_agent(self)
-	AgentManager.broadcast.connect(func(id: StringName, data: Variant):
+	Agents.register_agent(self)
+	Agents.broadcast.connect(func(id: StringName, data: Variant):
 		print("Agent %s received broadcast '%s'" % [agent_id, id])
 		_on_broadcast(id, data)
 	)
@@ -166,9 +166,7 @@ func _ready() -> void:
 	)
 	
 func _on_broadcast(id, _val):
-	if id == &"PISELLARE" and possible_jobs[0] and state == STATE.IDLE:
-		state = STATE.FRIDGE
-		current_action = ACTION.DOUGH
+	pass
 		
 # Probably useless
 func _on_direct_signal(_id, _val):

@@ -62,7 +62,7 @@ var emergency = false
 var times := []
 
 func _ready():
-	# TODO: This fix is extremely ass. It works.
+	# HACK: This fix is extremely ass. It works.
 	add_child(timer)
 	timer.wait_time = 0.2
 	timer.timeout.connect(func():

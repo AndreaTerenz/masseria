@@ -81,7 +81,6 @@ var action_target : Node2D = null :
 var color: Color
 var possible_jobs : Array[bool] = [true, true, false, false]
 var kitchen : Node2D = null
-var break_location := Vector2.ZERO
 var idle_path_offset := 0.0
 var patience := Timer.new()
 var waiting = false
@@ -145,7 +144,10 @@ func _ready() -> void:
 		bt_player.blackboard.bind_var_to_property(v, self, v)
 		
 	state = STATE.IDLE
+	
 	idle_path_offset = 0.0
+	path = get_tree().get_first_node_in_group(&"IdlePath")
+	
 	global_position = path.to_global(path.curve.sample_baked(idle_path_offset))
 	
 	face.modulate = color

@@ -17,17 +17,13 @@ resource_name = "kitchen"
 script/source = "extends Node2D
 
 signal orders_changed(new_val: int, diff: int)
+signal job_added(id: int, loc: Node, idx: int)
+signal job_removed(id: int, loc: Node, idx: int)
+signal score_change(s: float, delivery: bool)
 
 @export var agent_scene : PackedScene = preload(\"res://Scenes/Agent.tscn\")
 @export var test_agents_count := 8
 @export var test_pizzas_count := 14
-
-@onready var jobs_list: ScrollContainer = %JobsList
-@onready var agents_list = %AgentsList
-@onready var idle_path: Path2D = $IdlePath
-@onready var break_point: Sprite2D = $BreakPoint
-@onready var exit = $Exit
-@onready var ui = $CanvasLayer/UI
 
 var orders := 0:
 	set(v):
@@ -51,8 +47,7 @@ var orders := 0:
 			#HACK: Assumes (correctly for now) that the pizza being
 			#delivered is the first in the queue
 			var score = max(75 - (now - times.pop_front()), 0)
-			ui.add_score(score)
-			exit.show_delivery_score(score)
+			score_change.emit(score, true)
 
 var timer := Timer.new()
 var jobs : Array[Array] = []
@@ -75,11 +70,13 @@ func _ready():
 		emergency = true
 	)
 	
-	for oven in get_tree().get_nodes_in_group(&\"Ovens\"):
+	var tree := get_tree()
+	
+	for oven in tree.get_nodes_in_group(&\"Ovens\"):
 		oven.done.connect(func(): add_job(3, oven))
 		
-	for table in get_tree().get_nodes_in_group(&\"Tables\"):
-		table.dough_done.connect(func(s): ui.add_score(s))
+	for table in tree.get_nodes_in_group(&\"Tables\"):
+		table.dough_done.connect(func(s): score_change.emit(s, false))
 	
 func add_pizzas(amount: int):
 	orders += amount
@@ -92,26 +89,18 @@ func add_agents(amount: int):
 func _on_new_agent():
 	var agg : Agent = agent_scene.instantiate()
 	
-	agg.path = idle_path
 	agg.kitchen = self
-	# TODO: Is this the best way?
-	agg.break_location = break_point.position
 	
 	add_child(agg)
-	
-	agents_list.add_agent(agg)
 	
 	agg.delivered.connect(func reduce():
 		orders-=1
 	)
-	
-func _add_score(score):
-	ui.add_score(score)
 
 func add_job(id: int, location=null):
 	var j := [id, location]
 	
-	jobs_list.add_job(j)
+	job_added.emit(id, location, len(jobs))
 	jobs.append(j)
 	
 	if patience.is_stopped():
@@ -128,7 +117,7 @@ func request_job(curriculum):
 			2: &\"Ovens\"
 		}
 	if emergency:
-		if get_children().any(func (k): return k.is_in_group(id_to_group[0]) and not k.occupied):
+		if any_in_group_free(id_to_group[0]):
 			idx = 0
 		else:
 			emergency = false
@@ -144,10 +133,8 @@ func request_job(curriculum):
 			if not (id in id_to_group.keys()):
 				idx = i
 				break
-			
-			var group : StringName = id_to_group[id]
-			
-			if get_children().any(func (k): return k.is_in_group(group) and not k.occupied):
+				
+			if any_in_group_free(id_to_group[id]):
 				idx = i
 				break
 		
@@ -158,7 +145,7 @@ func request_job(curriculum):
 	var output := jobs[idx]
 	
 	jobs.remove_at(idx)
-	jobs_list.remove_job(idx)
+	job_removed.emit(output[0], output[1], idx)
 	
 	on_cooldown = true
 	timer.start()
@@ -175,6 +162,8 @@ func _on_test_pressed() -> void:
 	add_pizzas(test_pizzas_count)
 	add_agents(test_agents_count)
 		
+func any_in_group_free(group: StringName) -> bool:
+	return get_tree().get_nodes_in_group(group).any(func (n): return not n.occupied)
 "
 
 [sub_resource type="Curve2D" id="Curve2D_obaid"]
@@ -189,7 +178,10 @@ script/source = "extends Sprite2D
 
 @export var score_display = preload(\"res://Scenes/pizza_rl.tscn\")
 
-func show_delivery_score(score: float):
+func _on_kitchen_score_change(s: float, delivery: bool) -> void:
+	if not delivery:
+		return
+		
 	var added_score = score_display.instantiate()
 	
 	add_child(added_score)
@@ -197,7 +189,7 @@ func show_delivery_score(score: float):
 	added_score.top_level = true
 	added_score.global_position = position + Vector2.DOWN * 50.
 	
-	added_score.set_score(score, 24)
+	added_score.set_score(s, 24)
 	added_score.run_tween(Vector2.DOWN, added_score.position)
 "
 
@@ -242,8 +234,8 @@ func _on_kitchen_orders_changed(new_val: int, diff: int) -> void:
 		else:
 			pizza_list.remove_first()
 
-func add_score(score:float):
-	score_label.score += score
+func _on_score_change(s: float, delivery: bool) -> void:
+	score_label.score += s
 "
 
 [sub_resource type="GDScript" id="GDScript_rxako"]
@@ -332,15 +324,15 @@ script/source = "extends ScrollContainer
 
 @onready var container: VBoxContainer = $VBoxContainer
 
-func add_job(job: Array):
+func add_job(id: int, loc: Node, _idx: int):
 	var lbl := Label.new()
-	var place_name : String = job[1].name if job[1] != null else \"null\"
+	var place_name : String = loc.name if loc != null else \"null\"
 	
-	lbl.text = \"%d @ %s\" % [job[0], place_name]
+	lbl.text = \"%d @ %s\" % [id, place_name]
 	
 	container.add_child(lbl)
 	
-func remove_job(idx: int):
+func remove_job(_id: int, _loc: Node, idx: int):
 	var to_remove = container.get_child(idx)
 	
 	to_remove.queue_free()
@@ -358,11 +350,12 @@ func _ready():
 	template = container.get_child(0)
 	container.remove_child(template)
 	
-func add_agent(a: Agent):
-	var tmp := template.duplicate()
-	
-	container.add_child(tmp)
-	tmp.setup(a)
+	Agents.new_agent.connect(func (a: Agent):
+		var tmp := template.duplicate()
+		
+		container.add_child(tmp)
+		tmp.setup(a)
+	)
 "
 
 [sub_resource type="GDScript" id="GDScript_subwx"]
@@ -426,7 +419,7 @@ offset = Vector2(2815, 1600)
 region_enabled = true
 region_rect = Rect2(0, 0, 5632, 3200)
 
-[node name="IdlePath" type="Path2D" parent="."]
+[node name="IdlePath" type="Path2D" parent="." groups=["IdlePath"]]
 position = Vector2(128, 128)
 curve = SubResource("Curve2D_obaid")
 
@@ -698,7 +691,6 @@ horizontal_alignment = 1
 script = ExtResource("6_8jt66")
 
 [node name="JobsList" type="ScrollContainer" parent="CanvasLayer"]
-unique_name_in_owner = true
 z_index = 1
 offset_left = 1280.0
 offset_right = 1408.0
@@ -711,7 +703,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="AgentsList" type="ScrollContainer" parent="CanvasLayer"]
-unique_name_in_owner = true
 offset_right = 128.0
 offset_bottom = 896.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_qvvrj")
@@ -844,5 +835,9 @@ texture = ExtResource("7_g2chq")
 expand_mode = 3
 stretch_mode = 5
 
+[connection signal="job_added" from="." to="CanvasLayer/JobsList" method="add_job"]
+[connection signal="job_removed" from="." to="CanvasLayer/JobsList" method="remove_job"]
 [connection signal="orders_changed" from="." to="CanvasLayer/UI" method="_on_kitchen_orders_changed"]
+[connection signal="score_change" from="." to="Exit" method="_on_kitchen_score_change"]
+[connection signal="score_change" from="." to="CanvasLayer/UI" method="_on_score_change"]
 [connection signal="pressed" from="CanvasLayer/UI/Control/VBoxContainer/Test" to="." method="_on_test_pressed"]

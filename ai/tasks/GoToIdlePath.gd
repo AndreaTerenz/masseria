@@ -11,16 +11,13 @@ var here : Vector2 :
 		agent.global_position = h
 
 var target : Vector2
-var path : Path2D
+var path : Path2D :
+	get():
+		return agent.path
 
 # Called to generate a display name for the task (requires @tool).
 func _generate_name() -> String:
 	return "Return to idle path"
-
-# Called to initialize the task.
-func _setup() -> void:
-	path = agent.path
-
 
 # Called when the task is entered.
 func _enter() -> void:

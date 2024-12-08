@@ -56,6 +56,8 @@ func _process(delta: float) -> void:
 
 func tween_done():
 	done.emit()
+	Agents.add_job(3, self)
+	
 	bar.visible = false
 	cooked_pizza.visible = true
 

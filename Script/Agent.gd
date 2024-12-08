@@ -80,7 +80,7 @@ var action_target : Node2D = null :
 		
 var color: Color
 var possible_jobs : Array[bool] = [true, true, false, false]
-var kitchen : Node2D = null
+#var kitchen : Node2D = null
 var idle_path_offset := 0.0
 var patience := Timer.new()
 var waiting = false
@@ -125,7 +125,6 @@ func _ready() -> void:
 	possible_jobs.shuffle()
 	color = Color.from_hsv(randf(), 0.75, 1)
 	
-	Agents.register_agent(self)
 	Agents.broadcast.connect(func(id: StringName, data: Variant):
 		print("Agent %s received broadcast '%s'" % [agent_id, id])
 		_on_broadcast(id, data)
@@ -147,6 +146,8 @@ func _ready() -> void:
 	
 	idle_path_offset = 0.0
 	path = get_tree().get_first_node_in_group(&"IdlePath")
+	
+	assert(path != null, "Failed to get idle path!")
 	
 	global_position = path.to_global(path.curve.sample_baked(idle_path_offset))
 	
@@ -188,7 +189,8 @@ func idle_step(delta: float):
 	global_position = path.to_global(path.curve.sample_baked(idle_path_offset))
 
 func request_new_job():
-	var new_job = kitchen.request_job(possible_jobs)
+	#var new_job = kitchen.request_job(possible_jobs)
+	var new_job = Agents.request_job(possible_jobs)
 	if new_job[0] == ACTION.NULL:
 		return
 		
@@ -274,7 +276,8 @@ func start_patience():
 	patience.start()
 	
 func send_order_back():
-	kitchen.add_job(current_action, null)
+	#kitchen.add_job(current_action, null)
+	Agents.add_job(current_action, null)
 	print("Added back job ", current_action)
 
 static func readable_job(job_idx: int) -> String:

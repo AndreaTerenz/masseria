@@ -3,31 +3,62 @@ extends Node
 signal new_agent(a: Agent)
 signal agent_removed(a: Agent)
 signal broadcast(id: StringName, data: Variant)
+signal job_added(id: int, loc: Node, idx: int)
+signal job_removed(id: int, loc: Node, idx: int)
 
-var agents_created = 0
-var agents : Array[Agent] = []
+var agent_scene : PackedScene = preload("res://Scenes/Agent.tscn")
 
-func register_agent(a: Agent):
-	agents.append(a)
+var jobs : Array[Array] = []
+var emergency = false
+var patience := Timer.new()
+var timer := Timer.new()
+var on_cooldown := false
+# Dummy node to contain Agent nodes
+var agents := Node.new()
+var count : int :
+	get():
+		return agents.get_child_count()
+
+func _ready() -> void:
+	# HACK: This fix is extremely ass. It works.
+	add_child(timer)
+	timer.wait_time = 0.2
+	timer.timeout.connect(func():
+		on_cooldown = false
+	)
 	
-	a.agent_id = str(agents_created)
-	agents_created += 1
+	add_child(patience)
+	patience.wait_time = 3
+	patience.timeout.connect(func():
+		emergency = true
+	)
+	
+	add_child(agents)
+
+func add_agent() -> Agent:
+	var a : Agent = agent_scene.instantiate()
+	
+	a.agent_id = str(count)
+	agents.add_child(a)
 	
 	print("Added agent %s" % a.agent_id)
 	
 	new_agent.emit(a)
 	
+	return a
+	
 func remove_agent(id := "") -> Agent:
-	if len(agents) == 0:
+	if count == 0:
 		print("No agent in the current scene.")
 		return null
-	
+		
+	var agg_nodes = agents.get_children()
 	var removed : Agent = null
 	
 	if id.strip_edges() == "":
 		removed = agents.pick_random()
 	else:
-		var tmp := agents.filter(func (a: Agent): return a.agent_id == id)
+		var tmp := agg_nodes.filter(func (a: Agent): return a.agent_id == id)
 		
 		if len(tmp) == 0:
 			print("No agent found with id %s" % id)
@@ -35,7 +66,7 @@ func remove_agent(id := "") -> Agent:
 			
 		removed = tmp[0]
 	
-	agents.erase(removed)
+	agents.remove_child(removed)
 	
 	agent_removed.emit(removed)
 	print("Removed agent %s" % id)
@@ -44,3 +75,67 @@ func remove_agent(id := "") -> Agent:
 
 func send_broadcast(signal_id: StringName, signal_data = null):
 	broadcast.emit(signal_id, signal_data)
+
+func add_job(id: int, location=null):
+	var j := [id, location]
+	
+	job_added.emit(id, location, len(jobs))
+	jobs.append(j)
+	
+	if patience.is_stopped():
+		patience.start()
+	
+func request_job(curriculum):
+	if on_cooldown:
+		#print("Job assignment on cooldown")
+		return [-1, null]
+	
+	var idx := -1
+	var id_to_group := {
+			0: &"Tables",
+			2: &"Ovens"
+		}
+	if emergency:
+		if any_in_group_free(id_to_group[0]):
+			idx = 0
+		else:
+			emergency = false
+			patience.start()
+	else:
+		for i in len(jobs):
+			var job := jobs[i]
+			var id : int = job[0]
+			
+			if not curriculum[id]:
+				continue
+			
+			if not (id in id_to_group.keys()):
+				idx = i
+				break
+				
+			if any_in_group_free(id_to_group[id]):
+				idx = i
+				break
+		
+	if idx == -1:
+		#print("No valid job found for curriculum: %s" % [curriculum])
+		return [-1, null]
+			
+	var output := jobs[idx]
+	
+	jobs.remove_at(idx)
+	job_removed.emit(output[0], output[1], idx)
+	
+	on_cooldown = true
+	timer.start()
+	emergency = false
+	if not patience.is_stopped():
+		patience.stop()
+	if len(jobs) > 0:
+		patience.start()
+
+	return output
+
+		
+func any_in_group_free(group: StringName) -> bool:
+	return get_tree().get_nodes_in_group(group).any(func (n): return not n.occupied)

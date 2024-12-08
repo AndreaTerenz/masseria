@@ -17,11 +17,8 @@ resource_name = "kitchen"
 script/source = "extends Node2D
 
 signal orders_changed(new_val: int, diff: int)
-signal job_added(id: int, loc: Node, idx: int)
-signal job_removed(id: int, loc: Node, idx: int)
 signal score_change(s: float, delivery: bool)
 
-@export var agent_scene : PackedScene = preload(\"res://Scenes/Agent.tscn\")
 @export var test_agents_count := 8
 @export var test_pizzas_count := 14
 
@@ -39,7 +36,7 @@ var orders := 0:
 		
 		if diff > 0:
 			for _i in range(diff):
-				add_job(0, null)
+				Agents.add_job(0, null)
 				times.append(now)
 		else:
 			assert(len(times) >= 1, \"Pizza was delivered but none were in the queue\")
@@ -49,121 +46,29 @@ var orders := 0:
 			var score = max(75 - (now - times.pop_front()), 0)
 			score_change.emit(score, true)
 
-var timer := Timer.new()
-var jobs : Array[Array] = []
-var on_cooldown := false
-var patience := Timer.new()
-var emergency = false
 var times := []
 
 func _ready():
-	# HACK: This fix is extremely ass. It works.
-	add_child(timer)
-	timer.wait_time = 0.2
-	timer.timeout.connect(func():
-		on_cooldown = false
-	)
-	
-	add_child(patience)
-	patience.wait_time = 3
-	patience.timeout.connect(func():
-		emergency = true
-	)
-	
 	var tree := get_tree()
-	
-	for oven in tree.get_nodes_in_group(&\"Ovens\"):
-		oven.done.connect(func(): add_job(3, oven))
 		
 	for table in tree.get_nodes_in_group(&\"Tables\"):
 		table.dough_done.connect(func(s): score_change.emit(s, false))
 	
-func add_pizzas(amount: int):
+func add_pizzas(amount: int = 1):
 	orders += amount
 	
-func add_agents(amount: int):
+func add_agents(amount: int = 1):
 	for a in range(amount):
-		_on_new_agent()
-		await get_tree().create_timer(0.1).timeout 
-
-func _on_new_agent():
-	var agg : Agent = agent_scene.instantiate()
-	
-	agg.kitchen = self
-	
-	add_child(agg)
-	
-	agg.delivered.connect(func reduce():
-		orders-=1
-	)
-
-func add_job(id: int, location=null):
-	var j := [id, location]
-	
-	job_added.emit(id, location, len(jobs))
-	jobs.append(j)
-	
-	if patience.is_stopped():
-		patience.start()
-	
-func request_job(curriculum):
-	if on_cooldown:
-		#print(\"Job assignment on cooldown\")
-		return [-1, null]
-	
-	var idx := -1
-	var id_to_group := {
-			0: &\"Tables\",
-			2: &\"Ovens\"
-		}
-	if emergency:
-		if any_in_group_free(id_to_group[0]):
-			idx = 0
-		else:
-			emergency = false
-			patience.start()
-	else:
-		for i in len(jobs):
-			var job := jobs[i]
-			var id : int = job[0]
-			
-			if not curriculum[id]:
-				continue
-			
-			if not (id in id_to_group.keys()):
-				idx = i
-				break
-				
-			if any_in_group_free(id_to_group[id]):
-				idx = i
-				break
+		var agg := Agents.add_agent()
 		
-	if idx == -1:
-		#print(\"No valid job found for curriculum: %s\" % [curriculum])
-		return [-1, null]
-			
-	var output := jobs[idx]
-	
-	jobs.remove_at(idx)
-	job_removed.emit(output[0], output[1], idx)
-	
-	on_cooldown = true
-	timer.start()
-	emergency = false
-	if not patience.is_stopped():
-		patience.stop()
-	if len(jobs) > 0:
-		patience.start()
-
-	return output
-
+		agg.delivered.connect(func(): orders-=1)
+		
+		if amount > 1:
+			await get_tree().create_timer(0.1).timeout
 
 func _on_test_pressed() -> void:
 	add_pizzas(test_pizzas_count)
 	add_agents(test_agents_count)
-		
-func any_in_group_free(group: StringName) -> bool:
-	return get_tree().get_nodes_in_group(group).any(func (n): return not n.occupied)
 "
 
 [sub_resource type="Curve2D" id="Curve2D_obaid"]
@@ -324,18 +229,21 @@ script/source = "extends ScrollContainer
 
 @onready var container: VBoxContainer = $VBoxContainer
 
-func add_job(id: int, loc: Node, _idx: int):
-	var lbl := Label.new()
-	var place_name : String = loc.name if loc != null else \"null\"
+func _ready() -> void:
+	Agents.job_added.connect(func (id: int, loc: Node, _idx: int):
+		var lbl := Label.new()
+		var place_name : String = loc.name if loc != null else \"null\"
+		
+		lbl.text = \"%d @ %s\" % [id, place_name]
+		
+		container.add_child(lbl)
+	)
 	
-	lbl.text = \"%d @ %s\" % [id, place_name]
-	
-	container.add_child(lbl)
-	
-func remove_job(_id: int, _loc: Node, idx: int):
-	var to_remove = container.get_child(idx)
-	
-	to_remove.queue_free()
+	Agents.job_removed.connect(func (_id: int, _loc: Node, idx: int):
+		var to_remove = container.get_child(idx)
+		
+		to_remove.queue_free()
+	)
 "
 
 [sub_resource type="GDScript" id="GDScript_jx185"]
@@ -835,8 +743,6 @@ texture = ExtResource("7_g2chq")
 expand_mode = 3
 stretch_mode = 5
 
-[connection signal="job_added" from="." to="CanvasLayer/JobsList" method="add_job"]
-[connection signal="job_removed" from="." to="CanvasLayer/JobsList" method="remove_job"]
 [connection signal="orders_changed" from="." to="CanvasLayer/UI" method="_on_kitchen_orders_changed"]
 [connection signal="score_change" from="." to="Exit" method="_on_kitchen_score_change"]
 [connection signal="score_change" from="." to="CanvasLayer/UI" method="_on_score_change"]

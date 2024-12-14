@@ -276,7 +276,6 @@ func start_patience():
 	patience.start()
 	
 func send_order_back():
-	#kitchen.add_job(current_action, null)
 	Agents.add_job(current_action, null)
 	print("Added back job ", current_action)
 

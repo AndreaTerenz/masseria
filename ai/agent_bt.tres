@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=168 format=3 uid="uid://bv6csbkmtc48m"]
+[gd_resource type="BehaviorTree" load_steps=166 format=3 uid="uid://bv6csbkmtc48m"]
 
 [ext_resource type="Script" uid="uid://bulx3ielux6rn" path="res://ai/tasks/MoveTo.gd" id="1_y8ahv"]
 [ext_resource type="Script" uid="uid://ct0hw4l5xkoxj" path="res://ai/tasks/GoToIdlePath.gd" id="2_nv2oq"]
@@ -772,16 +772,6 @@ children = [SubResource("BTCheckVar_rmnht"), SubResource("BTSelector_6bufh")]
 [sub_resource type="BTComment" id="BTComment_uc4cq"]
 custom_name = "If all above fail, step along idle path and check new job"
 
-[sub_resource type="BBVariant" id="BBVariant_qa1ek"]
-type = 2
-saved_value = 0
-resource_name = "0"
-
-[sub_resource type="BTCheckVar" id="BTCheckVar_y3c4u"]
-variable = &"state"
-value = SubResource("BBVariant_qa1ek")
-custom_name = "Check if Agent's State is IDLE"
-
 [sub_resource type="BBNode" id="BBNode_1g4nq"]
 saved_value = NodePath(".")
 resource_name = "."
@@ -813,7 +803,7 @@ custom_name = "Move along the Idle Path (call to idle_step)"
 
 [sub_resource type="BTSequence" id="BTSequence_leljs"]
 custom_name = "Stay Idle"
-children = [SubResource("BTCheckVar_y3c4u"), SubResource("BTCallMethod_exfy3"), SubResource("BTCheckVar_vkmyg"), SubResource("BTCallMethod_pkkoi")]
+children = [SubResource("BTCallMethod_exfy3"), SubResource("BTCheckVar_vkmyg"), SubResource("BTCallMethod_pkkoi")]
 
 [sub_resource type="BTSelector" id="BTSelector_0xbrx"]
 custom_name = "Main Selector (Agent's Loop)"

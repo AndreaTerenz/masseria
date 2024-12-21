@@ -33,8 +33,6 @@ enum ACTION {
 @onready var right_hand = $RightHand
 @onready var face = $Face
 
-var agent_id : StringName = &"default"
-var debug = false
 var readable_id : String :
 	get:
 		if not agent_id.is_valid_int():
@@ -44,7 +42,6 @@ var readable_id : String :
 var mov_speed : float :
 	get:
 		return base_speed * Globals.GAME_SPEED
-
 var current_action := ACTION.NULL :
 	set(a):
 		if a == current_action:
@@ -52,72 +49,35 @@ var current_action := ACTION.NULL :
 			
 		current_action = a
 		action_changed.emit(a)
-		
 var action_target : Node2D = null :
 	set(new):
-		var current = action_target
-		
-		if new == null and current == null:
-			return
-		
-		# I HAVE TO DO IT LIKE THIS BECAUSE GODOT IS VERY STUPID AND EVALUATES THE ASSERT MESSAGE
-		# EVEN BEFORE CHECKING THE ASSERT CONDITION ITSELF
-		if not (new == null or current == null):
-			assert(false, "%s is trying to use %s but is already using %s" % [readable_id, new.name, current.name])
-		
-		if state not in [STATE.SERVING, STATE.BREAK] and debug:
-			if new != null:
-				print("%s, during action %s, occupied %s" % [readable_id, readable_action(current_action), new.name])
-			elif current != null:
-				print("%s, during action %s, released %s" % [readable_id, readable_action(current_action), current.name])
-			
-			if new != null:
-				new.user = self
-			# if current != null and not current.is_self_oven:
-			# 	current.user = null
-			
+		_new_action_target(action_target, new)
 		action_target = new
+var state := STATE.IDLE :
+	set(s):
+		_new_state(state, s)
+		state = s
+var waiting = false :
+	set(w):
+		waiting = w
+		if waiting:
+			patience.start()
+		else:
+			patience.stop()
 		
+var agent_id : StringName = &"default"
+var debug = false
 var color: Color
 var possible_jobs : Array[bool] = [true, true, false, false]
 #var kitchen : Node2D = null
 var idle_path_offset := 0.0
 var patience := Timer.new()
-var waiting = false
 
 # RL stuff
 var m := 0.0
 var q := 0.0
 var lr := 0.5
 var rl_steps := 0
-
-var state := STATE.IDLE :
-	set(s):
-		if s in [STATE.IDLE, STATE.BREAK]:
-			self.rotation_degrees = 0
-			if current_action == ACTION.OVEN:
-				# Do nothing, the oven will add the job once the pizza is ready
-				pass
-			elif current_action == ACTION.SERVE:
-				emit_signal("delivered")
-			carrying.hide()
-				
-		match s:
-			STATE.OVEN:
-				carrying.play("pizza")
-			STATE.SERVING:
-				carrying.play("cooked_pizza")
-			STATE.TABLE:
-				if current_action == ACTION.DOUGH:
-					carrying.play("dough")
-				else:
-					carrying.play("tomato")
-			STATE.BREAK:
-				current_action = ACTION.NULL
-			STATE.HELP:
-				waiting = true
-		state = s
-		state_changed.emit(s)
 
 func _ready() -> void:
 	add_to_group(&"Agents")
@@ -168,7 +128,7 @@ func _ready() -> void:
 		waiting = false
 	)
 	
-func _on_broadcast(id, _val):
+func _on_broadcast(_id, _val):
 	pass
 		
 # Probably useless
@@ -270,10 +230,9 @@ func ask_for_help(target_job, target, requester):
 func accept_request():
 	action_target = null
 	waiting = false
-	patience.stop()
 
 func start_patience():
-	patience.start()
+	waiting = true
 	
 func send_order_back():
 	Agents.add_job(current_action, null)
@@ -287,3 +246,52 @@ static func readable_state(s: STATE) -> String:
 
 static func readable_action(a: ACTION) -> String:
 	return ACTION.keys()[a + 1]
+	
+func _new_state(_old, new):
+	if new in [STATE.IDLE, STATE.BREAK]:
+		self.rotation_degrees = 0
+		if current_action == ACTION.OVEN:
+			# Do nothing, the oven will add the job once the pizza is ready
+			pass
+		elif current_action == ACTION.SERVE:
+			emit_signal("delivered")
+		carrying.hide()
+			
+	match new:
+		STATE.OVEN:
+			carrying.play("pizza")
+		STATE.SERVING:
+			carrying.play("cooked_pizza")
+		STATE.TABLE:
+			if current_action == ACTION.DOUGH:
+				carrying.play("dough")
+			else:
+				carrying.play("tomato")
+		STATE.BREAK:
+			current_action = ACTION.NULL
+		STATE.HELP:
+			waiting = true
+			
+	state_changed.emit(new)
+
+func _new_action_target(old, new):
+	if new == null and old == null:
+		return
+	
+	# I HAVE TO DO IT LIKE THIS BECAUSE GODOT IS VERY STUPID AND EVALUATES THE ASSERT MESSAGE
+	# EVEN BEFORE CHECKING THE ASSERT CONDITION ITSELF
+	if not (new == null or old == null):
+		assert(false, "%s is trying to use %s but is already using %s" % [readable_id, new.name, old.name])
+	
+	if state not in [STATE.SERVING, STATE.BREAK] and debug:
+		if new != null:
+			print("%s, during action %s, occupied %s" % [readable_id, readable_action(current_action), new.name])
+		elif old != null:
+			print("%s, during action %s, released %s" % [readable_id, readable_action(current_action), old.name])
+		
+		if new != null:
+			new.user = self
+		# if current != null and not current.is_self_oven:
+		# 	current.user = null
+		
+	

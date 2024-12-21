@@ -13,7 +13,8 @@ config_version=5
 config/name="MASseria"
 run/main_scene="res://Scenes/Main.tscn"
 config/features=PackedStringArray("4.4", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://dgmoxxbbs7soi"
+config/windows_native_icon="res://icon.ico"
 
 [autoload]
 

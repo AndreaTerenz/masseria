@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bi2rau283g2l6"]
+[gd_scene load_steps=16 format=3 uid="uid://bi2rau283g2l6"]
 
 [ext_resource type="Script" uid="uid://bgyyjshiklsyr" path="res://Script/Agent.gd" id="2_u83cq"]
 [ext_resource type="Texture2D" uid="uid://cmgblggqri7mn" path="res://Assets/kenney_shape-characters/PNG/Default/grey_body_circle.png" id="3_3ijh3"]
@@ -9,6 +9,19 @@
 [ext_resource type="Texture2D" uid="uid://cjcpoqeqta7ty" path="res://Assets/hand-made/dough.png" id="7_ik1gl"]
 [ext_resource type="Texture2D" uid="uid://b2anau4ms0fv8" path="res://Assets/hand-made/piza.png" id="8_dn7v1"]
 [ext_resource type="Texture2D" uid="uid://dj3y4kssklsid" path="res://Assets/hand-made/tomato.png" id="9_jmdsv"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2kdas"]
+radius = 150.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vs2xc"]
+radius = 40.0125
+
+[sub_resource type="Gradient" id="Gradient_xs5q6"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_isa54"]
+gradient = SubResource("Gradient_xs5q6")
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_jj6lk"]
 
@@ -47,16 +60,28 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_2kdas"]
-radius = 150.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_vs2xc"]
-radius = 40.0125
-
 [node name="Agent" type="CharacterBody2D"]
 z_index = 50
 texture_filter = 1
 script = ExtResource("2_u83cq")
+
+[node name="ViewRange" type="Area2D" parent="."]
+
+[node name="RangeShape" type="CollisionShape2D" parent="ViewRange"]
+shape = SubResource("CircleShape2D_2kdas")
+
+[node name="Hitbox" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_vs2xc")
+
+[node name="Highlight" type="Sprite2D" parent="."]
+modulate = Color(0.9, 1, 0, 1)
+clip_children = 1
+scale = Vector2(1.125, 1.125)
+texture = ExtResource("3_3ijh3")
+
+[node name="Sprite2D" type="Sprite2D" parent="Highlight"]
+scale = Vector2(1.34615, 1.34615)
+texture = SubResource("GradientTexture2D_isa54")
 
 [node name="Face" type="Sprite2D" parent="."]
 modulate = Color(0.637333, 0.32, 1, 1)
@@ -83,13 +108,5 @@ blackboard_plan = SubResource("BlackboardPlan_jj6lk")
 position = Vector2(0, -43)
 sprite_frames = SubResource("SpriteFrames_0lmpo")
 animation = &"cooked_pizza"
-
-[node name="ViewRange" type="Area2D" parent="."]
-
-[node name="RangeShape" type="CollisionShape2D" parent="ViewRange"]
-shape = SubResource("CircleShape2D_2kdas")
-
-[node name="Hitbox" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_vs2xc")
 
 [connection signal="body_entered" from="ViewRange" to="." method="_on_view_range_body_entered"]

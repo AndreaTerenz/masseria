@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://y03djfecm8p4"]
+[gd_scene load_steps=30 format=3 uid="uid://y03djfecm8p4"]
 
 [ext_resource type="Texture2D" uid="uid://cyu2y8yyd8s88" path="res://Assets/hand-made/image_2024-10-24_10-37-44.png" id="1_bqitt"]
 [ext_resource type="PackedScene" uid="uid://tw01u1ja1wh7" path="res://Scenes/KitchenThings/oven.tscn" id="1_nda1u"]
@@ -276,12 +276,15 @@ script/source = "extends PanelContainer
 @onready var state_lbl = $VBoxContainer/HBoxContainer/State
 @onready var action_lbl = $VBoxContainer/HBoxContainer/Action
 @onready var extras_cont = $VBoxContainer/HBoxContainer
+@onready var highlight: Control = $Highlight
+
+var agent : Agent
 
 func _ready():
-	extras_cont.visible = false
+	mouse_entered.connect(func(): toggle_extra(true))
+	mouse_exited.connect(func(): toggle_extra(false))
 	
-	mouse_entered.connect(func(): extras_cont.visible=true)
-	mouse_exited.connect(func(): extras_cont.visible=false)
+	toggle_extra(false)
 
 func update_state(s: Agent.STATE):
 	state_lbl.text = Agent.readable_state(s).capitalize()
@@ -290,6 +293,8 @@ func update_action(a: Agent.ACTION):
 	action_lbl.text = Agent.readable_action(a).capitalize()
 
 func setup(ag: Agent):
+	agent = ag
+	
 	update_state(ag.state)
 	ag.state_changed.connect(update_state)
 	
@@ -310,7 +315,21 @@ func setup(ag: Agent):
 	
 	stylebox.set_bg_color(c)
 	add_theme_stylebox_override(\"panel\", stylebox)
+	
+func toggle_extra(on: bool):
+	extras_cont.visible = on
+	highlight.visible = on
+	
+	if agent:
+		agent.toggle_highlight(on)
 "
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_grg3l"]
+bg_color = Color(0.9, 1, 0, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g5qx7"]
 
@@ -661,6 +680,25 @@ size_flags_horizontal = 6
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 text = "0"
+
+[node name="Highlight" type="Control" parent="CanvasLayer/AgentsList/VBoxContainer/Template"]
+show_behind_parent = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Panel" type="Panel" parent="CanvasLayer/AgentsList/VBoxContainer/Template/Highlight"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -7.0
+offset_top = -7.0
+offset_right = 7.0
+offset_bottom = 7.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_grg3l")
 
 [node name="Panel" type="Panel" parent="CanvasLayer"]
 offset_right = 1408.0

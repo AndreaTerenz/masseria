@@ -32,6 +32,7 @@ enum ACTION {
 @onready var left_hand = $LeftHand
 @onready var right_hand = $RightHand
 @onready var face = $Face
+@onready var highlight = $Highlight
 
 var readable_id : String :
 	get:
@@ -89,6 +90,8 @@ func _ready() -> void:
 		print("Agent %s received broadcast '%s'" % [agent_id, id])
 		_on_broadcast(id, data)
 	)
+	
+	toggle_highlight(false)
 
 	oscillate_sprite(left_hand)
 	oscillate_sprite(right_hand)
@@ -291,7 +294,6 @@ func _new_action_target(old, new):
 		
 		if new != null:
 			new.user = self
-		# if current != null and not current.is_self_oven:
-		# 	current.user = null
-		
-	
+
+func toggle_highlight(on: bool):
+	highlight.visible = on

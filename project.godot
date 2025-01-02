@@ -26,7 +26,6 @@ Agents="*res://Script/Agents.gd"
 window/size/viewport_width=1408
 window/size/viewport_height=896
 window/size/resizable=false
-window/size/extend_to_title=true
 
 [editor_plugins]
 
